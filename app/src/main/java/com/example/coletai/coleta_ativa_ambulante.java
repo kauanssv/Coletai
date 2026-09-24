@@ -659,7 +659,7 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
 
         SharedPreferences.Editor editor =
                 preferencias.edit();
-
+ 
 
         editor.putString(
                 "pedido_status",
