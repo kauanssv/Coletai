@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="390dp"
+    android:height="500dp"
+    android:viewportWidth="390"
+    android:viewportHeight="500">
+
+    <!-- Fundo -->
+
+    <path
+        android:fillColor="#EDF2F0"
+        android:pathData="M0,0H390V500H0Z" />
+
+    <!-- Áreas verdes -->
+
+    <path
+        android:fillColor="#BFE3D3"
+        android:pathData="M200,149H272V215H200Z" />
+
+    <path
+        android:fillColor="#CBE8DA"
+        android:pathData="M0,294H48V354H0Z" />
+
+    <path
+        android:fillColor="#C6E5D7"
+        android:pathData="M295,294H390V352H295Z" />
+
+    <!-- Prédios superiores -->
+
+    <path
+        android:fillColor="#DDE6E2"
+        android:pathData="M0,0H103V75H0Z
+                          M112,0H159V75H112Z
+                          M168,0H187V75H168Z
+                          M200,0H270V75H200Z
+                          M280,0H328V75H280Z
+                          M334,0H390V75H334Z" />
+
+    <!-- Segunda fileira -->
+
+    <path
+        android:fillColor="#DDE6E2"
+        android:pathData="M0,82H103V142H0Z
+                          M112,82H159V142H112Z
+                          M168,82H187V142H168Z
+                          M200,82H270V142H200Z
+                          M280,82H328V142H280Z
+                          M334,82H390V142H334Z" />
+
+    <!-- Terceira fileira -->
+
+    <path
+        android:fillColor="#DDE6E2"
+        android:pathData="M0,149H103V215H0Z
+                          M112,149H159V215H112Z
+                          M168,149H187V215H168Z
+                          M280,149H328V215H280Z
+                          M334,149H390V215H334Z" />
+
+    <!-- Região central -->
+
+    <path
+        android:fillColor="#DDE6E2"
+        android:pathData="M0,229H103V288H0Z
+                          M112,229H159V288H112Z
+                          M168,229H187V288H168Z
+                          M200,229H270V288H200Z
+                          M280,229H328V288H280Z
+                          M334,229H390V288H334Z" />
+
+    <!-- Região inferior -->
+
+    <path
+        android:fillColor="#DDE6E2"
+        android:pathData="M52,296H103V352H52Z
+                          M112,296H159V352H112Z
+                          M168,296H187V352H168Z
+                          M200,296H270V352H200Z
+                          M334,296H390V352H334Z" />
+
+    <path
+        android:fillColor="#DDE6E2"
+        android:pathData="M0,360H103V412H0Z
+                          M112,360H159V412H112Z
+                          M168,360H187V412H168Z
+                          M200,360H270V412H200Z
+                          M280,360H328V412H280Z
+                          M334,360H390V412H334Z" />
+
+    <path
+        android:fillColor="#DDE6E2"
+        android:pathData="M0,420H103V500H0Z
+                          M112,420H159V500H112Z
+                          M168,420H187V500H168Z
+                          M200,420H270V500H200Z
+                          M280,420H328V500H280Z
+                          M334,420H390V500H334Z" />
+
+    <!-- Ruas horizontais -->
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M0,75H390V82H0Z
+                          M0,142H390V149H0Z
+                          M0,215H390V229H0Z
+                          M0,288H390V296H0Z
+                          M0,352H390V360H0Z
+                          M0,412H390V420H0Z" />
+
+    <!-- Ruas verticais -->
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M103,0H112V500H103Z
+                          M159,0H168V500H159Z
+                          M187,0H200V500H187Z
+                          M270,0H280V500H270Z
+                          M328,0H334V500H328Z" />
+
+    <!-- Detalhes sutis das vias -->
+
+    <path
+        android:fillColor="#E5ECE9"
+        android:pathData="M0,221H390V222H0Z
+                          M193,0H194V500H193Z" />
+
+</vector>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- TEMA NORMAL DO APP -->
+    <style
+        name="Base.Theme.Coletaí"
+        parent="Theme.Material3.DayNight.NoActionBar">
+
+        <item name="colorPrimary">@color/brand_700</item>
+        <item name="colorPrimaryContainer">@color/brand_100</item>
+        <item name="colorSecondary">@color/accent_amber</item>
+
+        <item name="android:statusBarColor">
+            @android:color/transparent
+        </item>
+
+        <item name="android:windowLightStatusBar">
+            true
+        </item>
+
+        <item name="android:navigationBarColor">
+            @android:color/transparent
+        </item>
+
+        <item name="android:windowLightNavigationBar">
+            true
+        </item>
+
+        <item
+            name="android:enforceNavigationBarContrast"
+            tools:targetApi="q">
+            false
+        </item>
+
+    </style>
+
+    <style
+        name="Theme.Coletaí"
+        parent="Base.Theme.Coletaí" />
+
+
+    <!-- SPLASH SCREEN -->
+    <style
+        name="Theme.Coletaí.Splash"
+        parent="Theme.SplashScreen">
+
+        <item name="windowSplashScreenBackground">
+            #083F39
+        </item>
+
+        <item name="windowSplashScreenAnimatedIcon">
+            @drawable/logo_splash
+        </item>
+
+        <item name="postSplashScreenTheme">
+            @style/Theme.Coletaí
+        </item>
+
+        <item name="android:statusBarColor">
+            #083F39
+        </item>
+
+        <item name="android:navigationBarColor">
+            #083F39
+        </item>
+
+        <item name="android:windowLightStatusBar">
+            false
+        </item>
+
+        <item name="android:windowLightNavigationBar">
+            false
+        </item>
+
+    </style>
+
+</resources>

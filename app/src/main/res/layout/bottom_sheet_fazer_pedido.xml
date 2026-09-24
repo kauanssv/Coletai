@@ -1,0 +1,716 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bottomSheetPedido"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_bottom_sheet"
+    android:clipToOutline="true"
+    android:elevation="18dp"
+    android:paddingTop="10dp"
+    tools:background="@android:color/white">
+
+    <!-- Barra para arrastar -->
+
+    <View
+        android:id="@+id/barraArrastar"
+        android:layout_width="38dp"
+        android:layout_height="4dp"
+        android:background="@drawable/bg_sheet_handle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Cabeçalho -->
+
+    <TextView
+        android:id="@+id/txtTituloPedido"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="22dp"
+        android:layout_marginTop="18dp"
+        android:layout_marginEnd="12dp"
+        android:text="Novo pedido"
+        android:textColor="@color/ink_900"
+        android:textSize="19sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@id/btnFecharPedido"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/barraArrastar" />
+
+    <TextView
+        android:id="@+id/btnFecharPedido"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/bg_close_button"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:text="×"
+        android:textColor="@color/ink_500"
+        android:textSize="25sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/barraArrastar" />
+
+    <View
+        android:id="@+id/divisorCabecalho"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="15dp"
+        android:background="@color/line"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtTituloPedido" />
+
+    <!-- Conteúdo com rolagem -->
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollFormularioPedido"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        android:paddingBottom="24dp"
+        app:layout_constraintBottom_toTopOf="@id/areaEnviarPedido"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/divisorCabecalho">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="22dp"
+            android:paddingTop="21dp"
+            android:paddingEnd="22dp"
+            android:paddingBottom="24dp">
+
+            <!-- Tipo de resíduo -->
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:letterSpacing="0.07"
+                android:text="TIPO DE RESÍDUO *"
+                android:textColor="@color/ink_700"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="11dp"
+                android:clipToPadding="false"
+                android:overScrollMode="never"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingEnd="10dp">
+
+                    <Button
+                        android:id="@+id/btnPilhas"
+                        android:layout_width="wrap_content"
+                        android:layout_height="42dp"
+                        android:background="@drawable/bg_residue_chip"
+                        android:backgroundTint="@null"
+                        android:minWidth="0dp"
+                        android:paddingStart="15dp"
+                        android:paddingEnd="15dp"
+                        android:text="🔋  Pilhas"
+                        android:textAllCaps="false"
+                        android:textColor="@color/ink_700"
+                        android:textSize="13sp"
+                        app:backgroundTint="@null" />
+
+                    <Button
+                        android:id="@+id/btnBaterias"
+                        android:layout_width="wrap_content"
+                        android:layout_height="42dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_residue_chip"
+                        android:backgroundTint="@null"
+                        android:minWidth="0dp"
+                        android:paddingStart="15dp"
+                        android:paddingEnd="15dp"
+                        android:text="⚡  Baterias"
+                        android:textAllCaps="false"
+                        android:textColor="@color/ink_700"
+                        android:textSize="13sp"
+                        app:backgroundTint="@null" />
+
+                    <Button
+                        android:id="@+id/btnEletronicos"
+                        android:layout_width="wrap_content"
+                        android:layout_height="42dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_residue_chip"
+                        android:backgroundTint="@null"
+                        android:minWidth="0dp"
+                        android:paddingStart="15dp"
+                        android:paddingEnd="15dp"
+                        android:text="💻  Eletrônicos"
+                        android:textAllCaps="false"
+                        android:textColor="@color/ink_700"
+                        android:textSize="13sp"
+                        app:backgroundTint="@null" />
+
+                    <Button
+                        android:id="@+id/btnMedicamentos"
+                        android:layout_width="wrap_content"
+                        android:layout_height="42dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_residue_chip"
+                        android:backgroundTint="@null"
+                        android:minWidth="0dp"
+                        android:paddingStart="15dp"
+                        android:paddingEnd="15dp"
+                        android:text="💊  Medicamentos"
+                        android:textAllCaps="false"
+                        android:textColor="@color/ink_700"
+                        android:textSize="13sp"
+                        app:backgroundTint="@null" />
+
+                    <Button
+                        android:id="@+id/btnAgulhas"
+                        android:layout_width="wrap_content"
+                        android:layout_height="42dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_residue_chip"
+                        android:backgroundTint="@null"
+                        android:minWidth="0dp"
+                        android:paddingStart="15dp"
+                        android:paddingEnd="15dp"
+                        android:text="💉  Agulhas"
+                        android:textAllCaps="false"
+                        android:textColor="@color/ink_700"
+                        android:textSize="13sp"
+                        app:backgroundTint="@null" />
+
+                    <Button
+                        android:id="@+id/btnOleo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="42dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_residue_chip"
+                        android:backgroundTint="@null"
+                        android:minWidth="0dp"
+                        android:paddingStart="15dp"
+                        android:paddingEnd="15dp"
+                        android:text="Óleo"
+                        android:textAllCaps="false"
+                        android:textColor="@color/ink_700"
+                        android:textSize="13sp"
+                        app:backgroundTint="@null" />
+
+                    <Button
+                        android:id="@+id/btnOutros"
+                        android:layout_width="wrap_content"
+                        android:layout_height="42dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_residue_chip"
+                        android:backgroundTint="@null"
+                        android:minWidth="0dp"
+                        android:paddingStart="15dp"
+                        android:paddingEnd="15dp"
+                        android:text="📦  Outros"
+                        android:textAllCaps="false"
+                        android:textColor="@color/ink_700"
+                        android:textSize="13sp"
+                        app:backgroundTint="@null" />
+
+                </LinearLayout>
+
+            </HorizontalScrollView>
+
+            <!-- Descrição -->
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:letterSpacing="0.07"
+                android:text="DESCRIÇÃO *"
+                android:textColor="@color/ink_700"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edtDescricaoPedido"
+                android:layout_width="match_parent"
+                android:layout_height="105dp"
+                android:layout_marginTop="9dp"
+                android:background="@drawable/bg_input"
+                android:gravity="top|start"
+                android:hint="Ex.: 2 celulares quebrados, notebook antigo com carregador…"
+                android:inputType="textCapSentences|textMultiLine"
+                android:maxLength="250"
+                android:paddingStart="16dp"
+                android:paddingTop="14dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="14dp"
+                android:scrollbars="vertical"
+                android:textColor="@color/ink_900"
+                android:textColorHint="@color/ink_400"
+                android:textSize="14sp" />
+
+            <!-- Peso -->
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:letterSpacing="0.07"
+                android:text="PESO ESTIMADO *"
+                android:textColor="@color/ink_700"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="9dp"
+                android:background="@drawable/bg_input">
+
+                <EditText
+                    android:id="@+id/edtPesoPedido"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:hint="0.0"
+                    android:inputType="numberDecimal"
+                    android:maxLines="1"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="55dp"
+                    android:textColor="@color/ink_900"
+                    android:textColorHint="@color/ink_400"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="end"
+                    android:gravity="center"
+                    android:paddingEnd="17dp"
+                    android:text="kg"
+                    android:textColor="@color/ink_400"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+            </FrameLayout>
+
+            <!-- Fotos -->
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:letterSpacing="0.07"
+                android:text="FOTOS"
+                android:textColor="@color/ink_700"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="92dp"
+                android:layout_marginTop="9dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/fotoPedido1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_photo_slot"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/imgFotoPedido1"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_camera"
+                        app:tint="@color/ink_400" />
+
+                    <TextView
+                        android:id="@+id/txtFotoPedido1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Adicionar"
+                        android:textColor="@color/ink_400"
+                        android:textSize="11sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/fotoPedido2"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_photo_slot"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/imgFotoPedido2"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_camera"
+                        app:tint="@color/ink_400" />
+
+                    <TextView
+                        android:id="@+id/txtFotoPedido2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Adicionar"
+                        android:textColor="@color/ink_400"
+                        android:textSize="11sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/fotoPedido3"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_photo_slot"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/imgFotoPedido3"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_camera"
+                        app:tint="@color/ink_400" />
+
+                    <TextView
+                        android:id="@+id/txtFotoPedido3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Adicionar"
+                        android:textColor="@color/ink_400"
+                        android:textSize="11sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Localização -->
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:letterSpacing="0.07"
+                android:text="LOCALIZAÇÃO PARA COLETA"
+                android:textColor="@color/ink_700"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <!-- Localização atual -->
+
+            <LinearLayout
+                android:id="@+id/opcaoLocalizacaoAtual"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_location_selected"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="13dp"
+                android:paddingEnd="13dp">
+
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_location_icon_selected"
+                    android:contentDescription="@null"
+                    android:padding="9dp"
+                    android:src="@drawable/ic_location_small"
+                    app:tint="@android:color/white" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Localização atual"
+                        android:textColor="@color/ink_900"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="Av. Paulista, 1578 — Bela Vista, SP"
+                        android:textColor="@color/ink_500"
+                        android:textSize="11sp" />
+
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/checkLocalizacaoAtual"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_check"
+                    app:tint="@color/brand_700" />
+
+            </LinearLayout>
+
+            <!-- Endereço salvo -->
+
+            <LinearLayout
+                android:id="@+id/opcaoEnderecoSalvo"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:layout_marginTop="9dp"
+                android:background="@drawable/bg_location_option"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="13dp"
+                android:paddingEnd="13dp">
+
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_location_icon"
+                    android:contentDescription="@null"
+                    android:padding="9dp"
+                    android:src="@drawable/ic_home"
+                    app:tint="@color/ink_500" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Endereço salvo"
+                        android:textColor="@color/ink_900"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="Casa · Trabalho"
+                        android:textColor="@color/ink_500"
+                        android:textSize="11sp" />
+
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/checkEnderecoSalvo"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_check"
+                    android:visibility="invisible"
+                    app:tint="@color/brand_700" />
+
+            </LinearLayout>
+
+            <Spinner
+                android:id="@+id/spinnerEnderecoSalvo"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_input"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:visibility="gone" />
+
+            <!-- Outro endereço -->
+
+            <LinearLayout
+                android:id="@+id/opcaoOutroEndereco"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:layout_marginTop="9dp"
+                android:background="@drawable/bg_location_option"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="13dp"
+                android:paddingEnd="13dp">
+
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_location_icon"
+                    android:contentDescription="@null"
+                    android:padding="9dp"
+                    android:src="@drawable/ic_map"
+                    app:tint="@color/ink_500" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Outro endereço"
+                        android:textColor="@color/ink_900"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="Informar manualmente"
+                        android:textColor="@color/ink_500"
+                        android:textSize="11sp" />
+
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/checkOutroEndereco"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_check"
+                    android:visibility="invisible"
+                    app:tint="@color/brand_700" />
+
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/edtOutroEndereco"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_input"
+                android:hint="Rua, número, bairro, cidade"
+                android:inputType="textPostalAddress"
+                android:maxLines="1"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textColor="@color/ink_900"
+                android:textColorHint="@color/ink_400"
+                android:textSize="13sp"
+                android:visibility="gone" />
+
+            <!-- Observações -->
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:letterSpacing="0.07"
+                android:text="OBSERVAÇÕES"
+                android:textColor="@color/ink_700"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edtObservacoesPedido"
+                android:layout_width="match_parent"
+                android:layout_height="90dp"
+                android:layout_marginTop="9dp"
+                android:background="@drawable/bg_input"
+                android:gravity="top|start"
+                android:hint="Ex.: Interfone com defeito, usar campainha…"
+                android:inputType="textCapSentences|textMultiLine"
+                android:maxLength="180"
+                android:paddingStart="16dp"
+                android:paddingTop="14dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="14dp"
+                android:textColor="@color/ink_900"
+                android:textColorHint="@color/ink_400"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Rodapé fixo -->
+
+    <LinearLayout
+        android:id="@+id/areaEnviarPedido"
+        android:layout_width="0dp"
+        android:layout_height="82dp"
+        android:background="@android:color/white"
+        android:elevation="12dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingStart="22dp"
+        android:paddingTop="13dp"
+        android:paddingEnd="22dp"
+        android:paddingBottom="17dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <Button
+            android:id="@+id/btnEnviarPedido"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:background="@drawable/bg_button_primary"
+            android:backgroundTint="@null"
+            android:drawableStart="@drawable/ic_recycle"
+            android:drawablePadding="9dp"
+            android:drawableTint="@android:color/white"
+            android:enabled="true"
+            android:gravity="center"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:text="Enviar pedido"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:backgroundTint="@null" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

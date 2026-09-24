@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F7F9F8"
+    tools:context=".tela_inicial_ambulante">
+
+
+    <!-- =====================================================
+         ÁREA NORMAL DO AMBULANTE
+         ===================================================== -->
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPagerAmbulante"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:overScrollMode="never"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/navegacaoInferior"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+    <!-- =====================================================
+         MENU INFERIOR
+         ===================================================== -->
+
+    <LinearLayout
+        android:id="@+id/navegacaoInferior"
+        android:layout_width="0dp"
+        android:layout_height="72dp"
+        android:background="@android:color/white"
+        android:elevation="14dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+
+        <!-- INÍCIO -->
+
+        <LinearLayout
+            android:id="@+id/navInicio"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/imgNavInicio"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:contentDescription="Início"
+                android:src="@drawable/ic_home"
+                app:tint="@color/brand_700" />
+
+            <TextView
+                android:id="@+id/txtNavInicio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Início"
+                android:textColor="@color/brand_700"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+
+        <!-- HISTÓRICO -->
+
+        <LinearLayout
+            android:id="@+id/navHistorico"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/imgNavHistorico"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:contentDescription="Histórico"
+                android:src="@drawable/ic_history"
+                app:tint="@color/ink_400" />
+
+            <TextView
+                android:id="@+id/txtNavHistorico"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Histórico"
+                android:textColor="@color/ink_500"
+                android:textSize="11sp" />
+
+        </LinearLayout>
+
+
+        <!-- PERFIL -->
+
+        <LinearLayout
+            android:id="@+id/navPerfil"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/imgNavPerfil"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:contentDescription="Perfil"
+                android:src="@drawable/ic_person"
+                app:tint="@color/ink_400" />
+
+            <TextView
+                android:id="@+id/txtNavPerfil"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Perfil"
+                android:textColor="@color/ink_500"
+                android:textSize="11sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+    <!-- =====================================================
+         DETALHES DO PEDIDO
+
+         Reaproveita o XML que você já criou.
+         Fica escondido normalmente.
+         ===================================================== -->
+
+    <include
+        android:id="@+id/telaDetalhesPedido"
+        layout="@layout/activity_detalhes_pedido_ambulante"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
