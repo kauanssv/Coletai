@@ -5,6 +5,34 @@
     xmlns:tools="http://schemas.android.com/tools">
 
 
+    <!-- =====================================================
+         BLUETOOTH
+         ===================================================== -->
+
+    <!-- Android 11 e anteriores -->
+
+    <uses-permission
+        android:name="android.permission.BLUETOOTH"
+        android:maxSdkVersion="30" />
+
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_ADMIN"
+        android:maxSdkVersion="30" />
+
+
+    <!-- Android 12 ou superior -->
+
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_CONNECT" />
+
+
+    <!-- O app continua funcionando mesmo sem Bluetooth -->
+
+    <uses-feature
+        android:name="android.hardware.bluetooth"
+        android:required="false" />
+
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -16,15 +44,16 @@
         android:theme="@style/Theme.Coletaí">
 
 
-        <!-- =====================================================
-             LOGIN / TELA INICIAL DO APP
-             ===================================================== -->
+        <!-- =================================================
+             LOGIN
+             ================================================= -->
 
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Coletaí.Splash"
             android:windowSoftInputMode="adjustResize">
+
 
             <intent-filter>
 
@@ -39,18 +68,22 @@
         </activity>
 
 
-        <!-- =====================================================
-             CLIENTE
-             ===================================================== -->
+        <!-- =================================================
+             BLUETOOTH
+             ================================================= -->
 
         <activity
-            android:name=".tela_inicial_cliente"
+            android:name=".BluetoothActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
 
+        <!-- =================================================
+             CLIENTE
+             ================================================= -->
+
         <activity
-            android:name=".tela_fazer_pedido"
+            android:name=".tela_inicial_cliente"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
@@ -61,9 +94,9 @@
             android:windowSoftInputMode="adjustResize" />
 
 
-        <!-- =====================================================
+        <!-- =================================================
              AMBULANTE
-             ===================================================== -->
+             ================================================= -->
 
         <activity
             android:name=".tela_inicial_ambulante"
@@ -71,10 +104,19 @@
             android:windowSoftInputMode="adjustResize" />
 
 
-        <!-- =====================================================
-             TELAS COMPARTILHADAS:
-             AMBULANTE / EMPRESA
-             ===================================================== -->
+        <!-- =================================================
+             EMPRESA
+             ================================================= -->
+
+        <activity
+            android:name=".tela_inicial_empresa"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+
+        <!-- =================================================
+             TELAS COMPARTILHADAS
+             ================================================= -->
 
         <activity
             android:name=".detalhes_pedido_ambulante"
@@ -90,16 +132,6 @@
 
         <activity
             android:name=".coleta_ativa_ambulante"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-
-
-        <!-- =====================================================
-             EMPRESA
-             ===================================================== -->
-
-        <activity
-            android:name=".tela_inicial_empresa"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 

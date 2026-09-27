@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText edtSenha;
 
     private Button btnEntrar;
+    private Button btnBluetoothDemo;
 
     private ImageButton btnMostrarSenha;
 
@@ -87,6 +88,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    // =====================================================
+    // COMPONENTES
+    // =====================================================
+
     private void iniciarComponentes() {
 
         edtEmail =
@@ -107,12 +112,22 @@ public class MainActivity extends AppCompatActivity {
                 );
 
 
+        btnBluetoothDemo =
+                findViewById(
+                        R.id.btnBluetoothDemo
+                );
+
+
         btnMostrarSenha =
                 findViewById(
                         R.id.btnMostrarSenha
                 );
     }
 
+
+    // =====================================================
+    // EVENTOS
+    // =====================================================
 
     private void configurarEventos() {
 
@@ -123,6 +138,11 @@ public class MainActivity extends AppCompatActivity {
 
         btnEntrar.setOnClickListener(
                 view -> realizarLogin()
+        );
+
+
+        btnBluetoothDemo.setOnClickListener(
+                view -> abrirBluetooth()
         );
 
 
@@ -144,6 +164,29 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
+
+    // =====================================================
+    // BLUETOOTH
+    // =====================================================
+
+    private void abrirBluetooth() {
+
+        Intent intent =
+                new Intent(
+                        MainActivity.this,
+                        BluetoothActivity.class
+                );
+
+
+        startActivity(
+                intent
+        );
+    }
+
+
+    // =====================================================
+    // CONTAS DE DEMONSTRAÇÃO
+    // =====================================================
 
     private void configurarContaDemonstracao(
             int viewId,
@@ -417,7 +460,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     // =====================================================
-    // PERFIL ATUAL
+    // USUÁRIO ATUAL
     // =====================================================
 
     private void salvarTipoUsuario(
@@ -442,6 +485,10 @@ public class MainActivity extends AppCompatActivity {
                 .apply();
     }
 
+
+    // =====================================================
+    // ERRO
+    // =====================================================
 
     private void mostrarErroLogin() {
 
