@@ -47,6 +47,17 @@ public class MainActivity extends AppCompatActivity {
         );
 
 
+        /*
+         * Estamos na tela de Login.
+         *
+         * Portanto, ainda não existe um perfil ativo.
+         *
+         * Isso evita que o Bluetooth considere uma conta
+         * antiga como ainda conectada.
+         */
+        limparUsuarioAtual();
+
+
         EdgeToEdge.enable(
                 this
         );
@@ -85,6 +96,49 @@ public class MainActivity extends AppCompatActivity {
         iniciarComponentes();
 
         configurarEventos();
+    }
+
+
+    // =====================================================
+    // USUÁRIO
+    // =====================================================
+
+    private void limparUsuarioAtual() {
+
+        SharedPreferences preferencias =
+                getSharedPreferences(
+                        "coletai",
+                        MODE_PRIVATE
+                );
+
+
+        preferencias
+                .edit()
+                .remove(
+                        "usuario_tipo_atual"
+                )
+                .apply();
+    }
+
+
+    private void salvarTipoUsuario(
+            String tipo
+    ) {
+
+        SharedPreferences preferencias =
+                getSharedPreferences(
+                        "coletai",
+                        MODE_PRIVATE
+                );
+
+
+        preferencias
+                .edit()
+                .putString(
+                        "usuario_tipo_atual",
+                        tipo
+                )
+                .apply();
     }
 
 
@@ -185,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     // =====================================================
-    // CONTAS DE DEMONSTRAÇÃO
+    // CONTAS DEMONSTRAÇÃO
     // =====================================================
 
     private void configurarContaDemonstracao(
@@ -456,33 +510,6 @@ public class MainActivity extends AppCompatActivity {
         startActivity(
                 intent
         );
-    }
-
-
-    // =====================================================
-    // USUÁRIO ATUAL
-    // =====================================================
-
-    private void salvarTipoUsuario(
-            String tipo
-    ) {
-
-        SharedPreferences preferencias =
-                getSharedPreferences(
-                        "coletai",
-                        MODE_PRIVATE
-                );
-
-
-        preferencias
-                .edit()
-
-                .putString(
-                        "usuario_tipo_atual",
-                        tipo
-                )
-
-                .apply();
     }
 
 

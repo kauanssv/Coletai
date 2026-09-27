@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -12,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.google.android.material.card.MaterialCardView;
 
@@ -20,30 +22,22 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
     private TextView btnVoltar;
 
     private TextView txtTagTipo;
-    private TextView txtEmoji;
-    private TextView txtTipoResiduo;
-    private TextView txtLocalizacaoTopo;
+    private TextView txtEmojiTipo;
+    private TextView txtTipoPedido;
+    private TextView txtLocalizacaoCabecalho;
 
-    private TextView txtDescricao;
-    private TextView txtPeso;
-    private TextView txtRegiao;
-    private TextView txtLocalizacao;
-    private TextView txtObservacao;
+    private TextView txtDescricaoPedido;
+    private TextView txtPesoPedido;
+    private TextView txtRegiaoPedido;
+    private TextView txtLocalizacaoPedido;
 
     private MaterialCardView cardObservacao;
+    private TextView txtObservacaoPedido;
 
+    private Button btnRecusar;
+    private Button btnEnviarProposta;
 
-    // =====================================================
-    // DADOS DO PEDIDO
-    // =====================================================
-
-    private String tipo;
-    private String emoji;
-    private String descricao;
-    private String peso;
-    private String regiao;
-    private String cidade;
-    private String observacao;
+    private SharedPreferences preferencias;
 
 
     @Override
@@ -55,22 +49,25 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
                 savedInstanceState
         );
 
-
         EdgeToEdge.enable(
                 this
         );
-
 
         setContentView(
                 R.layout.activity_detalhes_pedido_ambulante
         );
 
+        configurarBarrasDoSistema();
 
-        configurarBarras();
+        preferencias =
+                getSharedPreferences(
+                        "coletai",
+                        Context.MODE_PRIVATE
+                );
 
         iniciarComponentes();
 
-        receberDados();
+        carregarPedido();
 
         configurarEventos();
     }
@@ -80,7 +77,21 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
     // BARRAS DO SISTEMA
     // =====================================================
 
-    private void configurarBarras() {
+    private void configurarBarrasDoSistema() {
+
+        WindowInsetsControllerCompat controller =
+                new WindowInsetsControllerCompat(
+                        getWindow(),
+                        getWindow().getDecorView()
+                );
+
+        controller.setAppearanceLightStatusBars(
+                true
+        );
+
+        controller.setAppearanceLightNavigationBars(
+                true
+        );
 
         ViewCompat.setOnApplyWindowInsetsListener(
                 findViewById(
@@ -93,14 +104,12 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
                                     WindowInsetsCompat.Type.systemBars()
                             );
 
-
                     view.setPadding(
                             systemBars.left,
                             systemBars.top,
                             systemBars.right,
                             systemBars.bottom
                     );
-
 
                     return insets;
                 }
@@ -116,7 +125,7 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
 
         btnVoltar =
                 findViewById(
-                        R.id.btnVoltar
+                        R.id.btnVoltarDetalhes
                 );
 
 
@@ -126,51 +135,45 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
                 );
 
 
-        txtEmoji =
+        txtEmojiTipo =
                 findViewById(
-                        R.id.txtEmoji
+                        R.id.txtEmojiTipo
                 );
 
 
-        txtTipoResiduo =
+        txtTipoPedido =
                 findViewById(
-                        R.id.txtTipoResiduo
+                        R.id.txtTipoPedido
                 );
 
 
-        txtLocalizacaoTopo =
+        txtLocalizacaoCabecalho =
                 findViewById(
-                        R.id.txtLocalizacaoTopo
+                        R.id.txtLocalizacaoCabecalho
                 );
 
 
-        txtDescricao =
+        txtDescricaoPedido =
                 findViewById(
-                        R.id.txtDescricao
+                        R.id.txtDescricaoPedido
                 );
 
 
-        txtPeso =
+        txtPesoPedido =
                 findViewById(
-                        R.id.txtPeso
+                        R.id.txtPesoPedido
                 );
 
 
-        txtRegiao =
+        txtRegiaoPedido =
                 findViewById(
-                        R.id.txtRegiao
+                        R.id.txtRegiaoPedido
                 );
 
 
-        txtLocalizacao =
+        txtLocalizacaoPedido =
                 findViewById(
-                        R.id.txtLocalizacao
-                );
-
-
-        txtObservacao =
-                findViewById(
-                        R.id.txtObservacao
+                        R.id.txtLocalizacaoPedido
                 );
 
 
@@ -178,170 +181,200 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
                 findViewById(
                         R.id.cardObservacao
                 );
+
+
+        txtObservacaoPedido =
+                findViewById(
+                        R.id.txtObservacaoPedido
+                );
+
+
+        btnRecusar =
+                findViewById(
+                        R.id.btnRecusar
+                );
+
+
+        btnEnviarProposta =
+                findViewById(
+                        R.id.btnEnviarProposta
+                );
     }
 
 
     // =====================================================
-    // RECEBER DADOS
+    // CARREGAR PEDIDO
     // =====================================================
 
-    private void receberDados() {
+    private void carregarPedido() {
 
-        tipo =
-                getIntent()
-                        .getStringExtra(
-                                "tipo"
-                        );
-
-
-        emoji =
-                getIntent()
-                        .getStringExtra(
-                                "emoji"
-                        );
-
-
-        descricao =
-                getIntent()
-                        .getStringExtra(
-                                "descricao"
-                        );
-
-
-        peso =
-                getIntent()
-                        .getStringExtra(
-                                "peso"
-                        );
-
-
-        regiao =
-                getIntent()
-                        .getStringExtra(
-                                "regiao"
-                        );
-
-
-        cidade =
-                getIntent()
-                        .getStringExtra(
-                                "cidade"
-                        );
-
-
-        observacao =
-                getIntent()
-                        .getStringExtra(
-                                "observacao"
-                        );
-
-
-        // =================================================
-        // TIPO
-        // =================================================
-
-        if (tipo != null) {
-
-            txtTipoResiduo.setText(
-                    tipo
-            );
-
-
-            if (emoji != null) {
-
-                txtTagTipo.setText(
-                        emoji
-                                + " "
-                                + tipo
+        String tipo =
+                preferencias.getString(
+                        "pedido_tipo",
+                        "Eletrônicos"
                 );
 
-            } else {
 
-                txtTagTipo.setText(
-                        tipo
+        String emoji =
+                preferencias.getString(
+                        "pedido_emoji",
+                        obterEmoji(tipo)
                 );
-            }
+
+
+        String descricao =
+                preferencias.getString(
+                        "pedido_descricao",
+                        "TV de tubo 29\" e um rádio antigo. Estão na garagem."
+                );
+
+
+        String peso =
+                preferencias.getString(
+                        "pedido_peso",
+                        "14 kg"
+                );
+
+
+        String regiao =
+                preferencias.getString(
+                        "pedido_regiao",
+                        "Consolação"
+                );
+
+
+        String cidade =
+                preferencias.getString(
+                        "pedido_cidade",
+                        "São Paulo"
+                );
+
+
+        String observacao =
+                preferencias.getString(
+                        "pedido_observacao",
+                        ""
+                );
+
+
+        if (
+                tipo == null
+                        ||
+                        tipo.trim().isEmpty()
+        ) {
+
+            tipo =
+                    "Pedido";
+        }
+
+
+        if (
+                emoji == null
+                        ||
+                        emoji.trim().isEmpty()
+        ) {
+
+            emoji =
+                    obterEmoji(
+                            tipo
+                    );
+        }
+
+
+        if (
+                descricao == null
+                        ||
+                        descricao.trim().isEmpty()
+        ) {
+
+            descricao =
+                    "Sem descrição.";
+        }
+
+
+        if (
+                peso == null
+                        ||
+                        peso.trim().isEmpty()
+        ) {
+
+            peso =
+                    "Não informado";
+        }
+
+
+        if (
+                regiao == null
+                        ||
+                        regiao.trim().isEmpty()
+        ) {
+
+            regiao =
+                    "Região informada";
+        }
+
+
+        if (
+                cidade == null
+                        ||
+                        cidade.trim().isEmpty()
+        ) {
+
+            cidade =
+                    "São Paulo";
         }
 
 
         // =================================================
-        // EMOJI
+        // CABEÇALHO
         // =================================================
 
-        if (emoji != null) {
-
-            txtEmoji.setText(
-                    emoji
-            );
-        }
+        txtTagTipo.setText(
+                emoji + " " + tipo
+        );
 
 
-        // =================================================
-        // DESCRIÇÃO
-        // =================================================
-
-        if (descricao != null) {
-
-            txtDescricao.setText(
-                    descricao
-            );
-        }
+        txtEmojiTipo.setText(
+                emoji
+        );
 
 
-        // =================================================
-        // PESO
-        // =================================================
+        txtTipoPedido.setText(
+                tipo
+        );
 
-        if (peso != null) {
 
-            txtPeso.setText(
-                    peso
-            );
-        }
+        txtLocalizacaoCabecalho.setText(
+                regiao
+                        + ", "
+                        + cidade
+        );
 
 
         // =================================================
-        // LOCALIZAÇÃO
+        // PEDIDO
         // =================================================
 
-        if (regiao != null) {
-
-            txtRegiao.setText(
-                    regiao
-            );
+        txtDescricaoPedido.setText(
+                descricao
+        );
 
 
-            String localizacao;
+        txtPesoPedido.setText(
+                peso
+        );
 
 
-            if (
-                    cidade != null
-                            && !cidade
-                            .trim()
-                            .isEmpty()
-            ) {
-
-                localizacao =
-                        regiao
-                                + ", "
-                                + cidade;
-
-            } else {
-
-                localizacao =
-                        regiao;
-            }
+        txtRegiaoPedido.setText(
+                regiao
+        );
 
 
-            txtLocalizacao.setText(
-                    localizacao
-            );
-
-
-            txtLocalizacaoTopo.setText(
-                    localizacao
-            );
-        }
+        txtLocalizacaoPedido.setText(
+                regiao
+                        + ", "
+                        + cidade
+        );
 
 
         // =================================================
@@ -350,9 +383,8 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
 
         if (
                 observacao == null
-                        || observacao
-                        .trim()
-                        .isEmpty()
+                        ||
+                        observacao.trim().isEmpty()
         ) {
 
             cardObservacao.setVisibility(
@@ -366,7 +398,7 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
             );
 
 
-            txtObservacao.setText(
+            txtObservacaoPedido.setText(
                     observacao
             );
         }
@@ -379,109 +411,83 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
 
     private void configurarEventos() {
 
-        // VOLTAR
-
         btnVoltar.setOnClickListener(
                 view -> finish()
         );
 
 
-        // RECUSAR
-
-        findViewById(
-                R.id.btnRecusar
-        ).setOnClickListener(
-                view -> recusarPedido()
+        btnRecusar.setOnClickListener(
+                view -> finish()
         );
 
 
-        // ENVIAR PROPOSTA
+        btnEnviarProposta.setOnClickListener(
+                view -> {
 
-        findViewById(
-                R.id.btnEnviarProposta
-        ).setOnClickListener(
-                view -> abrirTelaProposta()
+                    Intent intent =
+                            new Intent(
+                                    detalhes_pedido_ambulante.this,
+                                    enviar_proposta_ambulante.class
+                            );
+
+
+                    startActivity(
+                            intent
+                    );
+                }
         );
     }
 
 
     // =====================================================
-    // RECUSAR PEDIDO
+    // EMOJI
     // =====================================================
 
-    private void recusarPedido() {
+    private String obterEmoji(
+            String tipo
+    ) {
 
-        /*
-         * Não mudamos o status global para cancelado.
-         *
-         * O pedido continua como "waiting" para poder
-         * continuar procurando outros coletores.
-         *
-         * Nesta sessão, a Home já sabe que a solicitação
-         * foi exibida e não abrirá imediatamente de novo.
-         */
+        if (tipo == null) {
 
-        finish();
-    }
+            return "📦";
+        }
 
 
-    // =====================================================
-    // ABRIR TELA DE PROPOSTA
-    // =====================================================
+        switch (tipo) {
 
-    private void abrirTelaProposta() {
+            case "Pilhas":
 
-        Intent intent =
-                new Intent(
-                        detalhes_pedido_ambulante.this,
-                        enviar_proposta_ambulante.class
-                );
+                return "🔋";
 
 
-        intent.putExtra(
-                "tipo",
-                tipo
-        );
+            case "Baterias":
+
+                return "⚡";
 
 
-        intent.putExtra(
-                "emoji",
-                emoji
-        );
+            case "Eletrônicos":
+
+                return "💻";
 
 
-        intent.putExtra(
-                "descricao",
-                descricao
-        );
+            case "Medicamentos":
+
+                return "💊";
 
 
-        intent.putExtra(
-                "peso",
-                peso
-        );
+            case "Agulhas":
+
+                return "💉";
 
 
-        intent.putExtra(
-                "regiao",
-                regiao
-        );
+            case "Óleo":
+
+                return "🫙";
 
 
-        intent.putExtra(
-                "cidade",
-                cidade
-        );
+            default:
 
-
-        intent.putExtra(
-                "observacao",
-                observacao
-        );
-
-
-        startActivity(
-                intent
-        );
+                return "📦";
+        }
     }
 }

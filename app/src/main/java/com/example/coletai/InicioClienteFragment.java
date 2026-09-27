@@ -30,6 +30,8 @@ public class InicioClienteFragment extends Fragment {
 
     private View rootView;
 
+    private BluetoothColetai bluetoothColetai;
+
     private Button btnFazerPedido;
 
     private LinearLayout painelCliente;
@@ -82,6 +84,11 @@ public class InicioClienteFragment extends Fragment {
 
         rootView = view;
 
+        bluetoothColetai =
+                BluetoothColetai.getInstance(
+                        requireContext()
+                );
+
         iniciarComponentes(view);
 
         esconderMenuAntigo(view);
@@ -89,6 +96,44 @@ public class InicioClienteFragment extends Fragment {
         configurarEventos();
 
         atualizarEstadoPedido();
+    }
+
+
+    @Override
+    public void onStart() {
+
+        super.onStart();
+
+        if (bluetoothColetai != null) {
+
+            bluetoothColetai.setSyncListener(
+                    () -> {
+
+                        if (
+                                isAdded()
+                                        &&
+                                        rootView != null
+                        ) {
+
+                            atualizarEstadoPedido();
+                        }
+                    }
+            );
+        }
+    }
+
+
+    @Override
+    public void onStop() {
+
+        if (bluetoothColetai != null) {
+
+            bluetoothColetai.setSyncListener(
+                    null
+            );
+        }
+
+        super.onStop();
     }
 
 

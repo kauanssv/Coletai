@@ -7,6 +7,14 @@ import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
+import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,89 +27,109 @@ import java.util.UUID;
 public class BluetoothColetai {
 
     // =====================================================
-    // LISTENER
+    // CALLBACKS DA TELA DE BLUETOOTH
     // =====================================================
 
     public interface Listener {
 
-        void onStatusAlterado(
-                String status
-        );
+        void onStatusAlterado(String status);
 
-        void onConectado(
-                String nomeDispositivo
-        );
+        void onConectado(String nomeDispositivo);
 
-        void onMensagemRecebida(
-                String mensagem
-        );
+        void onMensagemRecebida(String mensagem);
 
-        void onErro(
-                String mensagem
-        );
+        void onErro(String mensagem);
     }
 
 
     // =====================================================
-    // SINGLETON
+    // CALLBACK PARA ATUALIZAR A TELA VISÍVEL DO APP
+    // =====================================================
+
+    public interface SyncListener {
+
+        void onSyncAtualizado();
+    }
+
+
+    // =====================================================
+    // SINGLETON / CONFIGURAÇÃO
     // =====================================================
 
     private static BluetoothColetai instancia;
 
-
-    /*
-     * Este UUID identifica o "serviço" Bluetooth do Coletaí.
-     *
-     * É muito importante que seja sempre o mesmo
-     * nos dois celulares.
-     */
     private static final UUID UUID_COLETAI =
             UUID.fromString(
                     "9d7e2b28-9f45-4d86-a7a1-1f03e9f2c6a4"
             );
 
-
     private static final String NOME_SERVICO =
             "ColetaiBluetooth";
 
 
+    private final Context appContext;
     private final BluetoothAdapter bluetoothAdapter;
+    private final SharedPreferences preferencias;
+    private final Handler mainHandler;
 
 
     private BluetoothServerSocket serverSocket;
-
     private BluetoothSocket socket;
 
-
     private Thread threadServidor;
-
     private Thread threadConexao;
-
     private Thread threadLeitura;
 
-
-    private volatile boolean conectado =
-            false;
-
+    private volatile boolean conectado = false;
 
     private volatile Listener listener;
+    private volatile SyncListener syncListener;
+
+    private String nomeDispositivoConectado = "";
 
 
-    private String nomeDispositivoConectado =
-            "";
+    // =====================================================
+    // ESTADO LOCAL PARA SABER QUAL EVENTO ENVIAR
+    // =====================================================
 
+    private String ultimoStatusConhecido;
+    private String ultimaEtapaConhecida;
+
+    private long ultimoEnvioPedido = 0;
+    private long ultimoEnvioProposta = 0;
+    private long ultimoEnvioAceite = 0;
+    private long ultimoEnvioRecusa = 0;
+    private long ultimoEnvioEtapa = 0;
+    private long ultimoEnvioCancelamento = 0;
+
+
+    private final SharedPreferences.OnSharedPreferenceChangeListener
+            listenerPreferencias;
+
+
+    // =====================================================
+    // CONSTRUTOR
+    // =====================================================
 
     private BluetoothColetai(
             Context context
     ) {
 
+        appContext =
+                context.getApplicationContext();
+
+
+        mainHandler =
+                new Handler(
+                        Looper.getMainLooper()
+                );
+
+
         BluetoothManager bluetoothManager =
                 (BluetoothManager)
-                        context
-                                .getApplicationContext()
-                                .getSystemService(
-                                        Context.BLUETOOTH_SERVICE
-                                );
+                        appContext.getSystemService(
+                                Context.BLUETOOTH_SERVICE
+                        );
 
 
         if (bluetoothManager != null) {
@@ -114,6 +142,57 @@ public class BluetoothColetai {
             bluetoothAdapter =
                     null;
         }
+
+
+        preferencias =
+                appContext.getSharedPreferences(
+                        "coletai",
+                        Context.MODE_PRIVATE
+                );
+
+
+        ultimoStatusConhecido =
+                preferencias.getString(
+                        "pedido_status",
+                        ""
+                );
+
+
+        ultimaEtapaConhecida =
+                preferencias.getString(
+                        "coleta_etapa",
+                        ""
+                );
+
+
+        listenerPreferencias =
+                (sharedPreferences, chave) -> {
+
+                    if (
+                            "pedido_status".equals(
+                                    chave
+                            )
+                    ) {
+
+                        processarAlteracaoStatusLocal();
+                    }
+
+
+                    if (
+                            "coleta_etapa".equals(
+                                    chave
+                            )
+                    ) {
+
+                        processarAlteracaoEtapaLocal();
+                    }
+                };
+
+
+        preferencias
+                .registerOnSharedPreferenceChangeListener(
+                        listenerPreferencias
+                );
     }
 
 
@@ -135,7 +214,7 @@ public class BluetoothColetai {
 
 
     // =====================================================
-    // LISTENER
+    // LISTENERS
     // =====================================================
 
     public void setListener(
@@ -152,23 +231,804 @@ public class BluetoothColetai {
         }
 
 
-        if (conectado) {
+        if (estaConectado()) {
 
-            listener.onConectado(
+            notificarConectado(
                     nomeDispositivoConectado
             );
 
         } else {
 
-            listener.onStatusAlterado(
+            notificarStatus(
                     "Aguardando conexão"
             );
         }
     }
 
 
+    public void setSyncListener(
+            SyncListener syncListener
+    ) {
+
+        this.syncListener =
+                syncListener;
+    }
+
+
     // =====================================================
-    // INFORMAÇÕES
+    // DETECTAR ALTERAÇÃO LOCAL DE STATUS
+    // =====================================================
+
+    private void processarAlteracaoStatusLocal() {
+
+        String statusAtual =
+                preferencias.getString(
+                        "pedido_status",
+                        ""
+                );
+
+
+        String statusAnterior =
+                ultimoStatusConhecido == null
+                        ? ""
+                        : ultimoStatusConhecido;
+
+
+        ultimoStatusConhecido =
+                statusAtual == null
+                        ? ""
+                        : statusAtual;
+
+
+        if (!estaConectado()) {
+
+            return;
+        }
+
+
+        String tipoUsuario =
+                preferencias.getString(
+                        "usuario_tipo_atual",
+                        ""
+                );
+
+
+        // -------------------------------------------------
+        // CLIENTE
+        // -------------------------------------------------
+
+        if (
+                "cliente".equals(
+                        tipoUsuario
+                )
+        ) {
+
+            /*
+             * Criou um NOVO PEDIDO:
+             * vazio/done -> waiting
+             */
+            if (
+                    "waiting".equals(
+                            statusAtual
+                    )
+                            &&
+                            !"proposal".equals(
+                                    statusAnterior
+                            )
+            ) {
+
+                if (
+                        podeEnviar(
+                                ultimoEnvioPedido
+                        )
+                ) {
+
+                    ultimoEnvioPedido =
+                            System.currentTimeMillis();
+
+
+                    enviarPedidoAtual();
+                }
+
+
+                return;
+            }
+
+
+            /*
+             * Recusou uma PROPOSTA:
+             * proposal -> waiting
+             */
+            if (
+                    "proposal".equals(
+                            statusAnterior
+                    )
+                            &&
+                            "waiting".equals(
+                                    statusAtual
+                            )
+            ) {
+
+                if (
+                        podeEnviar(
+                                ultimoEnvioRecusa
+                        )
+                ) {
+
+                    ultimoEnvioRecusa =
+                            System.currentTimeMillis();
+
+
+                    enviarEventoSimples(
+                            "PROPOSTA_RECUSADA"
+                    );
+                }
+
+
+                return;
+            }
+
+
+            /*
+             * Aceitou a proposta:
+             * proposal -> active
+             */
+            if (
+                    "proposal".equals(
+                            statusAnterior
+                    )
+                            &&
+                            "active".equals(
+                                    statusAtual
+                            )
+            ) {
+
+                if (
+                        podeEnviar(
+                                ultimoEnvioAceite
+                        )
+                ) {
+
+                    ultimoEnvioAceite =
+                            System.currentTimeMillis();
+
+
+                    enviarPropostaAceita();
+                }
+
+
+                return;
+            }
+
+
+            /*
+             * Cancelou o pedido:
+             * waiting/proposal/active -> vazio
+             */
+            if (
+                    statusAtual != null
+                            &&
+                            statusAtual.isEmpty()
+                            &&
+                            statusAnterior != null
+                            &&
+                            !statusAnterior.isEmpty()
+            ) {
+
+                if (
+                        podeEnviar(
+                                ultimoEnvioCancelamento
+                        )
+                ) {
+
+                    ultimoEnvioCancelamento =
+                            System.currentTimeMillis();
+
+
+                    enviarEventoSimples(
+                            "PEDIDO_CANCELADO"
+                    );
+                }
+            }
+
+
+            return;
+        }
+
+
+        // -------------------------------------------------
+        // AMBULANTE / EMPRESA
+        // -------------------------------------------------
+
+        boolean ehColetor =
+                "ambulante".equals(
+                        tipoUsuario
+                )
+                        ||
+                        "empresa".equals(
+                                tipoUsuario
+                        );
+
+
+        if (!ehColetor) {
+
+            return;
+        }
+
+
+        /*
+         * Enviou proposta:
+         * waiting -> proposal
+         */
+        if (
+                "proposal".equals(
+                        statusAtual
+                )
+                        &&
+                        !"proposal".equals(
+                                statusAnterior
+                        )
+        ) {
+
+            if (
+                    podeEnviar(
+                            ultimoEnvioProposta
+                    )
+            ) {
+
+                ultimoEnvioProposta =
+                        System.currentTimeMillis();
+
+
+                enviarPropostaAtual();
+            }
+        }
+    }
+
+
+    // =====================================================
+    // DETECTAR ALTERAÇÃO LOCAL DA COLETA
+    // =====================================================
+
+    private void processarAlteracaoEtapaLocal() {
+
+        String etapaAtual =
+                preferencias.getString(
+                        "coleta_etapa",
+                        ""
+                );
+
+
+        String etapaAnterior =
+                ultimaEtapaConhecida == null
+                        ? ""
+                        : ultimaEtapaConhecida;
+
+
+        ultimaEtapaConhecida =
+                etapaAtual == null
+                        ? ""
+                        : etapaAtual;
+
+
+        if (!estaConectado()) {
+
+            return;
+        }
+
+
+        String tipoUsuario =
+                preferencias.getString(
+                        "usuario_tipo_atual",
+                        ""
+                );
+
+
+        boolean ehColetor =
+                "ambulante".equals(
+                        tipoUsuario
+                )
+                        ||
+                        "empresa".equals(
+                                tipoUsuario
+                        );
+
+
+        if (!ehColetor) {
+
+            return;
+        }
+
+
+        if (
+                etapaAtual == null
+                        ||
+                        etapaAtual.isEmpty()
+                        ||
+                        etapaAtual.equals(
+                                etapaAnterior
+                        )
+        ) {
+
+            return;
+        }
+
+
+        if (
+                "going".equals(
+                        etapaAtual
+                )
+                        ||
+                        "collecting".equals(
+                                etapaAtual
+                        )
+        ) {
+
+            if (
+                    podeEnviar(
+                            ultimoEnvioEtapa
+                    )
+            ) {
+
+                ultimoEnvioEtapa =
+                        System.currentTimeMillis();
+
+
+                enviarEtapaColeta(
+                        etapaAtual
+                );
+            }
+
+
+            return;
+        }
+
+
+        if (
+                "done".equals(
+                        etapaAtual
+                )
+        ) {
+
+            if (
+                    podeEnviar(
+                            ultimoEnvioEtapa
+                    )
+            ) {
+
+                ultimoEnvioEtapa =
+                        System.currentTimeMillis();
+
+
+                enviarColetaFinalizada();
+            }
+        }
+    }
+
+
+    private boolean podeEnviar(
+            long ultimoEnvio
+    ) {
+
+        return (
+                System.currentTimeMillis()
+                        -
+                        ultimoEnvio
+        ) > 700;
+    }
+
+
+    // =====================================================
+    // ENVIAR NOVO PEDIDO
+    // =====================================================
+
+    public void enviarPedidoAtual() {
+
+        if (!estaConectado()) {
+
+            return;
+        }
+
+
+        try {
+
+            JSONObject json =
+                    new JSONObject();
+
+
+            json.put(
+                    "evento",
+                    "NOVO_PEDIDO"
+            );
+
+
+            json.put(
+                    "tipo",
+                    preferencias.getString(
+                            "pedido_tipo",
+                            ""
+                    )
+            );
+
+
+            json.put(
+                    "emoji",
+                    preferencias.getString(
+                            "pedido_emoji",
+                            ""
+                    )
+            );
+
+
+            json.put(
+                    "descricao",
+                    preferencias.getString(
+                            "pedido_descricao",
+                            ""
+                    )
+            );
+
+
+            json.put(
+                    "peso",
+                    preferencias.getString(
+                            "pedido_peso",
+                            ""
+                    )
+            );
+
+
+            json.put(
+                    "regiao",
+                    preferencias.getString(
+                            "pedido_regiao",
+                            ""
+                    )
+            );
+
+
+            json.put(
+                    "cidade",
+                    preferencias.getString(
+                            "pedido_cidade",
+                            ""
+                    )
+            );
+
+
+            json.put(
+                    "observacao",
+                    preferencias.getString(
+                            "pedido_observacao",
+                            ""
+                    )
+            );
+
+
+            json.put(
+                    "enderecoCompleto",
+                    preferencias.getString(
+                            "pedido_endereco_completo",
+                            ""
+                    )
+            );
+
+
+            enviar(
+                    json.toString()
+            );
+
+        } catch (
+                JSONException e
+        ) {
+
+            notificarErro(
+                    "Não foi possível preparar o pedido."
+            );
+        }
+    }
+
+
+    // =====================================================
+    // ENVIAR PROPOSTA
+    // =====================================================
+
+    public void enviarPropostaAtual() {
+
+        if (!estaConectado()) {
+
+            return;
+        }
+
+
+        try {
+
+            JSONObject json =
+                    new JSONObject();
+
+
+            json.put(
+                    "evento",
+                    "PROPOSTA"
+            );
+
+
+            json.put(
+                    "preco",
+                    preferencias.getString(
+                            "proposta_preco",
+                            ""
+                    )
+            );
+
+
+            json.put(
+                    "mensagem",
+                    preferencias.getString(
+                            "proposta_mensagem",
+                            ""
+                    )
+            );
+
+
+            json.put(
+                    "nome",
+                    preferencias.getString(
+                            "proposta_coletor_nome",
+                            ""
+                    )
+            );
+
+
+            json.put(
+                    "avaliacao",
+                    preferencias.getFloat(
+                            "proposta_coletor_avaliacao",
+                            4.9f
+                    )
+            );
+
+
+            json.put(
+                    "coletas",
+                    preferencias.getInt(
+                            "proposta_coletor_coletas",
+                            0
+                    )
+            );
+
+
+            json.put(
+                    "tipoColetor",
+                    preferencias.getString(
+                            "proposta_coletor_tipo",
+                            ""
+                    )
+            );
+
+
+            json.put(
+                    "email",
+                    preferencias.getString(
+                            "proposta_coletor_email",
+                            ""
+                    )
+            );
+
+
+            enviar(
+                    json.toString()
+            );
+
+        } catch (
+                JSONException e
+        ) {
+
+            notificarErro(
+                    "Não foi possível preparar a proposta."
+            );
+        }
+    }
+
+
+    // =====================================================
+    // ENVIAR ACEITE
+    // =====================================================
+
+    private void enviarPropostaAceita() {
+
+        if (!estaConectado()) {
+
+            return;
+        }
+
+
+        try {
+
+            JSONObject json =
+                    new JSONObject();
+
+
+            json.put(
+                    "evento",
+                    "PROPOSTA_ACEITA"
+            );
+
+
+            json.put(
+                    "pedido_status",
+                    "active"
+            );
+
+
+            json.put(
+                    "coleta_etapa",
+                    "ready"
+            );
+
+
+            enviar(
+                    json.toString()
+            );
+
+        } catch (
+                JSONException e
+        ) {
+
+            notificarErro(
+                    "Não foi possível enviar o aceite."
+            );
+        }
+    }
+
+
+    // =====================================================
+    // ENVIAR ETAPA
+    // =====================================================
+
+    private void enviarEtapaColeta(
+            String etapa
+    ) {
+
+        if (!estaConectado()) {
+
+            return;
+        }
+
+
+        try {
+
+            JSONObject json =
+                    new JSONObject();
+
+
+            json.put(
+                    "evento",
+                    "COLETA_ETAPA"
+            );
+
+
+            json.put(
+                    "pedido_status",
+                    "active"
+            );
+
+
+            json.put(
+                    "coleta_etapa",
+                    etapa
+            );
+
+
+            enviar(
+                    json.toString()
+            );
+
+        } catch (
+                JSONException e
+        ) {
+
+            notificarErro(
+                    "Não foi possível sincronizar a coleta."
+            );
+        }
+    }
+
+
+    // =====================================================
+    // ENVIAR FINALIZAÇÃO
+    // =====================================================
+
+    private void enviarColetaFinalizada() {
+
+        if (!estaConectado()) {
+
+            return;
+        }
+
+
+        try {
+
+            JSONObject json =
+                    new JSONObject();
+
+
+            json.put(
+                    "evento",
+                    "COLETA_FINALIZADA"
+            );
+
+
+            json.put(
+                    "pedido_status",
+                    "done"
+            );
+
+
+            json.put(
+                    "coleta_etapa",
+                    "done"
+            );
+
+
+            enviar(
+                    json.toString()
+            );
+
+        } catch (
+                JSONException e
+        ) {
+
+            notificarErro(
+                    "Não foi possível finalizar a sincronização."
+            );
+        }
+    }
+
+
+    // =====================================================
+    // EVENTO SIMPLES
+    // =====================================================
+
+    private void enviarEventoSimples(
+            String evento
+    ) {
+
+        if (!estaConectado()) {
+
+            return;
+        }
+
+
+        try {
+
+            JSONObject json =
+                    new JSONObject();
+
+
+            json.put(
+                    "evento",
+                    evento
+            );
+
+
+            enviar(
+                    json.toString()
+            );
+
+        } catch (
+                JSONException e
+        ) {
+
+            notificarErro(
+                    "Não foi possível enviar a atualização."
+            );
+        }
+    }
+
+
+    // =====================================================
+    // BLUETOOTH
     // =====================================================
 
     public boolean temBluetooth() {
@@ -190,7 +1050,9 @@ public class BluetoothColetai {
 
             return bluetoothAdapter.isEnabled();
 
-        } catch (SecurityException e) {
+        } catch (
+                SecurityException e
+        ) {
 
             return false;
         }
@@ -213,10 +1075,6 @@ public class BluetoothColetai {
     }
 
 
-    // =====================================================
-    // DISPOSITIVOS PAREADOS
-    // =====================================================
-
     @SuppressLint("MissingPermission")
     public Set<BluetoothDevice> getDispositivosPareados() {
 
@@ -231,11 +1089,14 @@ public class BluetoothColetai {
             return bluetoothAdapter
                     .getBondedDevices();
 
-        } catch (SecurityException e) {
+        } catch (
+                SecurityException e
+        ) {
 
             notificarErro(
                     "Permissão Bluetooth não concedida."
             );
+
 
             return null;
         }
@@ -254,6 +1115,7 @@ public class BluetoothColetai {
             notificarErro(
                     "Bluetooth não disponível."
             );
+
 
             return;
         }
@@ -307,7 +1169,9 @@ public class BluetoothColetai {
                                         servidor.accept();
 
 
-                                if (socketRecebido != null) {
+                                if (
+                                        socketRecebido != null
+                                ) {
 
                                     definirConexao(
                                             socketRecebido
@@ -326,14 +1190,10 @@ public class BluetoothColetai {
                                     IOException e
                             ) {
 
-                                /*
-                                 * Se uma conexão já foi estabelecida,
-                                 * fechar o ServerSocket é normal.
-                                 */
                                 if (!conectado) {
 
-                                    notificarErro(
-                                            "Não foi possível aguardar uma conexão."
+                                    notificarStatus(
+                                            "Servidor Bluetooth encerrado"
                                     );
                                 }
 
@@ -367,6 +1227,7 @@ public class BluetoothColetai {
                     "Selecione um dispositivo."
             );
 
+
             return;
         }
 
@@ -376,6 +1237,7 @@ public class BluetoothColetai {
             notificarStatus(
                     "Já existe um celular conectado."
             );
+
 
             return;
         }
@@ -421,10 +1283,6 @@ public class BluetoothColetai {
                                                 );
 
 
-                                /*
-                                 * connect() é bloqueante,
-                                 * por isso estamos em uma Thread.
-                                 */
                                 novoSocket.connect();
 
 
@@ -455,14 +1313,10 @@ public class BluetoothColetai {
 
 
                                 notificarErro(
-                                        "Não foi possível conectar. "
-                                                + "Confirme se o Coletaí está aberto no outro celular."
+                                        "Não foi possível conectar."
                                 );
 
 
-                                /*
-                                 * Voltamos a aguardar uma conexão.
-                                 */
                                 iniciarServidor();
 
                             } finally {
@@ -495,10 +1349,6 @@ public class BluetoothColetai {
         }
 
 
-        /*
-         * Se já havia algum socket antigo,
-         * fechamos antes.
-         */
         if (
                 socket != null
                         &&
@@ -528,6 +1378,23 @@ public class BluetoothColetai {
         fecharServidor();
 
 
+        /*
+         * Atualiza os estados conhecidos quando a conexão começa.
+         */
+        ultimoStatusConhecido =
+                preferencias.getString(
+                        "pedido_status",
+                        ""
+                );
+
+
+        ultimaEtapaConhecida =
+                preferencias.getString(
+                        "coleta_etapa",
+                        ""
+                );
+
+
         notificarConectado(
                 nomeDispositivoConectado
         );
@@ -538,7 +1405,7 @@ public class BluetoothColetai {
 
 
     // =====================================================
-    // RECEBER MENSAGENS
+    // LEITURA
     // =====================================================
 
     private synchronized void iniciarLeitura() {
@@ -585,10 +1452,17 @@ public class BluetoothColetai {
                                 while (
                                         conectado
                                                 &&
-                                                (mensagem =
-                                                        leitor.readLine())
+                                                (
+                                                        mensagem =
+                                                                leitor.readLine()
+                                                )
                                                         != null
                                 ) {
+
+                                    processarMensagemRecebida(
+                                            mensagem
+                                    );
+
 
                                     notificarMensagem(
                                             mensagem
@@ -620,6 +1494,809 @@ public class BluetoothColetai {
 
 
     // =====================================================
+    // PROCESSAR MENSAGEM
+    // =====================================================
+
+    private void processarMensagemRecebida(
+            String mensagem
+    ) {
+
+        if (
+                mensagem == null
+                        ||
+                        mensagem.trim().isEmpty()
+        ) {
+
+            return;
+        }
+
+
+        try {
+
+            JSONObject json =
+                    new JSONObject(
+                            mensagem
+                    );
+
+
+            String evento =
+                    json.optString(
+                            "evento",
+                            ""
+                    );
+
+
+            switch (evento) {
+
+                case "NOVO_PEDIDO":
+
+                    receberNovoPedido(
+                            json
+                    );
+
+                    break;
+
+
+                case "PROPOSTA":
+
+                    receberProposta(
+                            json
+                    );
+
+                    break;
+
+
+                case "PROPOSTA_ACEITA":
+
+                    receberPropostaAceita();
+
+                    break;
+
+
+                case "PROPOSTA_RECUSADA":
+
+                    receberPropostaRecusada();
+
+                    break;
+
+
+                case "COLETA_ETAPA":
+
+                    receberEtapaColeta(
+                            json
+                    );
+
+                    break;
+
+
+                case "COLETA_FINALIZADA":
+
+                    receberColetaFinalizada();
+
+                    break;
+
+
+                case "PEDIDO_CANCELADO":
+
+                    receberPedidoCancelado();
+
+                    break;
+            }
+
+        } catch (
+                JSONException ignored
+        ) {
+
+            /*
+             * Mantém compatibilidade com a mensagem TESTE
+             * da tela de Bluetooth.
+             */
+        }
+    }
+
+
+    // =====================================================
+    // RECEBER NOVO PEDIDO
+    // =====================================================
+
+    private void receberNovoPedido(
+            JSONObject json
+    ) {
+
+        SharedPreferences.Editor editor =
+                preferencias.edit();
+
+
+        limparProposta(
+                editor
+        );
+
+
+        editor.putString(
+                "pedido_tipo",
+                json.optString(
+                        "tipo",
+                        ""
+                )
+        );
+
+
+        editor.putString(
+                "pedido_emoji",
+                json.optString(
+                        "emoji",
+                        ""
+                )
+        );
+
+
+        editor.putString(
+                "pedido_descricao",
+                json.optString(
+                        "descricao",
+                        ""
+                )
+        );
+
+
+        editor.putString(
+                "pedido_peso",
+                json.optString(
+                        "peso",
+                        ""
+                )
+        );
+
+
+        editor.putString(
+                "pedido_regiao",
+                json.optString(
+                        "regiao",
+                        ""
+                )
+        );
+
+
+        editor.putString(
+                "pedido_cidade",
+                json.optString(
+                        "cidade",
+                        ""
+                )
+        );
+
+
+        editor.putString(
+                "pedido_observacao",
+                json.optString(
+                        "observacao",
+                        ""
+                )
+        );
+
+
+        editor.putString(
+                "pedido_endereco_completo",
+                json.optString(
+                        "enderecoCompleto",
+                        ""
+                )
+        );
+
+
+        editor.putString(
+                "coleta_etapa",
+                "ready"
+        );
+
+
+        editor.putString(
+                "pedido_status",
+                "waiting"
+        );
+
+
+        editor.apply();
+
+
+        ultimoStatusConhecido =
+                "waiting";
+
+
+        ultimaEtapaConhecida =
+                "ready";
+
+
+        notificarSyncAtualizado();
+
+        abrirPedidoSeForColetor();
+    }
+
+
+    // =====================================================
+    // RECEBER PROPOSTA
+    // =====================================================
+
+    private void receberProposta(
+            JSONObject json
+    ) {
+
+        SharedPreferences.Editor editor =
+                preferencias.edit();
+
+
+        editor.putString(
+                "proposta_preco",
+                json.optString(
+                        "preco",
+                        ""
+                )
+        );
+
+
+        editor.putString(
+                "proposta_mensagem",
+                json.optString(
+                        "mensagem",
+                        ""
+                )
+        );
+
+
+        editor.putString(
+                "proposta_coletor_nome",
+                json.optString(
+                        "nome",
+                        "Coletor"
+                )
+        );
+
+
+        editor.putFloat(
+                "proposta_coletor_avaliacao",
+                (float) json.optDouble(
+                        "avaliacao",
+                        4.9
+                )
+        );
+
+
+        editor.putInt(
+                "proposta_coletor_coletas",
+                json.optInt(
+                        "coletas",
+                        0
+                )
+        );
+
+
+        editor.putString(
+                "proposta_coletor_tipo",
+                json.optString(
+                        "tipoColetor",
+                        ""
+                )
+        );
+
+
+        editor.putString(
+                "proposta_coletor_email",
+                json.optString(
+                        "email",
+                        ""
+                )
+        );
+
+
+        editor.putString(
+                "pedido_status",
+                "proposal"
+        );
+
+
+        editor.apply();
+
+
+        ultimoStatusConhecido =
+                "proposal";
+
+
+        notificarSyncAtualizado();
+
+
+        mostrarToastSeUsuario(
+                "cliente",
+                "Nova proposta recebida!"
+        );
+    }
+
+
+    // =====================================================
+    // RECEBER ACEITE
+    // =====================================================
+
+    private void receberPropostaAceita() {
+
+        preferencias
+                .edit()
+                .putString(
+                        "pedido_status",
+                        "active"
+                )
+                .putString(
+                        "coleta_etapa",
+                        "ready"
+                )
+                .apply();
+
+
+        ultimoStatusConhecido =
+                "active";
+
+
+        ultimaEtapaConhecida =
+                "ready";
+
+
+        notificarSyncAtualizado();
+
+
+        String tipoUsuario =
+                preferencias.getString(
+                        "usuario_tipo_atual",
+                        ""
+                );
+
+
+        boolean ehColetor =
+                "ambulante".equals(
+                        tipoUsuario
+                )
+                        ||
+                        "empresa".equals(
+                                tipoUsuario
+                        );
+
+
+        if (!ehColetor) {
+
+            return;
+        }
+
+
+        mainHandler.post(
+                () -> {
+
+                    Toast.makeText(
+                            appContext,
+                            "Proposta aceita pelo cliente!",
+                            Toast.LENGTH_SHORT
+                    ).show();
+
+
+                    Intent intent =
+                            new Intent(
+                                    appContext,
+                                    coleta_ativa_ambulante.class
+                            );
+
+
+                    intent.addFlags(
+                            Intent.FLAG_ACTIVITY_NEW_TASK
+                                    |
+                                    Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                    |
+                                    Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    );
+
+
+                    appContext.startActivity(
+                            intent
+                    );
+                }
+        );
+    }
+
+
+    // =====================================================
+    // RECEBER RECUSA
+    // =====================================================
+
+    private void receberPropostaRecusada() {
+
+        SharedPreferences.Editor editor =
+                preferencias.edit();
+
+
+        limparProposta(
+                editor
+        );
+
+
+        editor.putString(
+                "pedido_status",
+                "waiting"
+        );
+
+
+        editor.putString(
+                "coleta_etapa",
+                "ready"
+        );
+
+
+        editor.apply();
+
+
+        ultimoStatusConhecido =
+                "waiting";
+
+
+        ultimaEtapaConhecida =
+                "ready";
+
+
+        notificarSyncAtualizado();
+
+
+        String tipoUsuario =
+                preferencias.getString(
+                        "usuario_tipo_atual",
+                        ""
+                );
+
+
+        if (
+                "ambulante".equals(
+                        tipoUsuario
+                )
+                        ||
+                        "empresa".equals(
+                                tipoUsuario
+                        )
+        ) {
+
+            mainHandler.post(
+                    () -> Toast.makeText(
+                            appContext,
+                            "O cliente recusou a proposta.",
+                            Toast.LENGTH_SHORT
+                    ).show()
+            );
+        }
+    }
+
+
+    // =====================================================
+    // RECEBER ETAPA
+    // =====================================================
+
+    private void receberEtapaColeta(
+            JSONObject json
+    ) {
+
+        String etapa =
+                json.optString(
+                        "coleta_etapa",
+                        "ready"
+                );
+
+
+        preferencias
+                .edit()
+                .putString(
+                        "pedido_status",
+                        "active"
+                )
+                .putString(
+                        "coleta_etapa",
+                        etapa
+                )
+                .apply();
+
+
+        ultimoStatusConhecido =
+                "active";
+
+
+        ultimaEtapaConhecida =
+                etapa;
+
+
+        notificarSyncAtualizado();
+    }
+
+
+    // =====================================================
+    // RECEBER FINALIZAÇÃO
+    // =====================================================
+
+    private void receberColetaFinalizada() {
+
+        preferencias
+                .edit()
+                .putString(
+                        "pedido_status",
+                        "done"
+                )
+                .putString(
+                        "coleta_etapa",
+                        "done"
+                )
+                .apply();
+
+
+        ultimoStatusConhecido =
+                "done";
+
+
+        ultimaEtapaConhecida =
+                "done";
+
+
+        notificarSyncAtualizado();
+
+
+        mostrarToastSeUsuario(
+                "cliente",
+                "Coleta finalizada!"
+        );
+    }
+
+
+    // =====================================================
+    // RECEBER CANCELAMENTO
+    // =====================================================
+
+    private void receberPedidoCancelado() {
+
+        SharedPreferences.Editor editor =
+                preferencias.edit();
+
+
+        editor.remove(
+                "pedido_status"
+        );
+
+
+        editor.remove(
+                "coleta_etapa"
+        );
+
+
+        limparProposta(
+                editor
+        );
+
+
+        editor.apply();
+
+
+        ultimoStatusConhecido =
+                "";
+
+
+        ultimaEtapaConhecida =
+                "";
+
+
+        notificarSyncAtualizado();
+
+
+        String tipoUsuario =
+                preferencias.getString(
+                        "usuario_tipo_atual",
+                        ""
+                );
+
+
+        if (
+                "ambulante".equals(
+                        tipoUsuario
+                )
+                        ||
+                        "empresa".equals(
+                                tipoUsuario
+                        )
+        ) {
+
+            mainHandler.post(
+                    () -> {
+
+                        Toast.makeText(
+                                appContext,
+                                "O cliente cancelou o pedido.",
+                                Toast.LENGTH_SHORT
+                        ).show();
+
+
+                        Class<?> telaInicial =
+                                "empresa".equals(
+                                        tipoUsuario
+                                )
+                                        ? tela_inicial_empresa.class
+                                        : tela_inicial_ambulante.class;
+
+
+                        Intent intent =
+                                new Intent(
+                                        appContext,
+                                        telaInicial
+                                );
+
+
+                        intent.addFlags(
+                                Intent.FLAG_ACTIVITY_NEW_TASK
+                                        |
+                                        Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        );
+
+
+                        appContext.startActivity(
+                                intent
+                        );
+                    }
+            );
+        }
+    }
+
+
+    // =====================================================
+    // LIMPAR PROPOSTA
+    // =====================================================
+
+    private void limparProposta(
+            SharedPreferences.Editor editor
+    ) {
+
+        editor.remove(
+                "proposta_preco"
+        );
+
+        editor.remove(
+                "proposta_mensagem"
+        );
+
+        editor.remove(
+                "proposta_coletor_nome"
+        );
+
+        editor.remove(
+                "proposta_coletor_avaliacao"
+        );
+
+        editor.remove(
+                "proposta_coletor_coletas"
+        );
+
+        editor.remove(
+                "proposta_coletor_tipo"
+        );
+
+        editor.remove(
+                "proposta_coletor_email"
+        );
+    }
+
+
+    // =====================================================
+    // ABRIR PEDIDO NO COLETOR
+    // =====================================================
+
+    private void abrirPedidoSeForColetor() {
+
+        String tipoUsuario =
+                preferencias.getString(
+                        "usuario_tipo_atual",
+                        ""
+                );
+
+
+        boolean ehColetor =
+                "ambulante".equals(
+                        tipoUsuario
+                )
+                        ||
+                        "empresa".equals(
+                                tipoUsuario
+                        );
+
+
+        if (!ehColetor) {
+
+            return;
+        }
+
+
+        mainHandler.post(
+                () -> {
+
+                    Toast.makeText(
+                            appContext,
+                            "Novo pedido recebido!",
+                            Toast.LENGTH_SHORT
+                    ).show();
+
+
+                    Intent intent =
+                            new Intent(
+                                    appContext,
+                                    detalhes_pedido_ambulante.class
+                            );
+
+
+                    intent.addFlags(
+                            Intent.FLAG_ACTIVITY_NEW_TASK
+                                    |
+                                    Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                    |
+                                    Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    );
+
+
+                    appContext.startActivity(
+                            intent
+                    );
+                }
+        );
+    }
+
+
+    // =====================================================
+    // SINCRONIZAÇÃO DA TELA
+    // =====================================================
+
+    private void notificarSyncAtualizado() {
+
+        SyncListener atual =
+                syncListener;
+
+
+        if (atual == null) {
+
+            return;
+        }
+
+
+        mainHandler.post(
+                atual::onSyncAtualizado
+        );
+    }
+
+
+    private void mostrarToastSeUsuario(
+            String tipoEsperado,
+            String mensagem
+    ) {
+
+        String tipoAtual =
+                preferencias.getString(
+                        "usuario_tipo_atual",
+                        ""
+                );
+
+
+        if (
+                !tipoEsperado.equals(
+                        tipoAtual
+                )
+        ) {
+
+            return;
+        }
+
+
+        mainHandler.post(
+                () -> Toast.makeText(
+                        appContext,
+                        mensagem,
+                        Toast.LENGTH_SHORT
+                ).show()
+        );
+    }
+
+
+    // =====================================================
     // ENVIAR MENSAGEM
     // =====================================================
 
@@ -642,6 +2319,7 @@ public class BluetoothColetai {
             notificarErro(
                     "Nenhum celular conectado."
             );
+
 
             return;
         }
@@ -842,23 +2520,28 @@ public class BluetoothColetai {
 
 
     // =====================================================
-    // CALLBACKS
+    // CALLBACKS DA TELA BLUETOOTH
     // =====================================================
 
     private void notificarStatus(
             String status
     ) {
 
-        Listener listenerAtual =
+        Listener atual =
                 listener;
 
 
-        if (listenerAtual != null) {
+        if (atual == null) {
 
-            listenerAtual.onStatusAlterado(
-                    status
-            );
+            return;
         }
+
+
+        mainHandler.post(
+                () -> atual.onStatusAlterado(
+                        status
+                )
+        );
     }
 
 
@@ -866,16 +2549,21 @@ public class BluetoothColetai {
             String nome
     ) {
 
-        Listener listenerAtual =
+        Listener atual =
                 listener;
 
 
-        if (listenerAtual != null) {
+        if (atual == null) {
 
-            listenerAtual.onConectado(
-                    nome
-            );
+            return;
         }
+
+
+        mainHandler.post(
+                () -> atual.onConectado(
+                        nome
+                )
+        );
     }
 
 
@@ -883,16 +2571,21 @@ public class BluetoothColetai {
             String mensagem
     ) {
 
-        Listener listenerAtual =
+        Listener atual =
                 listener;
 
 
-        if (listenerAtual != null) {
+        if (atual == null) {
 
-            listenerAtual.onMensagemRecebida(
-                    mensagem
-            );
+            return;
         }
+
+
+        mainHandler.post(
+                () -> atual.onMensagemRecebida(
+                        mensagem
+                )
+        );
     }
 
 
@@ -900,15 +2593,20 @@ public class BluetoothColetai {
             String mensagem
     ) {
 
-        Listener listenerAtual =
+        Listener atual =
                 listener;
 
 
-        if (listenerAtual != null) {
+        if (atual == null) {
 
-            listenerAtual.onErro(
-                    mensagem
-            );
+            return;
         }
+
+
+        mainHandler.post(
+                () -> atual.onErro(
+                        mensagem
+                )
+        );
     }
 }
