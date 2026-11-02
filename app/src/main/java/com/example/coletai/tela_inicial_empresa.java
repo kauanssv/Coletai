@@ -14,7 +14,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.viewpager2.widget.ViewPager2;
 
-public class tela_inicial_empresa extends AppCompatActivity {
+public class tela_inicial_empresa extends ContaActivity {
 
     private ViewPager2 viewPager;
 
@@ -30,43 +30,12 @@ public class tela_inicial_empresa extends AppCompatActivity {
     private TextView txtNavHistorico;
     private TextView txtNavPerfil;
 
-
     @Override
-    protected void onCreate(
-            Bundle savedInstanceState
-    ) {
-
-        super.onCreate(
-                savedInstanceState
-        );
-
-        EdgeToEdge.enable(
-                this
-        );
-
-
-        /*
-         * A Empresa usa a mesma estrutura visual
-         * do Ambulante no MVP.
-         */
-        setContentView(
-                R.layout.activity_tela_inicial_ambulante
-        );
-
-
-        configurarBarras();
-
-        iniciarComponentes();
-
-        configurarViewPager();
-
-        configurarNavegacao();
-
-        atualizarMenu(
-                0
-        );
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        startActivity(new android.content.Intent(this, WorkspaceActivity.class));
+        finish();
     }
-
 
     // =====================================================
     // BARRAS DO SISTEMA
@@ -85,7 +54,6 @@ public class tela_inicial_empresa extends AppCompatActivity {
                                     WindowInsetsCompat.Type.systemBars()
                             );
 
-
                     view.setPadding(
                             systemBars.left,
                             systemBars.top,
@@ -93,12 +61,10 @@ public class tela_inicial_empresa extends AppCompatActivity {
                             systemBars.bottom
                     );
 
-
                     return insets;
                 }
         );
     }
-
 
     // =====================================================
     // COMPONENTES
@@ -110,7 +76,6 @@ public class tela_inicial_empresa extends AppCompatActivity {
                 findViewById(
                         R.id.viewPagerAmbulante
                 );
-
 
         navInicio =
                 findViewById(
@@ -127,7 +92,6 @@ public class tela_inicial_empresa extends AppCompatActivity {
                         R.id.navPerfil
                 );
 
-
         imgNavInicio =
                 findViewById(
                         R.id.imgNavInicio
@@ -142,7 +106,6 @@ public class tela_inicial_empresa extends AppCompatActivity {
                 findViewById(
                         R.id.imgNavPerfil
                 );
-
 
         txtNavInicio =
                 findViewById(
@@ -160,7 +123,6 @@ public class tela_inicial_empresa extends AppCompatActivity {
                 );
     }
 
-
     // =====================================================
     // VIEWPAGER
     // =====================================================
@@ -172,21 +134,17 @@ public class tela_inicial_empresa extends AppCompatActivity {
                         this
                 );
 
-
         viewPager.setAdapter(
                 adapter
         );
-
 
         viewPager.setOffscreenPageLimit(
                 2
         );
 
-
         viewPager.setUserInputEnabled(
                 true
         );
-
 
         viewPager.registerOnPageChangeCallback(
                 new ViewPager2.OnPageChangeCallback() {
@@ -200,7 +158,6 @@ public class tela_inicial_empresa extends AppCompatActivity {
                                 position
                         );
 
-
                         atualizarMenu(
                                 position
                         );
@@ -208,7 +165,6 @@ public class tela_inicial_empresa extends AppCompatActivity {
                 }
         );
     }
-
 
     // =====================================================
     // NAVEGAÇÃO
@@ -226,7 +182,6 @@ public class tela_inicial_empresa extends AppCompatActivity {
                 }
         );
 
-
         navHistorico.setOnClickListener(
                 view -> {
 
@@ -236,7 +191,6 @@ public class tela_inicial_empresa extends AppCompatActivity {
                     );
                 }
         );
-
 
         navPerfil.setOnClickListener(
                 view -> {
@@ -248,7 +202,6 @@ public class tela_inicial_empresa extends AppCompatActivity {
                 }
         );
     }
-
 
     // =====================================================
     // CORES DO MENU
@@ -264,20 +217,17 @@ public class tela_inicial_empresa extends AppCompatActivity {
                         R.color.brand_700
                 );
 
-
         int iconeNormal =
                 ContextCompat.getColor(
                         this,
                         R.color.ink_400
                 );
 
-
         int textoNormal =
                 ContextCompat.getColor(
                         this,
                         R.color.ink_500
                 );
-
 
         imgNavInicio.setImageTintList(
                 ColorStateList.valueOf(
@@ -287,7 +237,6 @@ public class tela_inicial_empresa extends AppCompatActivity {
                 )
         );
 
-
         imgNavHistorico.setImageTintList(
                 ColorStateList.valueOf(
                         position == 1
@@ -295,7 +244,6 @@ public class tela_inicial_empresa extends AppCompatActivity {
                                 : iconeNormal
                 )
         );
-
 
         imgNavPerfil.setImageTintList(
                 ColorStateList.valueOf(
@@ -305,13 +253,11 @@ public class tela_inicial_empresa extends AppCompatActivity {
                 )
         );
 
-
         txtNavInicio.setTextColor(
                 position == 0
                         ? selecionado
                         : textoNormal
         );
-
 
         txtNavHistorico.setTextColor(
                 position == 1
@@ -319,13 +265,11 @@ public class tela_inicial_empresa extends AppCompatActivity {
                         : textoNormal
         );
 
-
         txtNavPerfil.setTextColor(
                 position == 2
                         ? selecionado
                         : textoNormal
         );
-
 
         txtNavInicio.setTypeface(
                 null,
@@ -334,14 +278,12 @@ public class tela_inicial_empresa extends AppCompatActivity {
                         : android.graphics.Typeface.NORMAL
         );
 
-
         txtNavHistorico.setTypeface(
                 null,
                 position == 1
                         ? android.graphics.Typeface.BOLD
                         : android.graphics.Typeface.NORMAL
         );
-
 
         txtNavPerfil.setTypeface(
                 null,

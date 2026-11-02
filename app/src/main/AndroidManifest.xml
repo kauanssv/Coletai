@@ -3,6 +3,12 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
 
     <!-- =====================================================
@@ -34,6 +40,7 @@
 
 
     <application
+        android:usesCleartextTraffic="false"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -42,11 +49,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Coletaí">
+        <service android:name=".BluetoothSessionService" android:exported="false" android:foregroundServiceType="connectedDevice" />
+        <activity android:name=".OfflineBluetoothActivity" android:exported="false" />
 
 
         <!-- =================================================
              LOGIN
              ================================================= -->
+
+        <activity android:name=".OrderFlowActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".MainActivity"
@@ -136,6 +147,10 @@
             android:windowSoftInputMode="adjustResize" />
 
 
+        <activity android:name=".AdminActivity" android:exported="false" android:theme="@style/Theme.Coletai.Admin" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".WorkspaceActivity" android:theme="@style/Theme.Coletai.Platform" android:exported="false" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".RegistrationActivity" android:theme="@style/Theme.Coletai.Platform" android:exported="false" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".LocationActivity" android:theme="@style/Theme.Coletai.Platform" android:exported="false" />
     </application>
 
 </manifest>

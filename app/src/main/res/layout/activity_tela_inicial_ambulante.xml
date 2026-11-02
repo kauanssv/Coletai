@@ -59,7 +59,7 @@
                 android:id="@+id/imgNavInicio"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
-                android:contentDescription="Início"
+                android:contentDescription="@string/texto_inicio"
                 android:src="@drawable/ic_home"
                 app:tint="@color/brand_700" />
 
@@ -68,7 +68,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Início"
+                android:text="@string/texto_inicio"
                 android:textColor="@color/brand_700"
                 android:textSize="11sp"
                 android:textStyle="bold" />
@@ -92,7 +92,7 @@
                 android:id="@+id/imgNavHistorico"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
-                android:contentDescription="Histórico"
+                android:contentDescription="@string/texto_historico"
                 android:src="@drawable/ic_history"
                 app:tint="@color/ink_400" />
 
@@ -101,7 +101,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Histórico"
+                android:text="@string/texto_historico"
                 android:textColor="@color/ink_500"
                 android:textSize="11sp" />
 
@@ -124,7 +124,7 @@
                 android:id="@+id/imgNavPerfil"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
-                android:contentDescription="Perfil"
+                android:contentDescription="@string/texto_perfil"
                 android:src="@drawable/ic_person"
                 app:tint="@color/ink_400" />
 
@@ -133,32 +133,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Perfil"
+                android:text="@string/texto_perfil"
                 android:textColor="@color/ink_500"
                 android:textSize="11sp" />
 
         </LinearLayout>
 
     </LinearLayout>
-
-
-    <!-- =====================================================
-         DETALHES DO PEDIDO
-
-         Reaproveita o XML que você já criou.
-         Fica escondido normalmente.
-         ===================================================== -->
-
-    <include
-        android:id="@+id/telaDetalhesPedido"
-        layout="@layout/activity_detalhes_pedido_ambulante"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

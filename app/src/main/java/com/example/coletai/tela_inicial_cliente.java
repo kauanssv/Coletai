@@ -16,7 +16,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.viewpager2.widget.ViewPager2;
 
-public class tela_inicial_cliente extends AppCompatActivity {
+public class tela_inicial_cliente extends ContaActivity {
 
     private ViewPager2 viewPagerCliente;
 
@@ -35,23 +35,8 @@ public class tela_inicial_cliente extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        EdgeToEdge.enable(this);
-
-        setContentView(
-                R.layout.activity_tela_inicial_cliente
-        );
-
-        configurarBarrasDoSistema();
-        iniciarComponentes();
-        configurarViewPager();
-        configurarMenuInferior();
-
-        // Começa na tela Início
-        selecionarPagina(
-                0,
-                false
-        );
+        startActivity(new android.content.Intent(this, WorkspaceActivity.class));
+        finish();
     }
 
     private void configurarBarrasDoSistema() {

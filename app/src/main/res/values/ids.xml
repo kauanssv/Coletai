@@ -1,0 +1,5 @@
+<resources>
+    <item name="historyFragmentContainer" type="id" />
+    <item name="adminRoleInput" type="id" />
+    <item name="workNotifications" type="id" />
+</resources>

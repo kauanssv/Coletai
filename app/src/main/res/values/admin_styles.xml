@@ -1,0 +1,45 @@
+<resources>
+    <style name="Theme.Coletai.Admin" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">@color/admin_primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/admin_primary</item>
+        <item name="colorPrimaryContainer">@color/brand_100</item>
+        <item name="colorSecondaryContainer">@color/brand_100</item>
+        <item name="colorOnSecondaryContainer">@color/brand_800</item>
+        <item name="colorSurfaceContainer">@color/canvas</item>
+        <item name="colorSurfaceContainerHigh">@color/white</item>
+        <item name="colorOnSurfaceVariant">@color/ink_700</item>
+        <item name="colorSurface">@color/admin_surface</item>
+        <item name="colorOnSurface">@color/admin_ink</item>
+        <item name="android:windowBackground">@color/admin_bg</item>
+        <item name="android:fontFamily">sans</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:statusBarColor">@color/admin_navy</item>
+        <item name="android:navigationBarColor">@color/admin_surface</item>
+    </style>
+    <style name="AdminStat" parent="Widget.Material3.CardView.Outlined">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">96dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_margin">4dp</item>
+        <item name="cardCornerRadius">16dp</item>
+        <item name="cardBackgroundColor">@color/admin_surface</item>
+        <item name="strokeColor">@color/admin_line</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+    <style name="AdminStatNumber">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">26sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/admin_ink</item>
+    </style>
+    <style name="AdminStatLabel">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/admin_muted</item>
+    </style>
+</resources>

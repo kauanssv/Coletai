@@ -26,7 +26,7 @@
         <LinearLayout
             android:id="@+id/cabecalho"
             android:layout_width="0dp"
-            android:layout_height="62dp"
+            android:layout_height="wrap_content" android:minHeight="62dp"
             android:background="@android:color/white"
             android:gravity="center_vertical"
             android:orientation="horizontal"
@@ -45,7 +45,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center"
-                android:text="‹"
+                android:text="@string/texto_simbolo"
                 android:textColor="#374151"
                 android:textSize="30sp"
                 android:textStyle="bold" />
@@ -56,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
-                android:text="Coleta ativa"
+                android:text="@string/texto_coleta_ativa"
                 android:textColor="#111827"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -76,7 +76,7 @@
                     android:paddingTop="6dp"
                     android:paddingEnd="11dp"
                     android:paddingBottom="6dp"
-                    android:text="Em coleta"
+                    android:text="@string/texto_em_coleta"
                     android:textColor="#1F7A4D"
                     android:textSize="11sp"
                     android:textStyle="bold" />
@@ -102,7 +102,7 @@
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:contentDescription="Mapa da coleta"
+                android:contentDescription="@string/texto_mapa_da_coleta"
                 android:scaleType="centerCrop"
                 android:src="@drawable/mapa_cliente_bg" />
 
@@ -132,7 +132,7 @@
                     android:layout_height="26dp"
                     android:layout_gravity="center"
                     android:background="@drawable/bg_current_location"
-                    android:contentDescription="Ambulante"
+                    android:contentDescription="@string/texto_ambulante"
                     android:padding="5dp"
                     android:src="@drawable/ic_truck"
                     app:tint="@android:color/white" />
@@ -148,7 +148,7 @@
                 android:layout_gravity="top|start"
                 android:layout_marginStart="95dp"
                 android:layout_marginTop="35dp"
-                android:contentDescription="Destino"
+                android:contentDescription="@string/texto_destino"
                 android:src="@drawable/ic_map_pin" />
 
         </FrameLayout>
@@ -206,7 +206,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:letterSpacing="0.06"
-                            android:text="ENDEREÇO COMPLETO"
+                            android:text="@string/texto_endereco_completo"
                             android:textColor="#9CA3AF"
                             android:textSize="11sp"
                             android:textStyle="bold" />
@@ -223,7 +223,7 @@
                             <ImageView
                                 android:layout_width="18dp"
                                 android:layout_height="18dp"
-                                android:contentDescription="Endereço"
+                                android:contentDescription="@string/texto_endereco"
                                 android:src="@drawable/ic_location_small"
                                 app:tint="#1F7A4D" />
 
@@ -240,7 +240,7 @@
                                     android:id="@+id/txtEnderecoCompleto"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:text="Localização atual do cliente"
+                                    android:text="@string/texto_localizacao_atual_do_cliente"
                                     android:textColor="#111827"
                                     android:textSize="14sp"
                                     android:textStyle="bold" />
@@ -251,7 +251,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="3dp"
-                                    android:text="Consolação, São Paulo — SP"
+                                    android:text="@string/texto_consolacao_sao_paulo_sp"
                                     android:textColor="#6B7280"
                                     android:textSize="13sp" />
 
@@ -261,7 +261,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="7dp"
-                                    android:text="💬 Observação do cliente"
+                                    android:text="@string/texto_observacao_do_cliente"
                                     android:textColor="#D97706"
                                     android:textSize="12sp"
                                     android:visibility="gone" />
@@ -303,7 +303,7 @@
                             android:layout_height="42dp"
                             android:background="@drawable/bg_demo_icon"
                             android:gravity="center"
-                            android:text="LF"
+                            android:text="@string/texto_lf"
                             android:textColor="#1F7A4D"
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -320,7 +320,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Lucas"
+                                android:text="@string/texto_lucas"
                                 android:textColor="#111827"
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
@@ -330,7 +330,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="2dp"
-                                android:text="Cliente"
+                                android:text="@string/texto_cliente"
                                 android:textColor="#6B7280"
                                 android:textSize="12sp" />
 
@@ -346,7 +346,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:gravity="center"
-                                android:text="☎"
+                                android:text="@string/texto_simbolo_3"
                                 android:textColor="#1F7A4D"
                                 android:textSize="20sp" />
 
@@ -385,7 +385,7 @@
                             android:layout_width="42dp"
                             android:layout_height="42dp"
                             android:gravity="center"
-                            android:text="💻"
+                            android:text="@string/texto_simbolo_4"
                             android:textSize="24sp" />
 
 
@@ -401,7 +401,7 @@
                                 android:id="@+id/txtTipoPeso"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="Eletrônicos · 5 kg"
+                                android:text="@string/texto_eletronicos_5_kg"
                                 android:textColor="#111827"
                                 android:textSize="13sp"
                                 android:textStyle="bold" />
@@ -414,7 +414,7 @@
                                 android:layout_marginTop="3dp"
                                 android:ellipsize="end"
                                 android:maxLines="2"
-                                android:text="Notebook antigo e dois celulares quebrados"
+                                android:text="@string/texto_notebook_antigo_e_dois_celulares_quebrados"
                                 android:textColor="#6B7280"
                                 android:textSize="12sp" />
 
@@ -450,7 +450,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Valor da coleta"
+                            android:text="@string/texto_valor_da_coleta"
                             android:textColor="#6B7280"
                             android:textSize="13sp" />
 
@@ -459,7 +459,7 @@
                             android:id="@+id/txtValor"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="R$ 45,00"
+                            android:text="@string/texto_r_45_00"
                             android:textColor="#1F7A4D"
                             android:textSize="19sp"
                             android:textStyle="bold" />
@@ -480,7 +480,7 @@
         <LinearLayout
             android:id="@+id/rodape"
             android:layout_width="0dp"
-            android:layout_height="82dp"
+            android:layout_height="wrap_content" android:minHeight="82dp"
             android:background="@android:color/white"
             android:elevation="12dp"
             android:gravity="center"
@@ -496,11 +496,11 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAcaoColeta"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
+                android:gravity="center" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:minHeight="52dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                android:text="🚚  Iniciar deslocamento"
+                android:text="@string/texto_iniciar_deslocamento"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 android:textSize="15sp"
@@ -540,7 +540,7 @@
                 android:layout_width="38dp"
                 android:layout_height="38dp"
                 android:layout_gravity="center"
-                android:contentDescription="Finalizado"
+                android:contentDescription="@string/texto_finalizado"
                 android:src="@drawable/ic_check"
                 app:tint="#1F7A4D" />
 
@@ -551,7 +551,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="Coleta finalizada!"
+            android:text="@string/texto_coleta_finalizada"
             android:textColor="#111827"
             android:textSize="22sp"
             android:textStyle="bold" />
@@ -563,7 +563,7 @@
             android:layout_marginTop="8dp"
             android:gravity="center"
             android:lineSpacingExtra="2dp"
-            android:text="Obrigado por ajudar o meio ambiente. O descarte correto faz diferença 🌿"
+            android:text="@string/texto_obrigado_por_ajudar_o_meio_ambiente_o_descart"
             android:textColor="#6B7280"
             android:textSize="14sp" />
 
@@ -591,7 +591,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Valor ganho"
+                    android:text="@string/texto_valor_ganho"
                     android:textColor="#6B7280"
                     android:textSize="14sp" />
 
@@ -600,7 +600,7 @@
                     android:id="@+id/txtValorFinal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="R$ 45,00"
+                    android:text="@string/texto_r_45_00"
                     android:textColor="#1F7A4D"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -612,12 +612,12 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnVoltarInicio"
-            android:layout_width="match_parent"
-            android:layout_height="52dp"
+            android:gravity="center" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:minHeight="52dp"
             android:layout_marginTop="24dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="Voltar ao início"
+            android:text="@string/texto_voltar_ao_inicio"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
             android:textSize="15sp"

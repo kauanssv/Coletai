@@ -1,0 +1,8 @@
+<resources>
+    <string name="platform_initial_password">Senha inicial (mínimo 8 caracteres)</string>
+    <string name="platform_catalog">Catálogo</string>
+    <string name="platform_catalog_hint">Mantenha os materiais aceitos e as informações da plataforma.</string>
+    <string name="platform_information">Informações da plataforma</string>
+    <string name="admin_summary">Resumo</string>
+    <item name="platformMapContainer" type="id" />
+</resources>

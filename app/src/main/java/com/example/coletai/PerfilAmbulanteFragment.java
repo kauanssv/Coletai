@@ -32,14 +32,12 @@ public class PerfilAmbulanteFragment extends Fragment {
 
     private SharedPreferences preferencias;
 
-
     public PerfilAmbulanteFragment() {
 
         super(
                 R.layout.fragment_perfil_ambulante
         );
     }
-
 
     @Override
     public void onViewCreated(
@@ -52,7 +50,6 @@ public class PerfilAmbulanteFragment extends Fragment {
                 savedInstanceState
         );
 
-
         preferencias =
                 requireContext()
                         .getSharedPreferences(
@@ -60,26 +57,21 @@ public class PerfilAmbulanteFragment extends Fragment {
                                 Context.MODE_PRIVATE
                         );
 
-
         iniciarComponentes(
                 view
         );
 
-
         carregarDados();
-
 
         configurarEventos(
                 view
         );
     }
 
-
     @Override
     public void onResume() {
 
         super.onResume();
-
 
         if (
                 preferencias != null
@@ -88,7 +80,6 @@ public class PerfilAmbulanteFragment extends Fragment {
             carregarDados();
         }
     }
-
 
     // =====================================================
     // COMPONENTES
@@ -103,54 +94,45 @@ public class PerfilAmbulanteFragment extends Fragment {
                         R.id.layoutPerfil
                 );
 
-
         layoutEdicao =
                 view.findViewById(
                         R.id.layoutEdicao
                 );
-
 
         txtAvatar =
                 view.findViewById(
                         R.id.txtAvatar
                 );
 
-
         txtNomePrincipal =
                 view.findViewById(
                         R.id.txtNomePrincipal
                 );
-
 
         txtNome =
                 view.findViewById(
                         R.id.txtNome
                 );
 
-
         txtTelefone =
                 view.findViewById(
                         R.id.txtTelefone
                 );
-
 
         edtNome =
                 view.findViewById(
                         R.id.edtNome
                 );
 
-
         edtTelefone =
                 view.findViewById(
                         R.id.edtTelefone
                 );
 
-
         btnFecharEdicao =
                 view.findViewById(
                         R.id.btnFecharEdicao
                 );
-
 
         btnSalvarPerfil =
                 view.findViewById(
@@ -158,12 +140,19 @@ public class PerfilAmbulanteFragment extends Fragment {
                 );
     }
 
-
     // =====================================================
     // DADOS
     // =====================================================
 
     private void carregarDados() {
+        org.json.JSONObject profile = new ProfileRepository(preferencias).current();
+        android.widget.TextView header = requireView().findViewById(R.id.profileEmailHeader);
+        android.widget.TextView emailBody = requireView().findViewById(R.id.profileEmailBody);
+        android.widget.TextView document = requireView().findViewById(R.id.profileDocumentBody);
+        header.setText(profile.optString("email")); emailBody.setText(profile.optString("email"));
+        document.setText(profile.optString("document"));
+        android.widget.TextView documentEdit = requireView().findViewById(R.id.edtCpf);
+        if (documentEdit != null) documentEdit.setText(profile.optString("document"));
 
         String nome =
                 preferencias.getString(
@@ -171,28 +160,23 @@ public class PerfilAmbulanteFragment extends Fragment {
                         "João Santos"
                 );
 
-
         String telefone =
                 preferencias.getString(
                         "ambulante_telefone",
                         "(11) 98888-5678"
                 );
 
-
         txtNomePrincipal.setText(
                 nome
         );
-
 
         txtNome.setText(
                 nome
         );
 
-
         txtTelefone.setText(
                 telefone
         );
-
 
         txtAvatar.setText(
                 obterIniciais(
@@ -200,17 +184,14 @@ public class PerfilAmbulanteFragment extends Fragment {
                 )
         );
 
-
         edtNome.setText(
                 nome
         );
-
 
         edtTelefone.setText(
                 telefone
         );
     }
-
 
     // =====================================================
     // EVENTOS
@@ -231,13 +212,11 @@ public class PerfilAmbulanteFragment extends Fragment {
                 item -> abrirEdicao()
         );
 
-
         view.findViewById(
                 R.id.rowCpf
         ).setOnClickListener(
                 item -> abrirEdicao()
         );
-
 
         view.findViewById(
                 R.id.rowTelefone
@@ -245,20 +224,17 @@ public class PerfilAmbulanteFragment extends Fragment {
                 item -> abrirEdicao()
         );
 
-
         view.findViewById(
                 R.id.rowEmail
         ).setOnClickListener(
                 item -> abrirEdicao()
         );
 
-
         view.findViewById(
                 R.id.rowSenha
         ).setOnClickListener(
                 item -> abrirEdicao()
         );
-
 
         // FOTO
 
@@ -275,20 +251,17 @@ public class PerfilAmbulanteFragment extends Fragment {
                 }
         );
 
-
         // FECHAR EDIÇÃO
 
         btnFecharEdicao.setOnClickListener(
                 item -> fecharEdicao()
         );
 
-
         // SALVAR
 
         btnSalvarPerfil.setOnClickListener(
                 item -> salvarPerfil()
         );
-
 
         // LOGOUT
 
@@ -298,7 +271,6 @@ public class PerfilAmbulanteFragment extends Fragment {
                 item -> sairDaConta()
         );
     }
-
 
     // =====================================================
     // EDITAR
@@ -312,34 +284,28 @@ public class PerfilAmbulanteFragment extends Fragment {
                         "João Santos"
                 );
 
-
         String telefone =
                 preferencias.getString(
                         "ambulante_telefone",
                         "(11) 98888-5678"
                 );
 
-
         edtNome.setText(
                 nome
         );
-
 
         edtTelefone.setText(
                 telefone
         );
 
-
         layoutPerfil.setVisibility(
                 View.GONE
         );
-
 
         layoutEdicao.setVisibility(
                 View.VISIBLE
         );
     }
-
 
     private void fecharEdicao() {
 
@@ -347,12 +313,10 @@ public class PerfilAmbulanteFragment extends Fragment {
                 View.GONE
         );
 
-
         layoutPerfil.setVisibility(
                 View.VISIBLE
         );
     }
-
 
     // =====================================================
     // SALVAR
@@ -366,13 +330,11 @@ public class PerfilAmbulanteFragment extends Fragment {
                         .toString()
                         .trim();
 
-
         String telefone =
                 edtTelefone
                         .getText()
                         .toString()
                         .trim();
-
 
         if (nome.isEmpty()) {
 
@@ -380,12 +342,10 @@ public class PerfilAmbulanteFragment extends Fragment {
                     "Informe seu nome"
             );
 
-
             edtNome.requestFocus();
 
             return;
         }
-
 
         if (telefone.isEmpty()) {
 
@@ -393,31 +353,18 @@ public class PerfilAmbulanteFragment extends Fragment {
                     "Informe seu telefone"
             );
 
-
             edtTelefone.requestFocus();
 
             return;
         }
 
-
-        preferencias
-                .edit()
-
-                .putString(
-                        "ambulante_nome",
-                        nome
-                )
-
-                .putString(
-                        "ambulante_telefone",
-                        telefone
-                )
-
-                .apply();
-
+        ProfileRepository repository = new ProfileRepository(preferencias);
+        org.json.JSONObject profile = repository.current();
+        LocalJson.put(profile, "name", nome); LocalJson.put(profile, "phone", telefone);
+        try { repository.save(profile, false); }
+        catch (RuntimeException e) { Toast.makeText(requireContext(), e.getMessage(), Toast.LENGTH_LONG).show(); return; }
 
         carregarDados();
-
 
         Toast.makeText(
                 requireContext(),
@@ -425,16 +372,15 @@ public class PerfilAmbulanteFragment extends Fragment {
                 Toast.LENGTH_SHORT
         ).show();
 
-
         fecharEdicao();
     }
-
 
     // =====================================================
     // LOGOUT
     // =====================================================
 
     private void sairDaConta() {
+        LocalJson.commit(PlatformStore.open(requireContext()).edit().remove("logged_in_account"));
 
         Intent intent =
                 new Intent(
@@ -442,22 +388,18 @@ public class PerfilAmbulanteFragment extends Fragment {
                         MainActivity.class
                 );
 
-
         intent.addFlags(
                 Intent.FLAG_ACTIVITY_CLEAR_TOP
                         | Intent.FLAG_ACTIVITY_NEW_TASK
                         | Intent.FLAG_ACTIVITY_CLEAR_TASK
         );
 
-
         startActivity(
                 intent
         );
 
-
         requireActivity().finish();
     }
-
 
     // =====================================================
     // INICIAIS
@@ -475,14 +417,12 @@ public class PerfilAmbulanteFragment extends Fragment {
             return "JS";
         }
 
-
         String[] partes =
                 nome
                         .trim()
                         .split(
                                 "\\s+"
                         );
-
 
         if (
                 partes.length == 1
@@ -493,9 +433,8 @@ public class PerfilAmbulanteFragment extends Fragment {
                             0,
                             1
                     )
-                    .toUpperCase();
+                    .toUpperCase(java.util.Locale.getDefault());
         }
-
 
         String primeira =
                 partes[0]
@@ -503,7 +442,6 @@ public class PerfilAmbulanteFragment extends Fragment {
                                 0,
                                 1
                         );
-
 
         String ultima =
                 partes[
@@ -514,10 +452,9 @@ public class PerfilAmbulanteFragment extends Fragment {
                                 1
                         );
 
-
         return (
                 primeira
                         + ultima
-        ).toUpperCase();
+        ).toUpperCase(java.util.Locale.getDefault());
     }
 }

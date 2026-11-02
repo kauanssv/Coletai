@@ -1,0 +1,7 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/adminNavOverview" android:title="@string/admin_summary" android:icon="@drawable/ic_home" />
+    <item android:id="@+id/adminNavProfiles" android:title="@string/admin_profiles" android:icon="@drawable/ic_person" />
+    <item android:id="@+id/adminNavOrders" android:title="@string/admin_orders" android:icon="@drawable/ic_truck" />
+    <item android:id="@+id/adminNavAudit" android:title="@string/admin_audit" android:icon="@drawable/ic_history" />
+    <item android:id="@+id/adminNavCatalog" android:title="@string/platform_catalog" android:icon="@drawable/ic_recycle" />
+</menu>

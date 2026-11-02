@@ -37,7 +37,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:letterSpacing="0.08"
-                android:text="CONTA PROFISSIONAL"
+                android:text="@string/texto_conta_profissional"
                 android:textColor="@color/brand_700"
                 android:textSize="11sp"
                 android:textStyle="bold" />
@@ -47,7 +47,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Perfil"
+                android:text="@string/texto_perfil"
                 android:textColor="@color/ink_900"
                 android:textSize="28sp"
                 android:textStyle="bold" />
@@ -87,7 +87,7 @@
                             android:layout_height="64dp"
                             android:background="@drawable/bg_demo_icon"
                             android:gravity="center"
-                            android:text="JS"
+                            android:text="@string/texto_js"
                             android:textColor="@color/brand_700"
                             android:textSize="21sp"
                             android:textStyle="bold" />
@@ -107,7 +107,7 @@
                                 android:layout_width="14dp"
                                 android:layout_height="14dp"
                                 android:layout_gravity="center"
-                                android:contentDescription="Alterar foto"
+                                android:contentDescription="@string/texto_alterar_foto"
                                 android:src="@drawable/ic_camera"
                                 app:tint="@android:color/white" />
 
@@ -128,17 +128,17 @@
                             android:id="@+id/txtNomePrincipal"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="João Santos"
+                            android:text="@string/texto_joao_santos"
                             android:textColor="@color/ink_900"
                             android:textSize="17sp"
                             android:textStyle="bold" />
 
 
-                        <TextView
+                        <TextView android:id="@+id/profileEmailHeader"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="3dp"
-                            android:text="ambulante@gmail.com"
+                            android:text="@string/texto_ambulante_gmail_com"
                             android:textColor="@color/ink_500"
                             android:textSize="13sp" />
 
@@ -152,7 +152,7 @@
                             android:paddingTop="4dp"
                             android:paddingEnd="9dp"
                             android:paddingBottom="4dp"
-                            android:text="Ambulante"
+                            android:text="@string/texto_ambulante"
                             android:textColor="@color/brand_700"
                             android:textSize="11sp"
                             android:textStyle="bold" />
@@ -195,7 +195,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="★ 4.9"
+                            android:text="@string/texto_4_9"
                             android:textColor="@android:color/white"
                             android:textSize="18sp"
                             android:textStyle="bold" />
@@ -205,9 +205,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:text="AVALIAÇÃO"
+                            android:text="@string/texto_avaliacao"
                             android:textColor="#BDE3D2"
-                            android:textSize="9sp"
+                            android:textSize="11sp"
                             android:textStyle="bold" />
 
                     </LinearLayout>
@@ -240,7 +240,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="10"
+                            android:text="@string/texto_10"
                             android:textColor="@color/ink_900"
                             android:textSize="18sp"
                             android:textStyle="bold" />
@@ -250,9 +250,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:text="COLETAS"
+                            android:text="@string/texto_coletas"
                             android:textColor="#9CA3AF"
-                            android:textSize="9sp"
+                            android:textSize="11sp"
                             android:textStyle="bold" />
 
                     </LinearLayout>
@@ -284,7 +284,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="R$262"
+                            android:text="@string/texto_r_262_2"
                             android:textColor="@color/ink_900"
                             android:textSize="17sp"
                             android:textStyle="bold" />
@@ -294,9 +294,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:text="GANHOS"
+                            android:text="@string/texto_ganhos"
                             android:textColor="#9CA3AF"
-                            android:textSize="9sp"
+                            android:textSize="11sp"
                             android:textStyle="bold" />
 
                     </LinearLayout>
@@ -313,7 +313,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="23dp"
                 android:layout_marginBottom="8dp"
-                android:text="DADOS PESSOAIS"
+                android:text="@string/texto_dados_pessoais"
                 android:textColor="#9CA3AF"
                 android:textSize="11sp"
                 android:textStyle="bold" />
@@ -340,7 +340,7 @@
                     <LinearLayout
                         android:id="@+id/rowNome"
                         android:layout_width="match_parent"
-                        android:layout_height="58dp"
+                        android:layout_height="wrap_content" android:minHeight="58dp"
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center_vertical"
@@ -351,7 +351,7 @@
                         <TextView
                             android:layout_width="90dp"
                             android:layout_height="wrap_content"
-                            android:text="Nome"
+                            android:text="@string/texto_nome"
                             android:textColor="#9CA3AF"
                             android:textSize="12sp" />
 
@@ -361,7 +361,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="end"
-                            android:text="João Santos"
+                            android:text="@string/texto_joao_santos"
                             android:textColor="@color/ink_700"
                             android:textSize="13sp" />
 
@@ -379,7 +379,7 @@
                     <LinearLayout
                         android:id="@+id/rowCpf"
                         android:layout_width="match_parent"
-                        android:layout_height="58dp"
+                        android:layout_height="wrap_content" android:minHeight="58dp"
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center_vertical"
@@ -390,16 +390,16 @@
                         <TextView
                             android:layout_width="90dp"
                             android:layout_height="wrap_content"
-                            android:text="CPF"
+                            android:text="@string/texto_cpf"
                             android:textColor="#9CA3AF"
                             android:textSize="12sp" />
 
-                        <TextView
+                        <TextView android:id="@+id/profileDocumentBody"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="end"
-                            android:text="987.654.321-00"
+                            android:text="@string/texto_987_654_321_00"
                             android:textColor="@color/ink_700"
                             android:textSize="13sp" />
 
@@ -417,7 +417,7 @@
                     <LinearLayout
                         android:id="@+id/rowTelefone"
                         android:layout_width="match_parent"
-                        android:layout_height="58dp"
+                        android:layout_height="wrap_content" android:minHeight="58dp"
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center_vertical"
@@ -428,7 +428,7 @@
                         <TextView
                             android:layout_width="90dp"
                             android:layout_height="wrap_content"
-                            android:text="Telefone"
+                            android:text="@string/texto_telefone"
                             android:textColor="#9CA3AF"
                             android:textSize="12sp" />
 
@@ -438,7 +438,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="end"
-                            android:text="(11) 98888-5678"
+                            android:text="@string/texto_11_98888_5678"
                             android:textColor="@color/ink_700"
                             android:textSize="13sp" />
 
@@ -456,7 +456,7 @@
                     <LinearLayout
                         android:id="@+id/rowEmail"
                         android:layout_width="match_parent"
-                        android:layout_height="58dp"
+                        android:layout_height="wrap_content" android:minHeight="58dp"
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center_vertical"
@@ -467,16 +467,16 @@
                         <TextView
                             android:layout_width="90dp"
                             android:layout_height="wrap_content"
-                            android:text="E-mail"
+                            android:text="@string/texto_e_mail"
                             android:textColor="#9CA3AF"
                             android:textSize="12sp" />
 
-                        <TextView
+                        <TextView android:id="@+id/profileEmailBody"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="end"
-                            android:text="ambulante@gmail.com"
+                            android:text="@string/texto_ambulante_gmail_com"
                             android:textColor="@color/ink_700"
                             android:textSize="13sp" />
 
@@ -494,7 +494,7 @@
                     <LinearLayout
                         android:id="@+id/rowSenha"
                         android:layout_width="match_parent"
-                        android:layout_height="58dp"
+                        android:layout_height="wrap_content" android:minHeight="58dp"
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center_vertical"
@@ -505,7 +505,7 @@
                         <TextView
                             android:layout_width="90dp"
                             android:layout_height="wrap_content"
-                            android:text="Senha"
+                            android:text="@string/texto_senha"
                             android:textColor="#9CA3AF"
                             android:textSize="12sp" />
 
@@ -514,7 +514,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="end"
-                            android:text="••••••••"
+                            android:text="@string/texto_simbolo_5"
                             android:textColor="@color/ink_700"
                             android:textSize="15sp" />
 
@@ -529,12 +529,12 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSair"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:gravity="center" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:minHeight="50dp"
                 android:layout_marginTop="18dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                android:text="Sair da conta"
+                android:text="@string/texto_sair_da_conta"
                 android:textAllCaps="false"
                 android:textColor="#EF4444"
                 android:textSize="14sp"
@@ -583,7 +583,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center"
-                android:text="×"
+                android:text="@string/texto_simbolo_6"
                 android:textColor="@color/ink_700"
                 android:textSize="22sp" />
 
@@ -593,7 +593,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
-                android:text="Editar perfil"
+                android:text="@string/texto_editar_perfil"
                 android:textColor="@color/ink_900"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -608,7 +608,7 @@
                 android:gravity="center"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
-                android:text="Salvar"
+                android:text="@string/texto_salvar"
                 android:textColor="@color/brand_700"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -635,72 +635,72 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="NOME COMPLETO"
+                    android:text="@string/texto_nome_completo"
                     android:textColor="@color/ink_700"
                     android:textSize="11sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"     android:labelFor="@id/edtNome" />
 
 
                 <EditText
                     android:id="@+id/edtNome"
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:gravity="start|center_vertical" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:minHeight="52dp"
                     android:layout_marginTop="7dp"
                     android:background="@drawable/bg_input"
                     android:inputType="textCapWords"
                     android:paddingStart="15dp"
                     android:paddingEnd="15dp"
-                    android:text="João Santos"
+                    android:text="@string/texto_joao_santos"
                     android:textColor="@color/ink_900"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"     android:importantForAutofill="no"     android:maxLength="500" />
 
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="19dp"
-                    android:text="TELEFONE"
+                    android:text="@string/texto_telefone_2"
                     android:textColor="@color/ink_700"
                     android:textSize="11sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"     android:labelFor="@id/edtTelefone" />
 
 
                 <EditText
                     android:id="@+id/edtTelefone"
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:gravity="start|center_vertical" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:minHeight="52dp"
                     android:layout_marginTop="7dp"
                     android:background="@drawable/bg_input"
                     android:inputType="phone"
                     android:paddingStart="15dp"
                     android:paddingEnd="15dp"
-                    android:text="(11) 98888-5678"
+                    android:text="@string/texto_11_98888_5678"
                     android:textColor="@color/ink_900"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"     android:importantForAutofill="no"     android:maxLength="500" />
 
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="19dp"
-                    android:text="CPF"
+                    android:text="@string/texto_cpf"
                     android:textColor="@color/ink_700"
                     android:textSize="11sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"     android:labelFor="@id/edtCpf" />
 
 
                 <EditText
                     android:id="@+id/edtCpf"
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:gravity="start|center_vertical" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:minHeight="52dp"
                     android:layout_marginTop="7dp"
                     android:background="@drawable/bg_input"
                     android:enabled="false"
                     android:paddingStart="15dp"
                     android:paddingEnd="15dp"
-                    android:text="987.654.321-00"
+                    android:text="@string/texto_987_654_321_00"
                     android:textColor="#9CA3AF"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"     android:inputType="number"     android:importantForAutofill="no"     android:maxLength="500" />
 
             </LinearLayout>
 

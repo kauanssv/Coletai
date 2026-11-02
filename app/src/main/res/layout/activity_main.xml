@@ -48,7 +48,7 @@
                 <ImageView
                     android:layout_width="54dp"
                     android:layout_height="54dp"
-                    android:contentDescription="Logo do Coletaí"
+                    android:contentDescription="@string/texto_logo_do_coletai"
                     android:elevation="8dp"
                     android:src="@drawable/logo_coletai" />
 
@@ -63,7 +63,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Coletaí"
+                        android:text="@string/app_name"
                         android:textColor="@color/ink_900"
                         android:textSize="25sp"
                         android:textStyle="bold" />
@@ -74,9 +74,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:letterSpacing="0.08"
-                        android:text="DESCARTE CONSCIENTE"
+                        android:text="@string/texto_descarte_consciente"
                         android:textColor="@color/ink_500"
-                        android:textSize="10sp"
+                        android:textSize="11sp"
                         android:textStyle="bold" />
 
                 </LinearLayout>
@@ -100,7 +100,7 @@
                 android:paddingTop="7dp"
                 android:paddingEnd="11dp"
                 android:paddingBottom="7dp"
-                android:text="Tecnologia para um futuro limpo"
+                android:text="@string/texto_tecnologia_para_um_futuro_limpo"
                 android:textColor="@color/brand_800"
                 android:textSize="11sp"
                 android:textStyle="bold" />
@@ -111,18 +111,18 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
                 android:lineSpacingExtra="2dp"
-                android:text="Bom ter você\npor aqui."
+                android:text="@string/texto_bom_ter_voce_npor_aqui"
                 android:textColor="@color/ink_900"
                 android:textSize="30sp"
                 android:textStyle="bold" />
 
 
-            <TextView
+            <TextView android:id="@+id/loginSubtitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:lineSpacingExtra="3dp"
-                android:text="Acesse sua conta para solicitar ou realizar uma coleta."
+                android:text="@string/texto_versao_de_demonstracao_escolha_um_perfil_abai"
                 android:textColor="@color/ink_500"
                 android:textSize="14sp" />
 
@@ -135,26 +135,26 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="28dp"
-                android:text="E-mail"
+                android:text="@string/texto_e_mail"
                 android:textColor="@color/ink_700"
                 android:textSize="13sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"     android:labelFor="@id/edtEmail" />
 
 
             <EditText
                 android:id="@+id/edtEmail"
-                android:layout_width="match_parent"
-                android:layout_height="54dp"
+                android:gravity="start|center_vertical" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:minHeight="54dp"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/bg_input"
-                android:hint="seu@email.com"
+                android:hint="@string/texto_seu_email_com"
                 android:inputType="textEmailAddress"
                 android:maxLines="1"
                 android:paddingStart="17dp"
                 android:paddingEnd="17dp"
                 android:textColor="@color/ink_900"
                 android:textColorHint="@color/ink_400"
-                android:textSize="15sp" />
+                android:textSize="15sp"     android:importantForAutofill="no"     android:maxLength="500" />
 
 
             <!-- =====================================================
@@ -165,7 +165,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="18dp"
-                android:text="Senha"
+                android:text="@string/texto_senha"
                 android:textColor="@color/ink_700"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -183,14 +183,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@android:color/transparent"
-                    android:hint="••••••••"
+                    android:hint="@string/texto_simbolo_5"
                     android:inputType="textPassword"
                     android:maxLines="1"
                     android:paddingStart="17dp"
                     android:paddingEnd="54dp"
                     android:textColor="@color/ink_900"
                     android:textColorHint="@color/ink_400"
-                    android:textSize="15sp" />
+                    android:textSize="15sp"     android:importantForAutofill="no"     android:maxLength="500" />
 
 
                 <ImageButton
@@ -200,7 +200,7 @@
                     android:layout_gravity="end"
                     android:alpha="0.55"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Mostrar ou ocultar senha"
+                    android:contentDescription="@string/texto_mostrar_ou_ocultar_senha"
                     android:padding="14dp"
                     android:src="@drawable/ic_eye"
                     app:tint="@color/ink_500" />
@@ -214,19 +214,29 @@
 
             <Button
                 android:id="@+id/btnEntrar"
-                android:layout_width="match_parent"
-                android:layout_height="54dp"
+                android:gravity="center" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:minHeight="54dp"
                 android:layout_marginTop="24dp"
                 android:background="@drawable/bg_button_primary"
                 android:backgroundTint="@null"
                 android:elevation="5dp"
-                android:text="Entrar"
+                android:text="@string/texto_entrar_na_demonstracao"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 app:backgroundTint="@null" />
 
+
+            <com.google.android.material.button.MaterialButton android:id="@+id/btnRegister" style="@style/Widget.Material3.Button.TextButton" android:gravity="center" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:text="Criar minha conta" android:textAllCaps="false" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAdminDemo"
+                android:gravity="center" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="52dp"
+                android:layout_marginTop="20dp" android:text="@string/admin_shortcut"
+                android:contentDescription="@string/admin_shortcut_hint"
+                android:textAllCaps="false" android:textColor="@android:color/white"
+                app:backgroundTint="@color/admin_navy" app:cornerRadius="14dp" />
 
             <!-- =====================================================
                  DIVISÓRIA
@@ -243,7 +253,7 @@
                  CONTAS DE DEMONSTRAÇÃO
                  ===================================================== -->
 
-            <LinearLayout
+            <LinearLayout android:id="@+id/demoHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
@@ -255,7 +265,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Acesso rápido"
+                    android:text="@string/texto_acesso_rapido"
                     android:textColor="@color/ink_700"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -264,9 +274,9 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Contas de demonstração"
+                    android:text="@string/texto_contas_de_demonstracao"
                     android:textColor="@color/ink_500"
-                    android:textSize="10sp" />
+                    android:textSize="11sp" />
 
             </LinearLayout>
 
@@ -289,14 +299,14 @@
 
                     <ImageView
                         style="@style/DemoIcon"
-                        android:contentDescription="Cliente"
+                        android:contentDescription="@string/texto_cliente"
                         android:src="@drawable/ic_person"
                         app:tint="@color/brand_700" />
 
 
                     <TextView
                         style="@style/DemoLabel"
-                        android:text="Cliente" />
+                        android:text="@string/texto_cliente" />
 
                 </LinearLayout>
 
@@ -312,14 +322,14 @@
 
                     <ImageView
                         style="@style/DemoIcon"
-                        android:contentDescription="Ambulante"
+                        android:contentDescription="@string/texto_ambulante"
                         android:src="@drawable/ic_truck"
                         app:tint="@color/brand_700" />
 
 
                     <TextView
                         style="@style/DemoLabel"
-                        android:text="Ambulante" />
+                        android:text="@string/texto_ambulante" />
 
                 </LinearLayout>
 
@@ -334,27 +344,29 @@
 
                     <ImageView
                         style="@style/DemoIcon"
-                        android:contentDescription="Empresa"
+                        android:contentDescription="@string/texto_empresa"
                         android:src="@drawable/ic_leaf_small"
                         app:tint="@color/brand_700" />
 
 
                     <TextView
                         style="@style/DemoLabel"
-                        android:text="Empresa" />
+                        android:text="@string/texto_empresa" />
 
                 </LinearLayout>
 
             </LinearLayout>
 
 
-            <TextView
+            <TextView android:id="@+id/demoPasswordHint"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="Senha de demonstração: 12345"
+                android:text="@string/texto_senha_de_demonstracao_12345"
                 android:textColor="@color/ink_500"
                 android:textSize="11sp" />
+
+
 
 
             <!-- =====================================================
@@ -363,8 +375,8 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnBluetoothDemo"
-                android:layout_width="wrap_content"
-                android:layout_height="44dp"
+                android:gravity="center" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:minHeight="44dp"
                 android:layout_marginTop="28dp"
                 android:alpha="0.75"
                 android:insetTop="0dp"
@@ -372,7 +384,7 @@
                 android:minWidth="0dp"
                 android:paddingStart="18dp"
                 android:paddingEnd="18dp"
-                android:text="Bluetooth para demonstração"
+                android:text="@string/texto_bluetooth_para_demonstracao"
                 android:textAllCaps="false"
                 android:textColor="@color/ink_500"
                 android:textSize="11sp"

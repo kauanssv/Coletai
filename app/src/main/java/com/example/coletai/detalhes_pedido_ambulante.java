@@ -17,7 +17,8 @@ import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.google.android.material.card.MaterialCardView;
 
-public class detalhes_pedido_ambulante extends AppCompatActivity {
+public class detalhes_pedido_ambulante extends PedidoActivity {
+    @Override protected boolean aceitaStatus(String status) { return "waiting".equals(status) || "proposal".equals(status); }
 
     private TextView btnVoltar;
 
@@ -38,7 +39,6 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
     private Button btnEnviarProposta;
 
     private SharedPreferences preferencias;
-
 
     @Override
     protected void onCreate(
@@ -71,7 +71,6 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
 
         configurarEventos();
     }
-
 
     // =====================================================
     // BARRAS DO SISTEMA
@@ -116,7 +115,6 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
         );
     }
 
-
     // =====================================================
     // COMPONENTES
     // =====================================================
@@ -128,79 +126,66 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
                         R.id.btnVoltarDetalhes
                 );
 
-
         txtTagTipo =
                 findViewById(
                         R.id.txtTagTipo
                 );
-
 
         txtEmojiTipo =
                 findViewById(
                         R.id.txtEmojiTipo
                 );
 
-
         txtTipoPedido =
                 findViewById(
                         R.id.txtTipoPedido
                 );
-
 
         txtLocalizacaoCabecalho =
                 findViewById(
                         R.id.txtLocalizacaoCabecalho
                 );
 
-
         txtDescricaoPedido =
                 findViewById(
                         R.id.txtDescricaoPedido
                 );
-
 
         txtPesoPedido =
                 findViewById(
                         R.id.txtPesoPedido
                 );
 
-
         txtRegiaoPedido =
                 findViewById(
                         R.id.txtRegiaoPedido
                 );
-
 
         txtLocalizacaoPedido =
                 findViewById(
                         R.id.txtLocalizacaoPedido
                 );
 
-
         cardObservacao =
                 findViewById(
                         R.id.cardObservacao
                 );
-
 
         txtObservacaoPedido =
                 findViewById(
                         R.id.txtObservacaoPedido
                 );
 
-
         btnRecusar =
                 findViewById(
                         R.id.btnRecusar
                 );
-
 
         btnEnviarProposta =
                 findViewById(
                         R.id.btnEnviarProposta
                 );
     }
-
 
     // =====================================================
     // CARREGAR PEDIDO
@@ -214,13 +199,11 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
                         "Eletrônicos"
                 );
 
-
         String emoji =
                 preferencias.getString(
                         "pedido_emoji",
                         obterEmoji(tipo)
                 );
-
 
         String descricao =
                 preferencias.getString(
@@ -228,13 +211,11 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
                         "TV de tubo 29\" e um rádio antigo. Estão na garagem."
                 );
 
-
         String peso =
                 preferencias.getString(
                         "pedido_peso",
                         "14 kg"
                 );
-
 
         String regiao =
                 preferencias.getString(
@@ -242,20 +223,17 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
                         "Consolação"
                 );
 
-
         String cidade =
                 preferencias.getString(
                         "pedido_cidade",
                         "São Paulo"
                 );
 
-
         String observacao =
                 preferencias.getString(
                         "pedido_observacao",
                         ""
                 );
-
 
         if (
                 tipo == null
@@ -266,7 +244,6 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
             tipo =
                     "Pedido";
         }
-
 
         if (
                 emoji == null
@@ -280,7 +257,6 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
                     );
         }
 
-
         if (
                 descricao == null
                         ||
@@ -290,7 +266,6 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
             descricao =
                     "Sem descrição.";
         }
-
 
         if (
                 peso == null
@@ -302,7 +277,6 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
                     "Não informado";
         }
 
-
         if (
                 regiao == null
                         ||
@@ -312,7 +286,6 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
             regiao =
                     "Região informada";
         }
-
 
         if (
                 cidade == null
@@ -324,7 +297,6 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
                     "São Paulo";
         }
 
-
         // =================================================
         // CABEÇALHO
         // =================================================
@@ -333,23 +305,15 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
                 emoji + " " + tipo
         );
 
-
         txtEmojiTipo.setText(
                 emoji
         );
-
 
         txtTipoPedido.setText(
                 tipo
         );
 
-
-        txtLocalizacaoCabecalho.setText(
-                regiao
-                        + ", "
-                        + cidade
-        );
-
+        txtLocalizacaoCabecalho.setText(preferencias.getString("pedido_endereco_completo", ""));
 
         // =================================================
         // PEDIDO
@@ -359,23 +323,13 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
                 descricao
         );
 
-
         txtPesoPedido.setText(
                 peso
         );
 
+        txtRegiaoPedido.setText(preferencias.getString("pedido_endereco_completo", ""));
 
-        txtRegiaoPedido.setText(
-                regiao
-        );
-
-
-        txtLocalizacaoPedido.setText(
-                regiao
-                        + ", "
-                        + cidade
-        );
-
+        txtLocalizacaoPedido.setText(preferencias.getString("pedido_endereco_completo", ""));
 
         // =================================================
         // OBSERVAÇÃO
@@ -397,13 +351,11 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
                     View.VISIBLE
             );
 
-
             txtObservacaoPedido.setText(
                     observacao
             );
         }
     }
-
 
     // =====================================================
     // EVENTOS
@@ -415,11 +367,9 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
                 view -> finish()
         );
 
-
         btnRecusar.setOnClickListener(
                 view -> finish()
         );
-
 
         btnEnviarProposta.setOnClickListener(
                 view -> {
@@ -430,14 +380,12 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
                                     enviar_proposta_ambulante.class
                             );
 
-
                     startActivity(
                             intent
                     );
                 }
         );
     }
-
 
     // =====================================================
     // EMOJI
@@ -452,38 +400,31 @@ public class detalhes_pedido_ambulante extends AppCompatActivity {
             return "📦";
         }
 
-
         switch (tipo) {
 
             case "Pilhas":
 
                 return "🔋";
 
-
             case "Baterias":
 
                 return "⚡";
-
 
             case "Eletrônicos":
 
                 return "💻";
 
-
             case "Medicamentos":
 
                 return "💊";
-
 
             case "Agulhas":
 
                 return "💉";
 
-
             case "Óleo":
 
                 return "🫙";
-
 
             default:
 

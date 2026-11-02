@@ -7,7 +7,6 @@ import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
@@ -23,6 +22,8 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class BluetoothColetai {
 
@@ -41,7 +42,6 @@ public class BluetoothColetai {
         void onErro(String mensagem);
     }
 
-
     // =====================================================
     // CALLBACK PARA ATUALIZAR A TELA VISÍVEL DO APP
     // =====================================================
@@ -50,7 +50,6 @@ public class BluetoothColetai {
 
         void onSyncAtualizado();
     }
-
 
     // =====================================================
     // SINGLETON / CONFIGURAÇÃO
@@ -66,27 +65,34 @@ public class BluetoothColetai {
     private static final String NOME_SERVICO =
             "ColetaiBluetooth";
 
-
     private final Context appContext;
     private final BluetoothAdapter bluetoothAdapter;
     private final SharedPreferences preferencias;
     private final Handler mainHandler;
 
-
     private BluetoothServerSocket serverSocket;
-    private BluetoothSocket socket;
+    private volatile BluetoothSocket socket;
 
-    private Thread threadServidor;
-    private Thread threadConexao;
-    private Thread threadLeitura;
+    private volatile Thread threadServidor;
+    private long geracaoConexao;
+    private BluetoothSocket socketConectando;
+    private boolean servidorDesejado;
+    private String mensagemRecebidaId;
+    private volatile Thread threadConexao;
+    private final ExecutorService envioExecutor = Executors.newSingleThreadExecutor();
+    private final PedidoRepository pedidos;
+    private final EventStore eventos;
+    private boolean aplicandoRemoto;
+    private boolean sessaoAtiva = true;
+    private String peerAtual = "";
+    private final Runnable retryEnvio = this::reenviarPendentes;
 
     private volatile boolean conectado = false;
 
     private volatile Listener listener;
-    private volatile SyncListener syncListener;
+    private final java.util.Set<SyncListener> syncListeners = new java.util.concurrent.CopyOnWriteArraySet<>();
 
-    private String nomeDispositivoConectado = "";
-
+    private volatile String nomeDispositivoConectado = "";
 
     // =====================================================
     // ESTADO LOCAL PARA SABER QUAL EVENTO ENVIAR
@@ -95,17 +101,8 @@ public class BluetoothColetai {
     private String ultimoStatusConhecido;
     private String ultimaEtapaConhecida;
 
-    private long ultimoEnvioPedido = 0;
-    private long ultimoEnvioProposta = 0;
-    private long ultimoEnvioAceite = 0;
-    private long ultimoEnvioRecusa = 0;
-    private long ultimoEnvioEtapa = 0;
-    private long ultimoEnvioCancelamento = 0;
-
-
     private final SharedPreferences.OnSharedPreferenceChangeListener
             listenerPreferencias;
-
 
     // =====================================================
     // CONSTRUTOR
@@ -118,19 +115,16 @@ public class BluetoothColetai {
         appContext =
                 context.getApplicationContext();
 
-
         mainHandler =
                 new Handler(
                         Looper.getMainLooper()
                 );
-
 
         BluetoothManager bluetoothManager =
                 (BluetoothManager)
                         appContext.getSystemService(
                                 Context.BLUETOOTH_SERVICE
                         );
-
 
         if (bluetoothManager != null) {
 
@@ -143,13 +137,14 @@ public class BluetoothColetai {
                     null;
         }
 
-
         preferencias =
                 appContext.getSharedPreferences(
                         "coletai",
                         Context.MODE_PRIVATE
                 );
 
+        pedidos = new PedidoRepository(preferencias);
+        eventos = new EventStore(preferencias);
 
         ultimoStatusConhecido =
                 preferencias.getString(
@@ -157,16 +152,15 @@ public class BluetoothColetai {
                         ""
                 );
 
-
         ultimaEtapaConhecida =
                 preferencias.getString(
                         "coleta_etapa",
                         ""
                 );
 
-
         listenerPreferencias =
                 (sharedPreferences, chave) -> {
+                    if (aplicandoRemoto) return;
 
                     if (
                             "pedido_status".equals(
@@ -176,7 +170,6 @@ public class BluetoothColetai {
 
                         processarAlteracaoStatusLocal();
                     }
-
 
                     if (
                             "coleta_etapa".equals(
@@ -188,13 +181,11 @@ public class BluetoothColetai {
                     }
                 };
 
-
         preferencias
                 .registerOnSharedPreferenceChangeListener(
                         listenerPreferencias
                 );
     }
-
 
     public static synchronized BluetoothColetai getInstance(
             Context context
@@ -208,10 +199,8 @@ public class BluetoothColetai {
                     );
         }
 
-
         return instancia;
     }
-
 
     // =====================================================
     // LISTENERS
@@ -224,12 +213,10 @@ public class BluetoothColetai {
         this.listener =
                 listener;
 
-
         if (listener == null) {
 
             return;
         }
-
 
         if (estaConectado()) {
 
@@ -245,787 +232,131 @@ public class BluetoothColetai {
         }
     }
 
-
-    public void setSyncListener(
-            SyncListener syncListener
-    ) {
-
-        this.syncListener =
-                syncListener;
-    }
-
+    public void addSyncListener(SyncListener listener) { syncListeners.add(listener); }
+    public void removeSyncListener(SyncListener listener) { syncListeners.remove(listener); }
 
     // =====================================================
     // DETECTAR ALTERAÇÃO LOCAL DE STATUS
     // =====================================================
 
     private void processarAlteracaoStatusLocal() {
-
-        String statusAtual =
-                preferencias.getString(
-                        "pedido_status",
-                        ""
-                );
-
-
-        String statusAnterior =
-                ultimoStatusConhecido == null
-                        ? ""
-                        : ultimoStatusConhecido;
-
-
-        ultimoStatusConhecido =
-                statusAtual == null
-                        ? ""
-                        : statusAtual;
-
-
-        if (!estaConectado()) {
-
-            return;
-        }
-
-
-        String tipoUsuario =
-                preferencias.getString(
-                        "usuario_tipo_atual",
-                        ""
-                );
-
-
-        // -------------------------------------------------
-        // CLIENTE
-        // -------------------------------------------------
-
-        if (
-                "cliente".equals(
-                        tipoUsuario
-                )
-        ) {
-
-            /*
-             * Criou um NOVO PEDIDO:
-             * vazio/done -> waiting
-             */
-            if (
-                    "waiting".equals(
-                            statusAtual
-                    )
-                            &&
-                            !"proposal".equals(
-                                    statusAnterior
-                            )
-            ) {
-
-                if (
-                        podeEnviar(
-                                ultimoEnvioPedido
-                        )
-                ) {
-
-                    ultimoEnvioPedido =
-                            System.currentTimeMillis();
-
-
-                    enviarPedidoAtual();
-                }
-
-
-                return;
+        String atual = preferencias.getString("pedido_status", "");
+        String anterior = ultimoStatusConhecido;
+        ultimoStatusConhecido = atual;
+        notificarSyncAtualizado();
+        if (atual.equals(anterior) || !sessaoAtiva) return;
+        String perfil = preferencias.getString("usuario_tipo_atual", "");
+        if ("done".equals(atual)) pedidos.arquivar("concluido");
+        if ("cliente".equals(perfil)) {
+            if ("waiting".equals(atual)) {
+                if ("proposal".equals(anterior)) enviarEventoSimples("PROPOSTA_RECUSADA");
+                else enviarPedidoAtual();
+            } else if ("active".equals(atual) && "proposal".equals(anterior)) {
+                enviarPropostaAceita();
+            } else if (atual.isEmpty() && !anterior.isEmpty() && !"done".equals(anterior)) {
+                enviarEventoSimples("PEDIDO_CANCELADO");
             }
-
-
-            /*
-             * Recusou uma PROPOSTA:
-             * proposal -> waiting
-             */
-            if (
-                    "proposal".equals(
-                            statusAnterior
-                    )
-                            &&
-                            "waiting".equals(
-                                    statusAtual
-                            )
-            ) {
-
-                if (
-                        podeEnviar(
-                                ultimoEnvioRecusa
-                        )
-                ) {
-
-                    ultimoEnvioRecusa =
-                            System.currentTimeMillis();
-
-
-                    enviarEventoSimples(
-                            "PROPOSTA_RECUSADA"
-                    );
-                }
-
-
-                return;
-            }
-
-
-            /*
-             * Aceitou a proposta:
-             * proposal -> active
-             */
-            if (
-                    "proposal".equals(
-                            statusAnterior
-                    )
-                            &&
-                            "active".equals(
-                                    statusAtual
-                            )
-            ) {
-
-                if (
-                        podeEnviar(
-                                ultimoEnvioAceite
-                        )
-                ) {
-
-                    ultimoEnvioAceite =
-                            System.currentTimeMillis();
-
-
-                    enviarPropostaAceita();
-                }
-
-
-                return;
-            }
-
-
-            /*
-             * Cancelou o pedido:
-             * waiting/proposal/active -> vazio
-             */
-            if (
-                    statusAtual != null
-                            &&
-                            statusAtual.isEmpty()
-                            &&
-                            statusAnterior != null
-                            &&
-                            !statusAnterior.isEmpty()
-            ) {
-
-                if (
-                        podeEnviar(
-                                ultimoEnvioCancelamento
-                        )
-                ) {
-
-                    ultimoEnvioCancelamento =
-                            System.currentTimeMillis();
-
-
-                    enviarEventoSimples(
-                            "PEDIDO_CANCELADO"
-                    );
-                }
-            }
-
-
-            return;
-        }
-
-
-        // -------------------------------------------------
-        // AMBULANTE / EMPRESA
-        // -------------------------------------------------
-
-        boolean ehColetor =
-                "ambulante".equals(
-                        tipoUsuario
-                )
-                        ||
-                        "empresa".equals(
-                                tipoUsuario
-                        );
-
-
-        if (!ehColetor) {
-
-            return;
-        }
-
-
-        /*
-         * Enviou proposta:
-         * waiting -> proposal
-         */
-        if (
-                "proposal".equals(
-                        statusAtual
-                )
-                        &&
-                        !"proposal".equals(
-                                statusAnterior
-                        )
-        ) {
-
-            if (
-                    podeEnviar(
-                            ultimoEnvioProposta
-                    )
-            ) {
-
-                ultimoEnvioProposta =
-                        System.currentTimeMillis();
-
-
-                enviarPropostaAtual();
-            }
+        } else if (PedidoRules.coletor(perfil) && "proposal".equals(atual)) {
+            enviarPropostaAtual();
         }
     }
-
 
     // =====================================================
     // DETECTAR ALTERAÇÃO LOCAL DA COLETA
     // =====================================================
 
     private void processarAlteracaoEtapaLocal() {
-
-        String etapaAtual =
-                preferencias.getString(
-                        "coleta_etapa",
-                        ""
-                );
-
-
-        String etapaAnterior =
-                ultimaEtapaConhecida == null
-                        ? ""
-                        : ultimaEtapaConhecida;
-
-
-        ultimaEtapaConhecida =
-                etapaAtual == null
-                        ? ""
-                        : etapaAtual;
-
-
-        if (!estaConectado()) {
-
-            return;
-        }
-
-
-        String tipoUsuario =
-                preferencias.getString(
-                        "usuario_tipo_atual",
-                        ""
-                );
-
-
-        boolean ehColetor =
-                "ambulante".equals(
-                        tipoUsuario
-                )
-                        ||
-                        "empresa".equals(
-                                tipoUsuario
-                        );
-
-
-        if (!ehColetor) {
-
-            return;
-        }
-
-
-        if (
-                etapaAtual == null
-                        ||
-                        etapaAtual.isEmpty()
-                        ||
-                        etapaAtual.equals(
-                                etapaAnterior
-                        )
-        ) {
-
-            return;
-        }
-
-
-        if (
-                "going".equals(
-                        etapaAtual
-                )
-                        ||
-                        "collecting".equals(
-                                etapaAtual
-                        )
-        ) {
-
-            if (
-                    podeEnviar(
-                            ultimoEnvioEtapa
-                    )
-            ) {
-
-                ultimoEnvioEtapa =
-                        System.currentTimeMillis();
-
-
-                enviarEtapaColeta(
-                        etapaAtual
-                );
-            }
-
-
-            return;
-        }
-
-
-        if (
-                "done".equals(
-                        etapaAtual
-                )
-        ) {
-
-            if (
-                    podeEnviar(
-                            ultimoEnvioEtapa
-                    )
-            ) {
-
-                ultimoEnvioEtapa =
-                        System.currentTimeMillis();
-
-
-                enviarColetaFinalizada();
-            }
-        }
+        String atual = preferencias.getString("coleta_etapa", "");
+        String anterior = ultimaEtapaConhecida;
+        ultimaEtapaConhecida = atual;
+        notificarSyncAtualizado();
+        if (!sessaoAtiva || atual.equals(anterior)
+                || !PedidoRules.coletor(preferencias.getString("usuario_tipo_atual", ""))) return;
+        if ("going".equals(atual) || "collecting".equals(atual)) enviarEtapaColeta(atual);
+        else if ("done".equals(atual)) enviarColetaFinalizada();
     }
 
-
-    private boolean podeEnviar(
-            long ultimoEnvio
-    ) {
-
-        return (
-                System.currentTimeMillis()
-                        -
-                        ultimoEnvio
-        ) > 700;
+    public void pausarSessao() {
+        sessaoAtiva = false;
+        mainHandler.removeCallbacks(retryEnvio);
     }
 
+    public void selecionarPerfil(String perfil) {
+        selecionarConta(perfil);
+    }
+
+    public void selecionarConta(String account) {
+        ProfileRepository profiles = new ProfileRepository(preferencias);
+        JSONObject profile = profiles.get(account);
+        if (!profiles.available(account)) throw new IllegalArgumentException("Conta bloqueada ou excluída");
+        aplicandoRemoto = true;
+        try {
+            pedidos.selecionarConta(account, profile.optString("role"));
+            SharedPreferences.Editor editor = preferencias.edit();
+            ProfileRepository.mirror(editor, profile);
+            LocalJson.commit(editor);
+            ultimoStatusConhecido = preferencias.getString("pedido_status", "");
+            ultimaEtapaConhecida = preferencias.getString("coleta_etapa", "");
+        } finally {
+            aplicandoRemoto = false;
+        }
+        sessaoAtiva = !"admin".equals(profile.optString("role"));
+        reenviarPendentes();
+    }
 
     // =====================================================
     // ENVIAR NOVO PEDIDO
     // =====================================================
 
     public void enviarPedidoAtual() {
-
-        if (!estaConectado()) {
-
-            return;
-        }
-
-
-        try {
-
-            JSONObject json =
-                    new JSONObject();
-
-
-            json.put(
-                    "evento",
-                    "NOVO_PEDIDO"
-            );
-
-
-            json.put(
-                    "tipo",
-                    preferencias.getString(
-                            "pedido_tipo",
-                            ""
-                    )
-            );
-
-
-            json.put(
-                    "emoji",
-                    preferencias.getString(
-                            "pedido_emoji",
-                            ""
-                    )
-            );
-
-
-            json.put(
-                    "descricao",
-                    preferencias.getString(
-                            "pedido_descricao",
-                            ""
-                    )
-            );
-
-
-            json.put(
-                    "peso",
-                    preferencias.getString(
-                            "pedido_peso",
-                            ""
-                    )
-            );
-
-
-            json.put(
-                    "regiao",
-                    preferencias.getString(
-                            "pedido_regiao",
-                            ""
-                    )
-            );
-
-
-            json.put(
-                    "cidade",
-                    preferencias.getString(
-                            "pedido_cidade",
-                            ""
-                    )
-            );
-
-
-            json.put(
-                    "observacao",
-                    preferencias.getString(
-                            "pedido_observacao",
-                            ""
-                    )
-            );
-
-
-            json.put(
-                    "enderecoCompleto",
-                    preferencias.getString(
-                            "pedido_endereco_completo",
-                            ""
-                    )
-            );
-
-
-            enviar(
-                    json.toString()
-            );
-
-        } catch (
-                JSONException e
-        ) {
-
-            notificarErro(
-                    "Não foi possível preparar o pedido."
-            );
-        }
+        try { enviar(PedidoMessages.pedido(preferencias).toString()); }
+        catch (JSONException e) { notificarErro("Falha ao preparar evento de coleta."); }
     }
-
 
     // =====================================================
     // ENVIAR PROPOSTA
     // =====================================================
 
     public void enviarPropostaAtual() {
-
-        if (!estaConectado()) {
-
-            return;
-        }
-
-
-        try {
-
-            JSONObject json =
-                    new JSONObject();
-
-
-            json.put(
-                    "evento",
-                    "PROPOSTA"
-            );
-
-
-            json.put(
-                    "preco",
-                    preferencias.getString(
-                            "proposta_preco",
-                            ""
-                    )
-            );
-
-
-            json.put(
-                    "mensagem",
-                    preferencias.getString(
-                            "proposta_mensagem",
-                            ""
-                    )
-            );
-
-
-            json.put(
-                    "nome",
-                    preferencias.getString(
-                            "proposta_coletor_nome",
-                            ""
-                    )
-            );
-
-
-            json.put(
-                    "avaliacao",
-                    preferencias.getFloat(
-                            "proposta_coletor_avaliacao",
-                            4.9f
-                    )
-            );
-
-
-            json.put(
-                    "coletas",
-                    preferencias.getInt(
-                            "proposta_coletor_coletas",
-                            0
-                    )
-            );
-
-
-            json.put(
-                    "tipoColetor",
-                    preferencias.getString(
-                            "proposta_coletor_tipo",
-                            ""
-                    )
-            );
-
-
-            json.put(
-                    "email",
-                    preferencias.getString(
-                            "proposta_coletor_email",
-                            ""
-                    )
-            );
-
-
-            enviar(
-                    json.toString()
-            );
-
-        } catch (
-                JSONException e
-        ) {
-
-            notificarErro(
-                    "Não foi possível preparar a proposta."
-            );
-        }
+        try { enviar(PedidoMessages.proposta(preferencias).toString()); }
+        catch (JSONException e) { notificarErro("Falha ao preparar evento de coleta."); }
     }
-
 
     // =====================================================
     // ENVIAR ACEITE
     // =====================================================
 
     private void enviarPropostaAceita() {
-
-        if (!estaConectado()) {
-
-            return;
-        }
-
-
-        try {
-
-            JSONObject json =
-                    new JSONObject();
-
-
-            json.put(
-                    "evento",
-                    "PROPOSTA_ACEITA"
-            );
-
-
-            json.put(
-                    "pedido_status",
-                    "active"
-            );
-
-
-            json.put(
-                    "coleta_etapa",
-                    "ready"
-            );
-
-
-            enviar(
-                    json.toString()
-            );
-
-        } catch (
-                JSONException e
-        ) {
-
-            notificarErro(
-                    "Não foi possível enviar o aceite."
-            );
-        }
+        try { enviar(PedidoMessages.evento("PROPOSTA_ACEITA").toString()); }
+        catch (JSONException e) { notificarErro("Falha ao preparar evento de coleta."); }
     }
-
 
     // =====================================================
     // ENVIAR ETAPA
     // =====================================================
 
-    private void enviarEtapaColeta(
-            String etapa
-    ) {
-
-        if (!estaConectado()) {
-
-            return;
-        }
-
-
-        try {
-
-            JSONObject json =
-                    new JSONObject();
-
-
-            json.put(
-                    "evento",
-                    "COLETA_ETAPA"
-            );
-
-
-            json.put(
-                    "pedido_status",
-                    "active"
-            );
-
-
-            json.put(
-                    "coleta_etapa",
-                    etapa
-            );
-
-
-            enviar(
-                    json.toString()
-            );
-
-        } catch (
-                JSONException e
-        ) {
-
-            notificarErro(
-                    "Não foi possível sincronizar a coleta."
-            );
-        }
+    private void enviarEtapaColeta(String etapa) {
+        try { enviar(PedidoMessages.etapa(etapa).toString()); }
+        catch (JSONException e) { notificarErro("Falha ao preparar evento de coleta."); }
     }
-
 
     // =====================================================
     // ENVIAR FINALIZAÇÃO
     // =====================================================
 
     private void enviarColetaFinalizada() {
-
-        if (!estaConectado()) {
-
-            return;
-        }
-
-
-        try {
-
-            JSONObject json =
-                    new JSONObject();
-
-
-            json.put(
-                    "evento",
-                    "COLETA_FINALIZADA"
-            );
-
-
-            json.put(
-                    "pedido_status",
-                    "done"
-            );
-
-
-            json.put(
-                    "coleta_etapa",
-                    "done"
-            );
-
-
-            enviar(
-                    json.toString()
-            );
-
-        } catch (
-                JSONException e
-        ) {
-
-            notificarErro(
-                    "Não foi possível finalizar a sincronização."
-            );
-        }
+        try { enviar(PedidoMessages.evento("COLETA_FINALIZADA").toString()); }
+        catch (JSONException e) { notificarErro("Falha ao preparar evento de coleta."); }
     }
-
 
     // =====================================================
     // EVENTO SIMPLES
     // =====================================================
 
-    private void enviarEventoSimples(
-            String evento
-    ) {
-
-        if (!estaConectado()) {
-
-            return;
-        }
-
-
-        try {
-
-            JSONObject json =
-                    new JSONObject();
-
-
-            json.put(
-                    "evento",
-                    evento
-            );
-
-
-            enviar(
-                    json.toString()
-            );
-
-        } catch (
-                JSONException e
-        ) {
-
-            notificarErro(
-                    "Não foi possível enviar a atualização."
-            );
-        }
+    private void enviarEventoSimples(String evento) {
+        try { enviar(PedidoMessages.evento(evento).toString()); }
+        catch (JSONException e) { notificarErro("Falha ao preparar evento de coleta."); }
     }
-
 
     // =====================================================
     // BLUETOOTH
@@ -1036,7 +367,6 @@ public class BluetoothColetai {
         return bluetoothAdapter != null;
     }
 
-
     @SuppressLint("MissingPermission")
     public boolean bluetoothAtivado() {
 
@@ -1044,7 +374,6 @@ public class BluetoothColetai {
 
             return false;
         }
-
 
         try {
 
@@ -1058,7 +387,6 @@ public class BluetoothColetai {
         }
     }
 
-
     public boolean estaConectado() {
 
         return conectado
@@ -1068,12 +396,10 @@ public class BluetoothColetai {
                 socket.isConnected();
     }
 
-
     public String getNomeDispositivoConectado() {
 
         return nomeDispositivoConectado;
     }
-
 
     @SuppressLint("MissingPermission")
     public Set<BluetoothDevice> getDispositivosPareados() {
@@ -1082,7 +408,6 @@ public class BluetoothColetai {
 
             return null;
         }
-
 
         try {
 
@@ -1097,11 +422,9 @@ public class BluetoothColetai {
                     "Permissão Bluetooth não concedida."
             );
 
-
             return null;
         }
     }
-
 
     // =====================================================
     // SERVIDOR
@@ -1109,423 +432,220 @@ public class BluetoothColetai {
 
     @SuppressLint("MissingPermission")
     public synchronized void iniciarServidor() {
-
-        if (bluetoothAdapter == null) {
-
-            notificarErro(
-                    "Bluetooth não disponível."
-            );
-
-
-            return;
-        }
-
-
-        if (estaConectado()) {
-
-            return;
-        }
-
-
-        if (
-                threadServidor != null
-                        &&
-                        threadServidor.isAlive()
-        ) {
-
-            return;
-        }
-
-
-        threadServidor =
-                new Thread(
-                        () -> {
-
-                            try {
-
-                                notificarStatus(
-                                        "Aguardando outro celular..."
-                                );
-
-
-                                BluetoothServerSocket servidor =
-                                        bluetoothAdapter
-                                                .listenUsingRfcommWithServiceRecord(
-                                                        NOME_SERVICO,
-                                                        UUID_COLETAI
-                                                );
-
-
-                                synchronized (
-                                        BluetoothColetai.this
-                                ) {
-
-                                    serverSocket =
-                                            servidor;
-                                }
-
-
-                                BluetoothSocket socketRecebido =
-                                        servidor.accept();
-
-
-                                if (
-                                        socketRecebido != null
-                                ) {
-
-                                    definirConexao(
-                                            socketRecebido
-                                    );
-                                }
-
-                            } catch (
-                                    SecurityException e
-                            ) {
-
-                                notificarErro(
-                                        "Sem permissão para usar o Bluetooth."
-                                );
-
-                            } catch (
-                                    IOException e
-                            ) {
-
-                                if (!conectado) {
-
-                                    notificarStatus(
-                                            "Servidor Bluetooth encerrado"
-                                    );
-                                }
-
-                            } finally {
-
-                                threadServidor =
-                                        null;
-                            }
-
-                        },
-                        "Coletai-Bluetooth-Servidor"
-                );
-
-
+        if (bluetoothAdapter == null || !bluetoothAtivado()) return;
+        servidorDesejado = true;
+        if (conectado || (threadServidor != null && threadServidor.isAlive())) return;
+        final long geracao = geracaoConexao;
+        threadServidor = new Thread(() -> {
+            BluetoothServerSocket servidor = null;
+            try {
+                servidor = bluetoothAdapter.listenUsingRfcommWithServiceRecord(NOME_SERVICO, UUID_COLETAI);
+                synchronized (this) {
+                    if (geracao != geracaoConexao || conectado || !servidorDesejado) return;
+                    serverSocket = servidor;
+                }
+                notificarStatus("Aguardando outro celular...");
+                BluetoothSocket recebido = servidor.accept();
+                definirConexao(recebido, geracao);
+            } catch (SecurityException e) {
+                notificarErro("Sem permissão para usar o Bluetooth.");
+                synchronized (this) { servidorDesejado = false; }
+            } catch (IOException e) {
+                // O fechamento do servidor também interrompe accept().
+            } finally {
+                if (servidor != null) try { servidor.close(); } catch (IOException ignored) { }
+                synchronized (this) {
+                    if (serverSocket == servidor) serverSocket = null;
+                    if (threadServidor == Thread.currentThread()) threadServidor = null;
+                }
+                mainHandler.postDelayed(() -> {
+                    synchronized (BluetoothColetai.this) {
+                        if (geracao == geracaoConexao && servidorDesejado && !conectado) iniciarServidor();
+                    }
+                }, 1000);
+            }
+        }, "Coletai-Bluetooth-Servidor");
         threadServidor.start();
     }
-
 
     // =====================================================
     // CONECTAR
     // =====================================================
 
     @SuppressLint("MissingPermission")
-    public synchronized void conectar(
-            BluetoothDevice dispositivo
-    ) {
-
-        if (dispositivo == null) {
-
-            notificarErro(
-                    "Selecione um dispositivo."
-            );
-
-
+    public synchronized void conectar(BluetoothDevice dispositivo) {
+        if (dispositivo == null || bluetoothAdapter == null || !bluetoothAtivado()) {
+            notificarErro("Selecione um dispositivo e ative o Bluetooth.");
             return;
         }
-
-
-        if (estaConectado()) {
-
-            notificarStatus(
-                    "Já existe um celular conectado."
-            );
-
-
-            return;
-        }
-
-
-        if (
-                threadConexao != null
-                        &&
-                        threadConexao.isAlive()
-        ) {
-
-            return;
-        }
-
-
-        threadConexao =
-                new Thread(
-                        () -> {
-
-                            BluetoothSocket novoSocket =
-                                    null;
-
-
-                            try {
-
-                                String nome =
-                                        obterNomeDispositivo(
-                                                dispositivo
-                                        );
-
-
-                                notificarStatus(
-                                        "Conectando a "
-                                                + nome
-                                                + "..."
-                                );
-
-
-                                novoSocket =
-                                        dispositivo
-                                                .createRfcommSocketToServiceRecord(
-                                                        UUID_COLETAI
-                                                );
-
-
-                                novoSocket.connect();
-
-
-                                definirConexao(
-                                        novoSocket
-                                );
-
-                            } catch (
-                                    SecurityException e
-                            ) {
-
-                                fecharSocketSilenciosamente(
-                                        novoSocket
-                                );
-
-
-                                notificarErro(
-                                        "Permissão Bluetooth não concedida."
-                                );
-
-                            } catch (
-                                    IOException e
-                            ) {
-
-                                fecharSocketSilenciosamente(
-                                        novoSocket
-                                );
-
-
-                                notificarErro(
-                                        "Não foi possível conectar."
-                                );
-
-
-                                iniciarServidor();
-
-                            } finally {
-
-                                threadConexao =
-                                        null;
-                            }
-
-                        },
-                        "Coletai-Bluetooth-Conectar"
-                );
-
-
+        if (conectado || (threadConexao != null && threadConexao.isAlive())) return;
+        final long geracao = geracaoConexao;
+        threadConexao = new Thread(() -> {
+            BluetoothSocket novo = null;
+            try {
+                notificarStatus("Conectando a " + obterNomeDispositivo(dispositivo) + "...");
+                novo = dispositivo.createRfcommSocketToServiceRecord(UUID_COLETAI);
+                synchronized (this) {
+                    if (geracao != geracaoConexao) {
+                        fecharSocketSilenciosamente(novo);
+                        return;
+                    }
+                    socketConectando = novo;
+                }
+                novo.connect();
+                definirConexao(novo, geracao);
+            } catch (SecurityException | IOException e) {
+                fecharSocketSilenciosamente(novo);
+                synchronized (this) {
+                    if (geracao == geracaoConexao && !conectado) {
+                        notificarErro("Não foi possível conectar. Verifique o pareamento e a permissão Bluetooth.");
+                        iniciarServidor();
+                    }
+                }
+            } finally {
+                synchronized (this) {
+                    if (socketConectando == novo) socketConectando = null;
+                    if (threadConexao == Thread.currentThread()) threadConexao = null;
+                }
+            }
+        }, "Coletai-Bluetooth-Conectar");
         threadConexao.start();
     }
-
 
     // =====================================================
     // DEFINIR CONEXÃO
     // =====================================================
 
     @SuppressLint("MissingPermission")
-    private synchronized void definirConexao(
-            BluetoothSocket novoSocket
-    ) {
-
-        if (novoSocket == null) {
-
+    private synchronized void definirConexao(BluetoothSocket novoSocket, long geracao) {
+        if (novoSocket == null) return;
+        if (geracao != geracaoConexao) {
+            fecharSocketSilenciosamente(novoSocket);
             return;
         }
-
-
-        if (
-                socket != null
-                        &&
-                        socket != novoSocket
-        ) {
-
-            fecharSocketSilenciosamente(
-                    socket
-            );
+        if (socket != null && conectado) {
+            fecharSocketSilenciosamente(novoSocket);
+            return;
         }
-
-
-        socket =
-                novoSocket;
-
-
-        conectado =
-                true;
-
-
-        nomeDispositivoConectado =
-                obterNomeDispositivo(
-                        novoSocket.getRemoteDevice()
-                );
-
-
+        if (socket != null && socket != novoSocket) fecharSocketSilenciosamente(socket);
+        socket = novoSocket;
+        conectado = true;
+        peerAtual = novoSocket.getRemoteDevice().getAddress();
+        nomeDispositivoConectado = obterNomeDispositivo(novoSocket.getRemoteDevice());
         fecharServidor();
-
-
-        /*
-         * Atualiza os estados conhecidos quando a conexão começa.
-         */
-        ultimoStatusConhecido =
-                preferencias.getString(
-                        "pedido_status",
-                        ""
-                );
-
-
-        ultimaEtapaConhecida =
-                preferencias.getString(
-                        "coleta_etapa",
-                        ""
-                );
-
-
-        notificarConectado(
-                nomeDispositivoConectado
-        );
-
-
+        notificarConectado(nomeDispositivoConectado);
         iniciarLeitura();
+        mainHandler.post(this::reenviarPendentes);
     }
-
 
     // =====================================================
     // LEITURA
     // =====================================================
 
     private synchronized void iniciarLeitura() {
-
-        if (socket == null) {
-
-            return;
-        }
-
-
-        if (
-                threadLeitura != null
-                        &&
-                        threadLeitura.isAlive()
-        ) {
-
-            return;
-        }
-
-
-        final BluetoothSocket socketAtual =
-                socket;
-
-
-        threadLeitura =
-                new Thread(
-                        () -> {
-
-                            try {
-
-                                BufferedReader leitor =
-                                        new BufferedReader(
-                                                new InputStreamReader(
-                                                        socketAtual
-                                                                .getInputStream(),
-                                                        StandardCharsets.UTF_8
-                                                )
-                                        );
-
-
-                                String mensagem;
-
-
-                                while (
-                                        conectado
-                                                &&
-                                                (
-                                                        mensagem =
-                                                                leitor.readLine()
-                                                )
-                                                        != null
-                                ) {
-
-                                    processarMensagemRecebida(
-                                            mensagem
-                                    );
-
-
-                                    notificarMensagem(
-                                            mensagem
-                                    );
-                                }
-
-                            } catch (
-                                    IOException e
-                            ) {
-
-                                if (conectado) {
-
-                                    conexaoPerdida();
-                                }
-
-                            } finally {
-
-                                threadLeitura =
-                                        null;
-                            }
-
-                        },
-                        "Coletai-Bluetooth-Leitura"
-                );
-
-
-        threadLeitura.start();
+        final BluetoothSocket socketAtual = socket;
+        if (socketAtual == null) return;
+        new Thread(() -> {
+            try (BufferedReader leitor = new BufferedReader(new InputStreamReader(
+                    socketAtual.getInputStream(), StandardCharsets.UTF_8))) {
+                String mensagem;
+                while ((mensagem = MessageFrames.read(leitor)) != null) {
+                    final String recebida = mensagem;
+                    mainHandler.post(() -> {
+                        if (socket != socketAtual) return;
+                        processarMensagemRecebida(recebida);
+                        notificarMensagem(recebida);
+                    });
+                }
+            } catch (IOException e) {
+                // EOF e falhas de leitura têm o mesmo tratamento de encerramento.
+            } finally {
+                mainHandler.post(() -> conexaoPerdida(socketAtual));
+            }
+        }, "Coletai-Bluetooth-Leitura").start();
     }
-
 
     // =====================================================
     // PROCESSAR MENSAGEM
     // =====================================================
 
-    private void processarMensagemRecebida(
-            String mensagem
-    ) {
-
-        if (
-                mensagem == null
-                        ||
-                        mensagem.trim().isEmpty()
-        ) {
-
-            return;
-        }
-
-
+    private void processarMensagemRecebida(String mensagem) {
         try {
+            JSONObject json = new JSONObject(mensagem);
+            String evento = json.optString("evento");
+            if ("TESTE".equals(evento)) return;
+            if (!sessaoAtiva) return;
+            String perfil = preferencias.getString("usuario_tipo_atual", "");
+            if ("ACK".equals(evento)) {
+                JSONObject original = eventos.acknowledge(json.optString("mensagem_id"), peerAtual, perfil, LocalJson.account(preferencias));
+                if (original != null) {
+                    if (!json.optBoolean("aceito", false)) {
+                        if (original.optString("pedido_id").equals(preferencias.getString("pedido_id", ""))) {
+                            preferencias.edit().putString("pedido_entrega", "rejected").apply();
+                        }
+                        notificarErro("O outro celular recusou o evento: " + original.optString("evento"));
+                    } else if ("NOVO_PEDIDO".equals(original.optString("evento"))
+                            && original.optString("pedido_id").equals(preferencias.getString("pedido_id", ""))) {
+                        preferencias.edit().putString("pedido_entrega", "delivered").apply();
+                    }
+                    notificarSyncAtualizado();
+                    reenviarPendentes();
+                }
+                return;
+            }
+            String id = json.optString("mensagem_id");
+            String pedidoId = json.optString("pedido_id");
+            if (json.optInt("versao") != 1 || id.isEmpty() || pedidoId.isEmpty()) {
+                notificarErro("Protocolo incompatível. Atualize o Coletaí nos dois celulares.");
+                return;
+            }
+            if (eventos.processed(LocalJson.account(preferencias), peerAtual + "_" + id)) {
+                confirmar(id, true);
+                return;
+            }
+            String remetente = json.optString("remetente");
+            boolean origemValida = "cliente".equals(perfil) ? PedidoRules.coletor(remetente)
+                    : PedidoRules.coletor(perfil) && "cliente".equals(remetente);
+            boolean novo = "NOVO_PEDIDO".equals(evento);
+            boolean mesmoPedido = pedidoId.equals(preferencias.getString("pedido_id", ""));
+            String peerPedido = preferencias.getString("pedido_peer", "");
+            if (!conteudoValido(json) || (novo && pedidos.arquivado(pedidoId))
+                    || !origemValida || (!novo && (!mesmoPedido || !peerAtual.equals(peerPedido)))
+                    || !PedidoRules.podeReceber(evento, perfil,
+                    preferencias.getString("pedido_status", ""),
+                    preferencias.getString("coleta_etapa", "ready"), json.optString("coleta_etapa"))) {
+                confirmar(id, false);
+                return;
+            }
+            aplicandoRemoto = true;
+            try {
+                mensagemRecebidaId = id;
+                if ("PEDIDO_CANCELADO".equals(evento)) pedidos.arquivar("cancelado");
+                executarEvento(json);
+                if ("COLETA_FINALIZADA".equals(evento)) pedidos.arquivar("concluido");
 
-            JSONObject json =
-                    new JSONObject(
-                            mensagem
-                    );
+            } finally {
+                aplicandoRemoto = false;
+                mensagemRecebidaId = null;
+                ultimoStatusConhecido = preferencias.getString("pedido_status", "");
+                ultimaEtapaConhecida = preferencias.getString("coleta_etapa", "");
+            }
+            confirmar(id, true);
+        } catch (JSONException | IllegalStateException e) {
+            notificarErro("Mensagem inválida ou falha ao salvar: " + e.getMessage());
+        }
+    }
 
+    private void confirmar(String id, boolean aceito) throws JSONException {
+        JSONObject ack = new JSONObject();
+        ack.put("evento", "ACK");
+        ack.put("mensagem_id", id);
+        ack.put("aceito", aceito);
+        transmitir(ack.toString());
+    }
 
-            String evento =
-                    json.optString(
-                            "evento",
-                            ""
-                    );
-
-
+    private void executarEvento(JSONObject json) {
+        String evento = json.optString("evento");
             switch (evento) {
 
                 case "NOVO_PEDIDO":
@@ -1536,7 +656,6 @@ public class BluetoothColetai {
 
                     break;
 
-
                 case "PROPOSTA":
 
                     receberProposta(
@@ -1545,20 +664,17 @@ public class BluetoothColetai {
 
                     break;
 
-
                 case "PROPOSTA_ACEITA":
 
                     receberPropostaAceita();
 
                     break;
 
-
                 case "PROPOSTA_RECUSADA":
 
                     receberPropostaRecusada();
 
                     break;
-
 
                 case "COLETA_ETAPA":
 
@@ -1568,13 +684,11 @@ public class BluetoothColetai {
 
                     break;
 
-
                 case "COLETA_FINALIZADA":
 
                     receberColetaFinalizada();
 
                     break;
-
 
                 case "PEDIDO_CANCELADO":
 
@@ -1583,686 +697,132 @@ public class BluetoothColetai {
                     break;
             }
 
-        } catch (
-                JSONException ignored
-        ) {
-
-            /*
-             * Mantém compatibilidade com a mensagem TESTE
-             * da tela de Bluetooth.
-             */
-        }
     }
-
 
     // =====================================================
     // RECEBER NOVO PEDIDO
     // =====================================================
 
-    private void receberNovoPedido(
-            JSONObject json
-    ) {
-
-        SharedPreferences.Editor editor =
-                preferencias.edit();
-
-
-        limparProposta(
-                editor
-        );
-
-
-        editor.putString(
-                "pedido_tipo",
-                json.optString(
-                        "tipo",
-                        ""
-                )
-        );
-
-
-        editor.putString(
-                "pedido_emoji",
-                json.optString(
-                        "emoji",
-                        ""
-                )
-        );
-
-
-        editor.putString(
-                "pedido_descricao",
-                json.optString(
-                        "descricao",
-                        ""
-                )
-        );
-
-
-        editor.putString(
-                "pedido_peso",
-                json.optString(
-                        "peso",
-                        ""
-                )
-        );
-
-
-        editor.putString(
-                "pedido_regiao",
-                json.optString(
-                        "regiao",
-                        ""
-                )
-        );
-
-
-        editor.putString(
-                "pedido_cidade",
-                json.optString(
-                        "cidade",
-                        ""
-                )
-        );
-
-
-        editor.putString(
-                "pedido_observacao",
-                json.optString(
-                        "observacao",
-                        ""
-                )
-        );
-
-
-        editor.putString(
-                "pedido_endereco_completo",
-                json.optString(
-                        "enderecoCompleto",
-                        ""
-                )
-        );
-
-
-        editor.putString(
-                "coleta_etapa",
-                "ready"
-        );
-
-
-        editor.putString(
-                "pedido_status",
-                "waiting"
-        );
-
-
-        editor.apply();
-
-
-        ultimoStatusConhecido =
-                "waiting";
-
-
-        ultimaEtapaConhecida =
-                "ready";
-
-
-        notificarSyncAtualizado();
-
-        abrirPedidoSeForColetor();
+    private void receberNovoPedido(JSONObject json) {
+        SharedPreferences.Editor editor = editorRemoto();
+        PedidoRepository.limparProposta(editor);
+        for (String key : new String[]{"tipo", "emoji", "descricao", "peso", "regiao", "cidade", "observacao"}) {
+            editor.putString("pedido_" + key, json.optString(key));
+        }
+        editor.putString("pedido_endereco_completo", json.optString("enderecoCompleto"));
+        editor.putString("pedido_id", json.optString("pedido_id"));
+        editor.putString("pedido_peer", peerAtual);
+        editor.putString("coleta_etapa", "ready");
+        editor.putString("pedido_status", "waiting");
+        salvarRemoto(editor);
     }
-
 
     // =====================================================
     // RECEBER PROPOSTA
     // =====================================================
 
-    private void receberProposta(
-            JSONObject json
-    ) {
-
-        SharedPreferences.Editor editor =
-                preferencias.edit();
-
-
-        editor.putString(
-                "proposta_preco",
-                json.optString(
-                        "preco",
-                        ""
-                )
-        );
-
-
-        editor.putString(
-                "proposta_mensagem",
-                json.optString(
-                        "mensagem",
-                        ""
-                )
-        );
-
-
-        editor.putString(
-                "proposta_coletor_nome",
-                json.optString(
-                        "nome",
-                        "Coletor"
-                )
-        );
-
-
-        editor.putFloat(
-                "proposta_coletor_avaliacao",
-                (float) json.optDouble(
-                        "avaliacao",
-                        4.9
-                )
-        );
-
-
-        editor.putInt(
-                "proposta_coletor_coletas",
-                json.optInt(
-                        "coletas",
-                        0
-                )
-        );
-
-
-        editor.putString(
-                "proposta_coletor_tipo",
-                json.optString(
-                        "tipoColetor",
-                        ""
-                )
-        );
-
-
-        editor.putString(
-                "proposta_coletor_email",
-                json.optString(
-                        "email",
-                        ""
-                )
-        );
-
-
-        editor.putString(
-                "pedido_status",
-                "proposal"
-        );
-
-
-        editor.apply();
-
-
-        ultimoStatusConhecido =
-                "proposal";
-
-
-        notificarSyncAtualizado();
-
-
-        mostrarToastSeUsuario(
-                "cliente",
-                "Nova proposta recebida!"
-        );
+    private void receberProposta(JSONObject json) {
+        SharedPreferences.Editor editor = editorRemoto();
+        editor.putString("proposta_preco", json.optString("preco"));
+        editor.putString("proposta_mensagem", json.optString("mensagem"));
+        editor.putString("proposta_coletor_nome", json.optString("nome", "Coletor"));
+        editor.putFloat("proposta_coletor_avaliacao", (float) json.optDouble("avaliacao", 0));
+        editor.putInt("proposta_coletor_coletas", json.optInt("coletas", 0));
+        editor.putString("proposta_coletor_tipo", json.optString("tipoColetor"));
+        editor.putString("proposta_coletor_email", json.optString("email"));
+        editor.putString("pedido_status", "proposal");
+        salvarRemoto(editor);
+        mostrarToastSeUsuario("cliente", "Nova proposta recebida!");
     }
-
 
     // =====================================================
     // RECEBER ACEITE
     // =====================================================
 
     private void receberPropostaAceita() {
-
-        preferencias
-                .edit()
-                .putString(
-                        "pedido_status",
-                        "active"
-                )
-                .putString(
-                        "coleta_etapa",
-                        "ready"
-                )
-                .apply();
-
-
-        ultimoStatusConhecido =
-                "active";
-
-
-        ultimaEtapaConhecida =
-                "ready";
-
-
-        notificarSyncAtualizado();
-
-
-        String tipoUsuario =
-                preferencias.getString(
-                        "usuario_tipo_atual",
-                        ""
-                );
-
-
-        boolean ehColetor =
-                "ambulante".equals(
-                        tipoUsuario
-                )
-                        ||
-                        "empresa".equals(
-                                tipoUsuario
-                        );
-
-
-        if (!ehColetor) {
-
-            return;
-        }
-
-
-        mainHandler.post(
-                () -> {
-
-                    Toast.makeText(
-                            appContext,
-                            "Proposta aceita pelo cliente!",
-                            Toast.LENGTH_SHORT
-                    ).show();
-
-
-                    Intent intent =
-                            new Intent(
-                                    appContext,
-                                    coleta_ativa_ambulante.class
-                            );
-
-
-                    intent.addFlags(
-                            Intent.FLAG_ACTIVITY_NEW_TASK
-                                    |
-                                    Intent.FLAG_ACTIVITY_CLEAR_TOP
-                                    |
-                                    Intent.FLAG_ACTIVITY_SINGLE_TOP
-                    );
-
-
-                    appContext.startActivity(
-                            intent
-                    );
-                }
-        );
+        salvarRemoto(editorRemoto().putString("pedido_status", "active").putString("coleta_etapa", "ready"));
     }
-
 
     // =====================================================
     // RECEBER RECUSA
     // =====================================================
 
     private void receberPropostaRecusada() {
-
-        SharedPreferences.Editor editor =
-                preferencias.edit();
-
-
-        limparProposta(
-                editor
-        );
-
-
-        editor.putString(
-                "pedido_status",
-                "waiting"
-        );
-
-
-        editor.putString(
-                "coleta_etapa",
-                "ready"
-        );
-
-
-        editor.apply();
-
-
-        ultimoStatusConhecido =
-                "waiting";
-
-
-        ultimaEtapaConhecida =
-                "ready";
-
-
-        notificarSyncAtualizado();
-
-
-        String tipoUsuario =
-                preferencias.getString(
-                        "usuario_tipo_atual",
-                        ""
-                );
-
-
-        if (
-                "ambulante".equals(
-                        tipoUsuario
-                )
-                        ||
-                        "empresa".equals(
-                                tipoUsuario
-                        )
-        ) {
-
-            mainHandler.post(
-                    () -> Toast.makeText(
-                            appContext,
-                            "O cliente recusou a proposta.",
-                            Toast.LENGTH_SHORT
-                    ).show()
-            );
-        }
+        SharedPreferences.Editor editor = editorRemoto();
+        PedidoRepository.limparProposta(editor);
+        salvarRemoto(editor.putString("pedido_status", "waiting").putString("coleta_etapa", "ready"));
     }
-
 
     // =====================================================
     // RECEBER ETAPA
     // =====================================================
 
-    private void receberEtapaColeta(
-            JSONObject json
-    ) {
-
-        String etapa =
-                json.optString(
-                        "coleta_etapa",
-                        "ready"
-                );
-
-
-        preferencias
-                .edit()
-                .putString(
-                        "pedido_status",
-                        "active"
-                )
-                .putString(
-                        "coleta_etapa",
-                        etapa
-                )
-                .apply();
-
-
-        ultimoStatusConhecido =
-                "active";
-
-
-        ultimaEtapaConhecida =
-                etapa;
-
-
-        notificarSyncAtualizado();
+    private void receberEtapaColeta(JSONObject json) {
+        salvarRemoto(editorRemoto().putString("pedido_status", "active")
+                .putString("coleta_etapa", json.optString("coleta_etapa")));
     }
-
 
     // =====================================================
     // RECEBER FINALIZAÇÃO
     // =====================================================
 
     private void receberColetaFinalizada() {
-
-        preferencias
-                .edit()
-                .putString(
-                        "pedido_status",
-                        "done"
-                )
-                .putString(
-                        "coleta_etapa",
-                        "done"
-                )
-                .apply();
-
-
-        ultimoStatusConhecido =
-                "done";
-
-
-        ultimaEtapaConhecida =
-                "done";
-
-
-        notificarSyncAtualizado();
-
-
-        mostrarToastSeUsuario(
-                "cliente",
-                "Coleta finalizada!"
-        );
+        SharedPreferences.Editor editor = editorRemoto();
+        pedidos.arquivar("concluido", editor);
+        salvarRemoto(editor.putString("pedido_status", "done").putString("coleta_etapa", "done"));
+        mostrarToastSeUsuario("cliente", "Coleta finalizada!");
     }
-
 
     // =====================================================
     // RECEBER CANCELAMENTO
     // =====================================================
 
     private void receberPedidoCancelado() {
+        SharedPreferences.Editor editor = editorRemoto();
+        PedidoRepository.limparProposta(editor);
+        salvarRemoto(editor.remove("pedido_status").remove("coleta_etapa"));
+    }
 
-        SharedPreferences.Editor editor =
-                preferencias.edit();
+    // =====================================================
+    // PERSISTÊNCIA DOS EVENTOS RECEBIDOS
+    // =====================================================
 
+    private SharedPreferences.Editor editorRemoto() {
+        String role = LocalJson.account(preferencias);
+        return preferencias.edit().putBoolean("sync_received_" + role + "_" + peerAtual + "_" + mensagemRecebidaId, true);
+    }
 
-        editor.remove(
-                "pedido_status"
-        );
-
-
-        editor.remove(
-                "coleta_etapa"
-        );
-
-
-        limparProposta(
-                editor
-        );
-
-
-        editor.apply();
-
-
-        ultimoStatusConhecido =
-                "";
-
-
-        ultimaEtapaConhecida =
-                "";
-
-
+    private void salvarRemoto(SharedPreferences.Editor editor) {
+        if (!editor.commit()) throw new IllegalStateException("Falha ao salvar pedido recebido");
         notificarSyncAtualizado();
-
-
-        String tipoUsuario =
-                preferencias.getString(
-                        "usuario_tipo_atual",
-                        ""
-                );
-
-
-        if (
-                "ambulante".equals(
-                        tipoUsuario
-                )
-                        ||
-                        "empresa".equals(
-                                tipoUsuario
-                        )
-        ) {
-
-            mainHandler.post(
-                    () -> {
-
-                        Toast.makeText(
-                                appContext,
-                                "O cliente cancelou o pedido.",
-                                Toast.LENGTH_SHORT
-                        ).show();
-
-
-                        Class<?> telaInicial =
-                                "empresa".equals(
-                                        tipoUsuario
-                                )
-                                        ? tela_inicial_empresa.class
-                                        : tela_inicial_ambulante.class;
-
-
-                        Intent intent =
-                                new Intent(
-                                        appContext,
-                                        telaInicial
-                                );
-
-
-                        intent.addFlags(
-                                Intent.FLAG_ACTIVITY_NEW_TASK
-                                        |
-                                        Intent.FLAG_ACTIVITY_CLEAR_TOP
-                        );
-
-
-                        appContext.startActivity(
-                                intent
-                        );
-                    }
-            );
-        }
     }
 
-
-    // =====================================================
-    // LIMPAR PROPOSTA
-    // =====================================================
-
-    private void limparProposta(
-            SharedPreferences.Editor editor
-    ) {
-
-        editor.remove(
-                "proposta_preco"
-        );
-
-        editor.remove(
-                "proposta_mensagem"
-        );
-
-        editor.remove(
-                "proposta_coletor_nome"
-        );
-
-        editor.remove(
-                "proposta_coletor_avaliacao"
-        );
-
-        editor.remove(
-                "proposta_coletor_coletas"
-        );
-
-        editor.remove(
-                "proposta_coletor_tipo"
-        );
-
-        editor.remove(
-                "proposta_coletor_email"
-        );
+    private boolean conteudoValido(JSONObject json) {
+        try {
+            if ("NOVO_PEDIDO".equals(json.optString("evento"))) {
+                String peso = json.optString("peso").replace(" kg", "");
+                DecimalValues.positive(peso, 3);
+                return !json.optString("tipo").trim().isEmpty()
+                        && !json.optString("descricao").trim().isEmpty()
+                        && !json.optString("enderecoCompleto").trim().isEmpty();
+            }
+            if ("PROPOSTA".equals(json.optString("evento"))) {
+                DecimalValues.positive(json.optString("preco"), 2);
+                return PedidoRules.coletor(json.optString("tipoColetor"));
+            }
+            return true;
+        } catch (IllegalArgumentException e) { return false; }
     }
-
-
-    // =====================================================
-    // ABRIR PEDIDO NO COLETOR
-    // =====================================================
-
-    private void abrirPedidoSeForColetor() {
-
-        String tipoUsuario =
-                preferencias.getString(
-                        "usuario_tipo_atual",
-                        ""
-                );
-
-
-        boolean ehColetor =
-                "ambulante".equals(
-                        tipoUsuario
-                )
-                        ||
-                        "empresa".equals(
-                                tipoUsuario
-                        );
-
-
-        if (!ehColetor) {
-
-            return;
-        }
-
-
-        mainHandler.post(
-                () -> {
-
-                    Toast.makeText(
-                            appContext,
-                            "Novo pedido recebido!",
-                            Toast.LENGTH_SHORT
-                    ).show();
-
-
-                    Intent intent =
-                            new Intent(
-                                    appContext,
-                                    detalhes_pedido_ambulante.class
-                            );
-
-
-                    intent.addFlags(
-                            Intent.FLAG_ACTIVITY_NEW_TASK
-                                    |
-                                    Intent.FLAG_ACTIVITY_CLEAR_TOP
-                                    |
-                                    Intent.FLAG_ACTIVITY_SINGLE_TOP
-                    );
-
-
-                    appContext.startActivity(
-                            intent
-                    );
-                }
-        );
-    }
-
 
     // =====================================================
     // SINCRONIZAÇÃO DA TELA
     // =====================================================
 
     private void notificarSyncAtualizado() {
-
-        SyncListener atual =
-                syncListener;
-
-
-        if (atual == null) {
-
-            return;
-        }
-
-
-        mainHandler.post(
-                atual::onSyncAtualizado
-        );
+        mainHandler.post(() -> {
+            for (SyncListener observer : syncListeners) observer.onSyncAtualizado();
+        });
     }
-
 
     private void mostrarToastSeUsuario(
             String tipoEsperado,
@@ -2275,7 +835,6 @@ public class BluetoothColetai {
                         ""
                 );
 
-
         if (
                 !tipoEsperado.equals(
                         tipoAtual
@@ -2284,7 +843,6 @@ public class BluetoothColetai {
 
             return;
         }
-
 
         mainHandler.post(
                 () -> Toast.makeText(
@@ -2295,140 +853,97 @@ public class BluetoothColetai {
         );
     }
 
-
     // =====================================================
     // ENVIAR MENSAGEM
     // =====================================================
 
-    public void enviar(
-            String mensagem
-    ) {
-
-        if (
-                mensagem == null
-                        ||
-                        mensagem.trim().isEmpty()
-        ) {
-
-            return;
+    public void enviar(String mensagem) {
+        if (mensagem == null || mensagem.trim().isEmpty()) return;
+        try {
+            JSONObject event = new JSONObject(mensagem);
+            if ("TESTE".equals(event.optString("evento"))) {
+                if (!estaConectado()) notificarErro("Nenhum celular conectado.");
+                else transmitir(mensagem);
+                return;
+            }
+            String id = preferencias.getString("pedido_id", "");
+            if (id.isEmpty()) {
+                notificarErro("Pedido antigo sem identificação. Cancele e crie um novo pedido.");
+                return;
+            }
+            event.put("conta_id", LocalJson.account(preferencias));
+            eventos.add(event, preferencias.getString("usuario_tipo_atual", ""),
+                    id, preferencias.getString("pedido_peer", ""));
+            reenviarPendentes();
+        } catch (JSONException | IllegalStateException e) {
+            notificarErro("Não foi possível colocar o evento na fila: " + e.getMessage());
         }
-
-
-        if (!estaConectado()) {
-
-            notificarErro(
-                    "Nenhum celular conectado."
-            );
-
-
-            return;
-        }
-
-
-        final BluetoothSocket socketAtual =
-                socket;
-
-
-        new Thread(
-                () -> {
-
-                    try {
-
-                        OutputStream outputStream =
-                                socketAtual
-                                        .getOutputStream();
-
-
-                        String mensagemCompleta =
-                                mensagem
-                                        + "\n";
-
-
-                        outputStream.write(
-                                mensagemCompleta.getBytes(
-                                        StandardCharsets.UTF_8
-                                )
-                        );
-
-
-                        outputStream.flush();
-
-                    } catch (
-                            IOException e
-                    ) {
-
-                        conexaoPerdida();
-                    }
-
-                },
-                "Coletai-Bluetooth-Envio"
-        ).start();
     }
 
+    private void reenviarPendentes() {
+        mainHandler.removeCallbacks(retryEnvio);
+        if (!sessaoAtiva || !estaConectado()) return;
+        try {
+            JSONObject event = eventos.next(preferencias.getString("usuario_tipo_atual", ""), peerAtual, LocalJson.account(preferencias));
+            if (event == null) return;
+            if (event.optString("pedido_id").equals(preferencias.getString("pedido_id", ""))) {
+                preferencias.edit().putString("pedido_peer", peerAtual).apply();
+            }
+            transmitir(event.toString());
+            mainHandler.postDelayed(retryEnvio, 5000);
+        } catch (JSONException | IllegalStateException e) {
+            notificarErro("Não foi possível recuperar a fila de mensagens.");
+        }
+    }
+
+    private void transmitir(String mensagem) {
+        final BluetoothSocket atual = socket;
+        if (atual == null) return;
+        envioExecutor.execute(() -> {
+            if (socket != atual) return;
+            try {
+                OutputStream out = atual.getOutputStream();
+                out.write((mensagem + "\n").getBytes(StandardCharsets.UTF_8));
+                out.flush();
+            } catch (IOException e) {
+                mainHandler.post(() -> conexaoPerdida(atual));
+            }
+        });
+    }
 
     // =====================================================
     // CONEXÃO PERDIDA
     // =====================================================
 
-    private synchronized void conexaoPerdida() {
-
-        fecharSocketSilenciosamente(
-                socket
-        );
-
-
-        socket =
-                null;
-
-
-        conectado =
-                false;
-
-
-        nomeDispositivoConectado =
-                "";
-
-
-        notificarStatus(
-                "Conexão encerrada"
-        );
-
-
+    private synchronized void conexaoPerdida(BluetoothSocket origem) {
+        if (socket != origem) return;
+        fecharSocketSilenciosamente(origem);
+        socket = null;
+        conectado = false;
+        nomeDispositivoConectado = "";
+        mainHandler.removeCallbacks(retryEnvio);
+        notificarStatus("Conexão encerrada. Eventos pendentes serão reenviados ao reconectar.");
         iniciarServidor();
     }
-
 
     // =====================================================
     // DESCONECTAR
     // =====================================================
 
     public synchronized void desconectar() {
-
-        fecharSocketSilenciosamente(
-                socket
-        );
-
-
-        socket =
-                null;
-
-
-        conectado =
-                false;
-
-
-        nomeDispositivoConectado =
-                "";
-
-
-        notificarStatus(
-                "Desconectado"
-        );
-
-
-        iniciarServidor();
+        geracaoConexao++;
+        servidorDesejado = false;
+        fecharSocketSilenciosamente(socketConectando);
+        socketConectando = null;
+        BluetoothSocket antigo = socket;
+        socket = null;
+        conectado = false;
+        fecharSocketSilenciosamente(antigo);
+        fecharServidor();
+        nomeDispositivoConectado = "";
+        mainHandler.removeCallbacks(retryEnvio);
+        notificarStatus("Desconectado");
     }
-
 
     // =====================================================
     // FECHAR SERVIDOR
@@ -2448,12 +963,10 @@ public class BluetoothColetai {
 
             }
 
-
             serverSocket =
                     null;
         }
     }
-
 
     private void fecharSocketSilenciosamente(
             BluetoothSocket socket
@@ -2463,7 +976,6 @@ public class BluetoothColetai {
 
             return;
         }
-
 
         try {
 
@@ -2475,7 +987,6 @@ public class BluetoothColetai {
 
         }
     }
-
 
     // =====================================================
     // NOME DO DISPOSITIVO
@@ -2491,12 +1002,10 @@ public class BluetoothColetai {
             return "Dispositivo";
         }
 
-
         try {
 
             String nome =
                     dispositivo.getName();
-
 
             if (
                     nome == null
@@ -2507,7 +1016,6 @@ public class BluetoothColetai {
                 return "Dispositivo Bluetooth";
             }
 
-
             return nome;
 
         } catch (
@@ -2517,7 +1025,6 @@ public class BluetoothColetai {
             return "Dispositivo Bluetooth";
         }
     }
-
 
     // =====================================================
     // CALLBACKS DA TELA BLUETOOTH
@@ -2530,20 +1037,17 @@ public class BluetoothColetai {
         Listener atual =
                 listener;
 
-
         if (atual == null) {
 
             return;
         }
 
-
         mainHandler.post(
-                () -> atual.onStatusAlterado(
+                () -> { if (listener == atual) atual.onStatusAlterado(
                         status
-                )
+                ); }
         );
     }
-
 
     private void notificarConectado(
             String nome
@@ -2552,20 +1056,17 @@ public class BluetoothColetai {
         Listener atual =
                 listener;
 
-
         if (atual == null) {
 
             return;
         }
 
-
         mainHandler.post(
-                () -> atual.onConectado(
+                () -> { if (listener == atual) atual.onConectado(
                         nome
-                )
+                ); }
         );
     }
-
 
     private void notificarMensagem(
             String mensagem
@@ -2574,39 +1075,23 @@ public class BluetoothColetai {
         Listener atual =
                 listener;
 
-
         if (atual == null) {
 
             return;
         }
 
-
         mainHandler.post(
-                () -> atual.onMensagemRecebida(
+                () -> { if (listener == atual) atual.onMensagemRecebida(
                         mensagem
-                )
+                ); }
         );
     }
 
-
-    private void notificarErro(
-            String mensagem
-    ) {
-
-        Listener atual =
-                listener;
-
-
-        if (atual == null) {
-
-            return;
-        }
-
-
-        mainHandler.post(
-                () -> atual.onErro(
-                        mensagem
-                )
-        );
+    private void notificarErro(String mensagem) {
+        mainHandler.post(() -> {
+            Listener atual = listener;
+            if (atual != null) atual.onErro(mensagem);
+            else Toast.makeText(appContext, mensagem, Toast.LENGTH_LONG).show();
+        });
     }
 }

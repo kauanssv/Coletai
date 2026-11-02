@@ -1,0 +1,13 @@
+{
+  "verified_on": "2026-10-31",
+  "municipal_map": "https://www.google.com/maps/d/viewer?mid=1Kok7L5JyjXN758y3vy3kMsKYdJylrQE",
+  "municipal_directory": "https://prefeitura.sp.gov.br/web/subprefeituras/w/ecoponto-esta%C3%A7%C3%A3o-de-entrega-volunt%C3%A1ria-de-inserv%C3%ADveis",
+  "municipal_kml_sha256": "bf4a9e1da1157f65d91d481d68a013a468a773c1457bf8c33838b4c38c8e78a8",
+  "municipal_points_included": 127,
+  "excluded": [
+    "General Flores: temporariamente fora de operação na listagem da Prefeitura",
+    "11 polígonos de lotes de varrição: não são ecopontos",
+    "Pontos antigos do mapa Sucata Digital sem correspondência na listagem atual; matriz atual corrigida pelo link Google Maps do rodapé"
+  ],
+  "extra_points": 8
+}

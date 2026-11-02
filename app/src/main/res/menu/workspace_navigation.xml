@@ -1,0 +1,5 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/workHome" android:title="Início" android:icon="@drawable/ic_home" />
+    <item android:id="@+id/workHistory" android:title="Histórico" android:icon="@drawable/ic_history" />
+    <item android:id="@+id/workProfile" android:title="Perfil" android:icon="@drawable/ic_person" />
+</menu>

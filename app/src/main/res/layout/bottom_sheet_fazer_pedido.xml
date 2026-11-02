@@ -32,7 +32,7 @@
         android:layout_marginStart="22dp"
         android:layout_marginTop="18dp"
         android:layout_marginEnd="12dp"
-        android:text="Novo pedido"
+        android:text="@string/texto_novo_pedido"
         android:textColor="@color/ink_900"
         android:textSize="19sp"
         android:textStyle="bold"
@@ -50,7 +50,7 @@
         android:clickable="true"
         android:focusable="true"
         android:gravity="center"
-        android:text="×"
+        android:text="@string/texto_simbolo_6"
         android:textColor="@color/ink_500"
         android:textSize="25sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -96,7 +96,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:letterSpacing="0.07"
-                android:text="TIPO DE RESÍDUO *"
+                android:text="@string/texto_tipo_de_residuo"
                 android:textColor="@color/ink_700"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -117,14 +117,14 @@
 
                     <Button
                         android:id="@+id/btnPilhas"
-                        android:layout_width="wrap_content"
-                        android:layout_height="42dp"
+                        android:gravity="center" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" android:minHeight="42dp"
                         android:background="@drawable/bg_residue_chip"
                         android:backgroundTint="@null"
                         android:minWidth="0dp"
                         android:paddingStart="15dp"
                         android:paddingEnd="15dp"
-                        android:text="🔋  Pilhas"
+                        android:text="@string/texto_pilhas"
                         android:textAllCaps="false"
                         android:textColor="@color/ink_700"
                         android:textSize="13sp"
@@ -132,15 +132,15 @@
 
                     <Button
                         android:id="@+id/btnBaterias"
-                        android:layout_width="wrap_content"
-                        android:layout_height="42dp"
+                        android:gravity="center" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" android:minHeight="42dp"
                         android:layout_marginStart="8dp"
                         android:background="@drawable/bg_residue_chip"
                         android:backgroundTint="@null"
                         android:minWidth="0dp"
                         android:paddingStart="15dp"
                         android:paddingEnd="15dp"
-                        android:text="⚡  Baterias"
+                        android:text="@string/texto_baterias"
                         android:textAllCaps="false"
                         android:textColor="@color/ink_700"
                         android:textSize="13sp"
@@ -148,15 +148,15 @@
 
                     <Button
                         android:id="@+id/btnEletronicos"
-                        android:layout_width="wrap_content"
-                        android:layout_height="42dp"
+                        android:gravity="center" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" android:minHeight="42dp"
                         android:layout_marginStart="8dp"
                         android:background="@drawable/bg_residue_chip"
                         android:backgroundTint="@null"
                         android:minWidth="0dp"
                         android:paddingStart="15dp"
                         android:paddingEnd="15dp"
-                        android:text="💻  Eletrônicos"
+                        android:text="@string/texto_eletronicos_3"
                         android:textAllCaps="false"
                         android:textColor="@color/ink_700"
                         android:textSize="13sp"
@@ -164,15 +164,15 @@
 
                     <Button
                         android:id="@+id/btnMedicamentos"
-                        android:layout_width="wrap_content"
-                        android:layout_height="42dp"
+                        android:gravity="center" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" android:minHeight="42dp"
                         android:layout_marginStart="8dp"
                         android:background="@drawable/bg_residue_chip"
                         android:backgroundTint="@null"
                         android:minWidth="0dp"
                         android:paddingStart="15dp"
                         android:paddingEnd="15dp"
-                        android:text="💊  Medicamentos"
+                        android:text="@string/texto_medicamentos"
                         android:textAllCaps="false"
                         android:textColor="@color/ink_700"
                         android:textSize="13sp"
@@ -180,15 +180,15 @@
 
                     <Button
                         android:id="@+id/btnAgulhas"
-                        android:layout_width="wrap_content"
-                        android:layout_height="42dp"
+                        android:gravity="center" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" android:minHeight="42dp"
                         android:layout_marginStart="8dp"
                         android:background="@drawable/bg_residue_chip"
                         android:backgroundTint="@null"
                         android:minWidth="0dp"
                         android:paddingStart="15dp"
                         android:paddingEnd="15dp"
-                        android:text="💉  Agulhas"
+                        android:text="@string/texto_agulhas"
                         android:textAllCaps="false"
                         android:textColor="@color/ink_700"
                         android:textSize="13sp"
@@ -196,15 +196,15 @@
 
                     <Button
                         android:id="@+id/btnOleo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="42dp"
+                        android:gravity="center" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" android:minHeight="42dp"
                         android:layout_marginStart="8dp"
                         android:background="@drawable/bg_residue_chip"
                         android:backgroundTint="@null"
                         android:minWidth="0dp"
                         android:paddingStart="15dp"
                         android:paddingEnd="15dp"
-                        android:text="Óleo"
+                        android:text="@string/texto_oleo"
                         android:textAllCaps="false"
                         android:textColor="@color/ink_700"
                         android:textSize="13sp"
@@ -212,15 +212,15 @@
 
                     <Button
                         android:id="@+id/btnOutros"
-                        android:layout_width="wrap_content"
-                        android:layout_height="42dp"
+                        android:gravity="center" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" android:minHeight="42dp"
                         android:layout_marginStart="8dp"
                         android:background="@drawable/bg_residue_chip"
                         android:backgroundTint="@null"
                         android:minWidth="0dp"
                         android:paddingStart="15dp"
                         android:paddingEnd="15dp"
-                        android:text="📦  Outros"
+                        android:text="@string/texto_outros"
                         android:textAllCaps="false"
                         android:textColor="@color/ink_700"
                         android:textSize="13sp"
@@ -237,19 +237,19 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="22dp"
                 android:letterSpacing="0.07"
-                android:text="DESCRIÇÃO *"
+                android:text="@string/texto_descricao"
                 android:textColor="@color/ink_700"
                 android:textSize="12sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"     android:labelFor="@id/edtDescricaoPedido" />
 
             <EditText
                 android:id="@+id/edtDescricaoPedido"
                 android:layout_width="match_parent"
-                android:layout_height="105dp"
+                android:layout_height="wrap_content" android:minHeight="105dp"
                 android:layout_marginTop="9dp"
                 android:background="@drawable/bg_input"
                 android:gravity="top|start"
-                android:hint="Ex.: 2 celulares quebrados, notebook antigo com carregador…"
+                android:hint="@string/texto_ex_2_celulares_quebrados_notebook_antigo_com"
                 android:inputType="textCapSentences|textMultiLine"
                 android:maxLength="250"
                 android:paddingStart="16dp"
@@ -259,7 +259,7 @@
                 android:scrollbars="vertical"
                 android:textColor="@color/ink_900"
                 android:textColorHint="@color/ink_400"
-                android:textSize="14sp" />
+                android:textSize="14sp"     android:importantForAutofill="no" />
 
             <!-- Peso -->
 
@@ -268,7 +268,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:letterSpacing="0.07"
-                android:text="PESO ESTIMADO *"
+                android:text="@string/texto_peso_estimado"
                 android:textColor="@color/ink_700"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -284,14 +284,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@android:color/transparent"
-                    android:hint="0.0"
+                    android:hint="@string/texto_0_0"
                     android:inputType="numberDecimal"
                     android:maxLines="1"
                     android:paddingStart="16dp"
                     android:paddingEnd="55dp"
                     android:textColor="@color/ink_900"
                     android:textColorHint="@color/ink_400"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"     android:importantForAutofill="no"     android:maxLength="16" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -299,7 +299,7 @@
                     android:layout_gravity="end"
                     android:gravity="center"
                     android:paddingEnd="17dp"
-                    android:text="kg"
+                    android:text="@string/texto_kg"
                     android:textColor="@color/ink_400"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -313,7 +313,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:letterSpacing="0.07"
-                android:text="FOTOS"
+                android:text="@string/texto_fotos"
                 android:textColor="@color/ink_700"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -349,7 +349,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:text="Adicionar"
+                        android:text="@string/texto_adicionar"
                         android:textColor="@color/ink_400"
                         android:textSize="11sp" />
 
@@ -381,7 +381,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:text="Adicionar"
+                        android:text="@string/texto_adicionar"
                         android:textColor="@color/ink_400"
                         android:textSize="11sp" />
 
@@ -412,7 +412,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:text="Adicionar"
+                        android:text="@string/texto_adicionar"
                         android:textColor="@color/ink_400"
                         android:textSize="11sp" />
 
@@ -427,7 +427,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:letterSpacing="0.07"
-                android:text="LOCALIZAÇÃO PARA COLETA"
+                android:text="@string/texto_localizacao_para_coleta"
                 android:textColor="@color/ink_700"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -437,7 +437,7 @@
             <LinearLayout
                 android:id="@+id/opcaoLocalizacaoAtual"
                 android:layout_width="match_parent"
-                android:layout_height="72dp"
+                android:layout_height="wrap_content" android:minHeight="72dp"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/bg_location_selected"
                 android:clickable="true"
@@ -466,7 +466,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Localização atual"
+                        android:text="@string/texto_localizacao_atual"
                         android:textColor="@color/ink_900"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -477,7 +477,7 @@
                         android:layout_marginTop="3dp"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:text="Av. Paulista, 1578 — Bela Vista, SP"
+                        android:text="@string/texto_av_paulista_1578_bela_vista_sp"
                         android:textColor="@color/ink_500"
                         android:textSize="11sp" />
 
@@ -498,7 +498,7 @@
             <LinearLayout
                 android:id="@+id/opcaoEnderecoSalvo"
                 android:layout_width="match_parent"
-                android:layout_height="72dp"
+                android:layout_height="wrap_content" android:minHeight="72dp"
                 android:layout_marginTop="9dp"
                 android:background="@drawable/bg_location_option"
                 android:clickable="true"
@@ -527,7 +527,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Endereço salvo"
+                        android:text="@string/texto_endereco_salvo"
                         android:textColor="@color/ink_900"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -536,7 +536,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
-                        android:text="Casa · Trabalho"
+                        android:text="@string/texto_casa_trabalho"
                         android:textColor="@color/ink_500"
                         android:textSize="11sp" />
 
@@ -568,7 +568,7 @@
             <LinearLayout
                 android:id="@+id/opcaoOutroEndereco"
                 android:layout_width="match_parent"
-                android:layout_height="72dp"
+                android:layout_height="wrap_content" android:minHeight="72dp"
                 android:layout_marginTop="9dp"
                 android:background="@drawable/bg_location_option"
                 android:clickable="true"
@@ -597,7 +597,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Outro endereço"
+                        android:text="@string/texto_outro_endereco"
                         android:textColor="@color/ink_900"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -606,7 +606,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
-                        android:text="Informar manualmente"
+                        android:text="@string/texto_informar_manualmente"
                         android:textColor="@color/ink_500"
                         android:textSize="11sp" />
 
@@ -625,11 +625,11 @@
 
             <EditText
                 android:id="@+id/edtOutroEndereco"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
+                android:gravity="start|center_vertical" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:minHeight="52dp"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/bg_input"
-                android:hint="Rua, número, bairro, cidade"
+                android:hint="@string/texto_rua_numero_bairro_cidade"
                 android:inputType="textPostalAddress"
                 android:maxLines="1"
                 android:paddingStart="16dp"
@@ -637,7 +637,7 @@
                 android:textColor="@color/ink_900"
                 android:textColorHint="@color/ink_400"
                 android:textSize="13sp"
-                android:visibility="gone" />
+                android:visibility="gone"     android:importantForAutofill="no"     android:maxLength="500" />
 
             <!-- Observações -->
 
@@ -646,19 +646,19 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:letterSpacing="0.07"
-                android:text="OBSERVAÇÕES"
+                android:text="@string/texto_observacoes"
                 android:textColor="@color/ink_700"
                 android:textSize="12sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"     android:labelFor="@id/edtObservacoesPedido" />
 
             <EditText
                 android:id="@+id/edtObservacoesPedido"
                 android:layout_width="match_parent"
-                android:layout_height="90dp"
+                android:layout_height="wrap_content" android:minHeight="90dp"
                 android:layout_marginTop="9dp"
                 android:background="@drawable/bg_input"
                 android:gravity="top|start"
-                android:hint="Ex.: Interfone com defeito, usar campainha…"
+                android:hint="@string/texto_ex_interfone_com_defeito_usar_campainha"
                 android:inputType="textCapSentences|textMultiLine"
                 android:maxLength="180"
                 android:paddingStart="16dp"
@@ -667,7 +667,7 @@
                 android:paddingBottom="14dp"
                 android:textColor="@color/ink_900"
                 android:textColorHint="@color/ink_400"
-                android:textSize="14sp" />
+                android:textSize="14sp"     android:importantForAutofill="no" />
 
         </LinearLayout>
 
@@ -678,7 +678,7 @@
     <LinearLayout
         android:id="@+id/areaEnviarPedido"
         android:layout_width="0dp"
-        android:layout_height="82dp"
+        android:layout_height="wrap_content" android:minHeight="82dp"
         android:background="@android:color/white"
         android:elevation="12dp"
         android:gravity="center"
@@ -694,7 +694,7 @@
         <Button
             android:id="@+id/btnEnviarPedido"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
+            android:layout_height="wrap_content" android:minHeight="52dp"
             android:background="@drawable/bg_button_primary"
             android:backgroundTint="@null"
             android:drawableStart="@drawable/ic_recycle"
@@ -704,7 +704,7 @@
             android:gravity="center"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
-            android:text="Enviar pedido"
+            android:text="@string/texto_enviar_pedido"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
             android:textSize="15sp"

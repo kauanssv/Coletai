@@ -29,6 +29,9 @@ import com.google.android.material.card.MaterialCardView;
 public class InicioClienteFragment extends Fragment {
 
     private View rootView;
+    private final BluetoothColetai.SyncListener atualizacao = () -> {
+        if (isAdded() && rootView != null) atualizarEstadoPedido();
+    };
 
     private BluetoothColetai bluetoothColetai;
 
@@ -60,8 +63,7 @@ public class InicioClienteFragment extends Fragment {
     private View indicadorNotificacao;
 
     private String tipoResiduoSelecionado = null;
-    private String localizacaoSelecionada = "atual";
-
+    private String localizacaoSelecionada = "outro";
 
     public InicioClienteFragment() {
 
@@ -69,7 +71,6 @@ public class InicioClienteFragment extends Fragment {
                 R.layout.fragment_inicio_cliente
         );
     }
-
 
     @Override
     public void onViewCreated(
@@ -98,7 +99,6 @@ public class InicioClienteFragment extends Fragment {
         atualizarEstadoPedido();
     }
 
-
     @Override
     public void onStart() {
 
@@ -106,36 +106,20 @@ public class InicioClienteFragment extends Fragment {
 
         if (bluetoothColetai != null) {
 
-            bluetoothColetai.setSyncListener(
-                    () -> {
-
-                        if (
-                                isAdded()
-                                        &&
-                                        rootView != null
-                        ) {
-
-                            atualizarEstadoPedido();
-                        }
-                    }
-            );
+            bluetoothColetai.addSyncListener(atualizacao);
         }
     }
-
 
     @Override
     public void onStop() {
 
         if (bluetoothColetai != null) {
 
-            bluetoothColetai.setSyncListener(
-                    null
-            );
+            bluetoothColetai.removeSyncListener(atualizacao);
         }
 
         super.onStop();
     }
-
 
     @Override
     public void onResume() {
@@ -148,6 +132,29 @@ public class InicioClienteFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onDestroyView() {
+        rootView = null;
+        btnFazerPedido = null;
+        painelCliente = null;
+        layoutStatusPedido = null;
+        cardAguardandoPropostas = null;
+        cardNovaProposta = null;
+        cardEmColeta = null;
+        txtPergunta = null;
+        txtTipoAguardando = null;
+        txtTipoProposta = null;
+        txtAvatarColetor = null;
+        txtNomeColetor = null;
+        txtAvaliacaoColetor = null;
+        txtPrecoProposta = null;
+        txtMensagemProposta = null;
+        txtColetorCaminho = null;
+        txtTipoEmColeta = null;
+        btnCancelarPedido = null;
+        indicadorNotificacao = null;
+        super.onDestroyView();
+    }
 
     // =====================================================
     // COMPONENTES
@@ -248,7 +255,6 @@ public class InicioClienteFragment extends Fragment {
                 );
     }
 
-
     // =====================================================
     // MENU ANTIGO
     // =====================================================
@@ -270,7 +276,6 @@ public class InicioClienteFragment extends Fragment {
         }
     }
 
-
     // =====================================================
     // EVENTOS
     // =====================================================
@@ -281,13 +286,11 @@ public class InicioClienteFragment extends Fragment {
                 view -> abrirFormularioPedido()
         );
 
-
         rootView.findViewById(
                 R.id.btnRecusarProposta
         ).setOnClickListener(
                 view -> recusarProposta()
         );
-
 
         rootView.findViewById(
                 R.id.btnAceitarProposta
@@ -295,12 +298,10 @@ public class InicioClienteFragment extends Fragment {
                 view -> aceitarProposta()
         );
 
-
         btnCancelarPedido.setOnClickListener(
                 view -> cancelarPedido()
         );
     }
-
 
     // =====================================================
     // ATUALIZAR ESTADO DA HOME
@@ -315,16 +316,13 @@ public class InicioClienteFragment extends Fragment {
                                 Context.MODE_PRIVATE
                         );
 
-
         String status =
                 preferencias.getString(
                         "pedido_status",
                         ""
                 );
 
-
         esconderTodosOsEstados();
-
 
         if (
                 status == null
@@ -336,7 +334,6 @@ public class InicioClienteFragment extends Fragment {
             return;
         }
 
-
         switch (status) {
 
             case "waiting":
@@ -347,7 +344,6 @@ public class InicioClienteFragment extends Fragment {
 
                 break;
 
-
             case "proposal":
 
                 mostrarEstadoProposta(
@@ -355,7 +351,6 @@ public class InicioClienteFragment extends Fragment {
                 );
 
                 break;
-
 
             case "active":
 
@@ -365,7 +360,6 @@ public class InicioClienteFragment extends Fragment {
 
                 break;
 
-
             default:
 
                 mostrarEstadoSemPedido();
@@ -373,7 +367,6 @@ public class InicioClienteFragment extends Fragment {
                 break;
         }
     }
-
 
     // =====================================================
     // ESCONDER ESTADOS
@@ -402,7 +395,6 @@ public class InicioClienteFragment extends Fragment {
         );
     }
 
-
     // =====================================================
     // SEM PEDIDO
     // =====================================================
@@ -413,19 +405,14 @@ public class InicioClienteFragment extends Fragment {
                 View.GONE
         );
 
-        txtPergunta.setText(
-                "O que deseja descartar hoje?"
-        );
+        txtPergunta.setText(R.string.texto_o_que_deseja_descartar_hoje);
 
-        btnFazerPedido.setText(
-                "Fazer pedido"
-        );
+        btnFazerPedido.setText(R.string.texto_fazer_pedido);
 
         alterarAlturaPainel(
                 238
         );
     }
-
 
     // =====================================================
     // AGUARDANDO PROPOSTAS
@@ -451,33 +438,26 @@ public class InicioClienteFragment extends Fragment {
                 View.VISIBLE
         );
 
-
         String tipo =
                 preferencias.getString(
                         "pedido_tipo",
                         "Pedido"
                 );
 
+        txtTipoAguardando.setText(tipo);
+        TextView entrega = rootView.findViewById(R.id.txtEntregaPedido);
+        String estado = preferencias.getString("pedido_entrega", "pending");
+        entrega.setText("delivered".equals(estado) ? R.string.aguardando_propostas
+                : "rejected".equals(estado) ? R.string.pedido_recusado : R.string.pedido_pendente);
 
-        txtTipoAguardando.setText(
-                tipo
-        );
+        txtPergunta.setText(R.string.texto_acompanhe_seu_pedido);
 
-
-        txtPergunta.setText(
-                "Deseja fazer outro pedido?"
-        );
-
-        btnFazerPedido.setText(
-                "Fazer pedido"
-        );
-
+        btnFazerPedido.setText(R.string.texto_fazer_pedido);
 
         alterarAlturaPainel(
                 330
         );
     }
-
 
     // =====================================================
     // NOVA PROPOSTA
@@ -503,13 +483,11 @@ public class InicioClienteFragment extends Fragment {
                 View.VISIBLE
         );
 
-
         String tipo =
                 preferencias.getString(
                         "pedido_tipo",
                         "Pedido"
                 );
-
 
         String nome =
                 preferencias.getString(
@@ -517,13 +495,11 @@ public class InicioClienteFragment extends Fragment {
                         "João Santos"
                 );
 
-
         float avaliacao =
                 preferencias.getFloat(
                         "proposta_coletor_avaliacao",
                         4.9f
                 );
-
 
         int coletas =
                 preferencias.getInt(
@@ -531,13 +507,11 @@ public class InicioClienteFragment extends Fragment {
                         287
                 );
 
-
         String preco =
                 preferencias.getString(
                         "proposta_preco",
                         "0,00"
                 );
-
 
         String mensagem =
                 preferencias.getString(
@@ -545,21 +519,17 @@ public class InicioClienteFragment extends Fragment {
                         ""
                 );
 
-
         txtTipoProposta.setText(
                 tipo
         );
-
 
         txtNomeColetor.setText(
                 nome
         );
 
-
         txtAvatarColetor.setText(
                 obterIniciais(nome)
         );
-
 
         txtAvaliacaoColetor.setText(
                 "★ "
@@ -573,11 +543,9 @@ public class InicioClienteFragment extends Fragment {
                         + " coletas"
         );
 
-
         txtPrecoProposta.setText(
                 "R$ " + preco
         );
-
 
         if (
                 mensagem == null
@@ -599,22 +567,14 @@ public class InicioClienteFragment extends Fragment {
             );
         }
 
+        txtPergunta.setText(R.string.texto_acompanhe_seu_pedido);
 
-        txtPergunta.setText(
-                "Deseja fazer outro pedido?"
-        );
-
-
-        btnFazerPedido.setText(
-                "Fazer pedido"
-        );
-
+        btnFazerPedido.setText(R.string.texto_fazer_pedido);
 
         alterarAlturaPainel(
                 430
         );
     }
-
 
     // =====================================================
     // EM COLETA
@@ -640,13 +600,11 @@ public class InicioClienteFragment extends Fragment {
                 View.VISIBLE
         );
 
-
         String tipo =
                 preferencias.getString(
                         "pedido_tipo",
                         "Pedido"
                 );
-
 
         String nomeColetor =
                 preferencias.getString(
@@ -654,39 +612,30 @@ public class InicioClienteFragment extends Fragment {
                         "João Santos"
                 );
 
-
-        txtColetorCaminho.setText(
-                nomeColetor
-                        + " está a caminho"
-        );
-
+        String etapa = preferencias.getString("coleta_etapa", "ready");
+        txtColetorCaminho.setText(getString("collecting".equals(etapa) ? R.string.coletor_no_local
+                : "going".equals(etapa) ? R.string.coletor_a_caminho : R.string.coletor_preparando, nomeColetor));
 
         txtTipoEmColeta.setText(
                 tipo
         );
 
+        txtPergunta.setText(R.string.texto_acompanhe_seu_pedido);
 
-        txtPergunta.setText(
-                "Deseja fazer outro pedido?"
-        );
-
-
-        btnFazerPedido.setText(
-                "Fazer pedido"
-        );
-
+        btnFazerPedido.setText(R.string.texto_fazer_pedido);
 
         alterarAlturaPainel(
                 330
         );
     }
 
-
     // =====================================================
     // ACEITAR PROPOSTA
     // =====================================================
 
     private void aceitarProposta() {
+        requireContext().getSharedPreferences("coletai", Context.MODE_PRIVATE).edit()
+                .putString("coleta_etapa", "ready").apply();
 
         SharedPreferences preferencias =
                 requireContext()
@@ -694,7 +643,6 @@ public class InicioClienteFragment extends Fragment {
                                 "coletai",
                                 Context.MODE_PRIVATE
                         );
-
 
         preferencias
                 .edit()
@@ -704,17 +652,14 @@ public class InicioClienteFragment extends Fragment {
                 )
                 .apply();
 
-
         Toast.makeText(
                 requireContext(),
                 "Proposta aceita!",
                 Toast.LENGTH_SHORT
         ).show();
 
-
         atualizarEstadoPedido();
     }
-
 
     // =====================================================
     // RECUSAR PROPOSTA
@@ -729,40 +674,16 @@ public class InicioClienteFragment extends Fragment {
                                 Context.MODE_PRIVATE
                         );
 
-
         SharedPreferences.Editor editor =
                 preferencias.edit();
-
 
         editor.putString(
                 "pedido_status",
                 "waiting"
         );
 
-
-        editor.remove(
-                "proposta_preco"
-        );
-
-        editor.remove(
-                "proposta_mensagem"
-        );
-
-        editor.remove(
-                "proposta_coletor_nome"
-        );
-
-        editor.remove(
-                "proposta_coletor_avaliacao"
-        );
-
-        editor.remove(
-                "proposta_coletor_coletas"
-        );
-
-
+        PedidoRepository.limparProposta(editor);
         editor.apply();
-
 
         Toast.makeText(
                 requireContext(),
@@ -770,10 +691,8 @@ public class InicioClienteFragment extends Fragment {
                 Toast.LENGTH_SHORT
         ).show();
 
-
         atualizarEstadoPedido();
     }
-
 
     // =====================================================
     // CANCELAR PEDIDO
@@ -788,12 +707,12 @@ public class InicioClienteFragment extends Fragment {
                                 Context.MODE_PRIVATE
                         );
 
-
         SharedPreferences.Editor editor =
                 preferencias.edit();
 
-
+        new PedidoRepository(preferencias).arquivar("cancelado");
         editor.remove("pedido_status");
+        editor.remove("coleta_etapa");
         editor.remove("pedido_tipo");
         editor.remove("pedido_emoji");
         editor.remove("pedido_descricao");
@@ -803,15 +722,8 @@ public class InicioClienteFragment extends Fragment {
         editor.remove("pedido_observacao");
         editor.remove("pedido_endereco_completo");
 
-        editor.remove("proposta_preco");
-        editor.remove("proposta_mensagem");
-        editor.remove("proposta_coletor_nome");
-        editor.remove("proposta_coletor_avaliacao");
-        editor.remove("proposta_coletor_coletas");
-
-
+        PedidoRepository.limparProposta(editor);
         editor.apply();
-
 
         Toast.makeText(
                 requireContext(),
@@ -819,10 +731,8 @@ public class InicioClienteFragment extends Fragment {
                 Toast.LENGTH_SHORT
         ).show();
 
-
         atualizarEstadoPedido();
     }
-
 
     // =====================================================
     // ALTERAR ALTURA DO PAINEL
@@ -835,18 +745,15 @@ public class InicioClienteFragment extends Fragment {
         ViewGroup.LayoutParams parametros =
                 painelCliente.getLayoutParams();
 
-
         parametros.height =
                 dpParaPx(
                         alturaDp
                 );
 
-
         painelCliente.setLayoutParams(
                 parametros
         );
     }
-
 
     private int dpParaPx(
             int dp
@@ -857,49 +764,47 @@ public class InicioClienteFragment extends Fragment {
                         .getDisplayMetrics()
                         .density;
 
-
         return Math.round(
                 dp * densidade
         );
     }
-
 
     // =====================================================
     // FORMULÁRIO DO PEDIDO
     // =====================================================
 
     private void abrirFormularioPedido() {
+        String status = requireContext().getSharedPreferences("coletai", Context.MODE_PRIVATE)
+                .getString("pedido_status", "");
+        if (!status.isEmpty() && !"done".equals(status)) {
+            Toast.makeText(requireContext(), "Conclua ou cancele o pedido atual antes de criar outro.", Toast.LENGTH_LONG).show();
+            return;
+        }
 
         tipoResiduoSelecionado = null;
 
         localizacaoSelecionada =
-                "atual";
-
+                "outro";
 
         BottomSheetDialog dialog =
                 new BottomSheetDialog(
                         requireContext()
                 );
 
-
         dialog.setContentView(
                 R.layout.bottom_sheet_fazer_pedido
         );
-
 
         configurarTamanhoBottomSheet(
                 dialog
         );
 
-
         configurarFormularioPedido(
                 dialog
         );
 
-
         dialog.show();
     }
-
 
     private void configurarTamanhoBottomSheet(
             BottomSheetDialog dialog
@@ -913,47 +818,38 @@ public class InicioClienteFragment extends Fragment {
                                     com.google.android.material.R.id.design_bottom_sheet
                             );
 
-
                     if (painel == null) {
 
                         return;
                     }
-
 
                     int alturaTela =
                             getResources()
                                     .getDisplayMetrics()
                                     .heightPixels;
 
-
                     int alturaPainel =
                             (int) (
                                     alturaTela * 0.88
                             );
 
-
                     painel.getLayoutParams().height =
                             alturaPainel;
 
-
                     painel.requestLayout();
-
 
                     painel.setBackgroundColor(
                             Color.TRANSPARENT
                     );
-
 
                     BottomSheetBehavior<FrameLayout> comportamento =
                             BottomSheetBehavior.from(
                                     painel
                             );
 
-
                     comportamento.setState(
                             BottomSheetBehavior.STATE_EXPANDED
                     );
-
 
                     comportamento.setSkipCollapsed(
                             true
@@ -961,7 +857,6 @@ public class InicioClienteFragment extends Fragment {
                 }
         );
     }
-
 
     private void configurarFormularioPedido(
             BottomSheetDialog dialog
@@ -972,42 +867,35 @@ public class InicioClienteFragment extends Fragment {
                         R.id.btnFecharPedido
                 );
 
-
         EditText edtDescricao =
                 dialog.findViewById(
                         R.id.edtDescricaoPedido
                 );
-
 
         EditText edtPeso =
                 dialog.findViewById(
                         R.id.edtPesoPedido
                 );
 
-
         EditText edtObservacoes =
                 dialog.findViewById(
                         R.id.edtObservacoesPedido
                 );
-
 
         EditText edtOutroEndereco =
                 dialog.findViewById(
                         R.id.edtOutroEndereco
                 );
 
-
         Spinner spinnerEndereco =
                 dialog.findViewById(
                         R.id.spinnerEnderecoSalvo
                 );
 
-
         Button btnEnviar =
                 dialog.findViewById(
                         R.id.btnEnviarPedido
                 );
-
 
         if (btnFechar != null) {
 
@@ -1016,23 +904,19 @@ public class InicioClienteFragment extends Fragment {
             );
         }
 
-
         configurarTiposDeResiduo(
                 dialog
         );
 
-
         configurarFotos(
                 dialog
         );
-
 
         configurarEnderecos(
                 dialog,
                 spinnerEndereco,
                 edtOutroEndereco
         );
-
 
         if (btnEnviar != null) {
 
@@ -1049,7 +933,6 @@ public class InicioClienteFragment extends Fragment {
         }
     }
 
-
     // =====================================================
     // TIPOS DE RESÍDUO
     // =====================================================
@@ -1063,42 +946,35 @@ public class InicioClienteFragment extends Fragment {
                         R.id.btnPilhas
                 );
 
-
         Button btnBaterias =
                 dialog.findViewById(
                         R.id.btnBaterias
                 );
-
 
         Button btnEletronicos =
                 dialog.findViewById(
                         R.id.btnEletronicos
                 );
 
-
         Button btnMedicamentos =
                 dialog.findViewById(
                         R.id.btnMedicamentos
                 );
-
 
         Button btnAgulhas =
                 dialog.findViewById(
                         R.id.btnAgulhas
                 );
 
-
         Button btnOleo =
                 dialog.findViewById(
                         R.id.btnOleo
                 );
 
-
         Button btnOutros =
                 dialog.findViewById(
                         R.id.btnOutros
                 );
-
 
         Button[] botoes = {
 
@@ -1111,13 +987,11 @@ public class InicioClienteFragment extends Fragment {
                 btnOutros
         };
 
-
         configurarBotaoResiduo(
                 btnPilhas,
                 "Pilhas",
                 botoes
         );
-
 
         configurarBotaoResiduo(
                 btnBaterias,
@@ -1125,13 +999,11 @@ public class InicioClienteFragment extends Fragment {
                 botoes
         );
 
-
         configurarBotaoResiduo(
                 btnEletronicos,
                 "Eletrônicos",
                 botoes
         );
-
 
         configurarBotaoResiduo(
                 btnMedicamentos,
@@ -1139,13 +1011,11 @@ public class InicioClienteFragment extends Fragment {
                 botoes
         );
 
-
         configurarBotaoResiduo(
                 btnAgulhas,
                 "Agulhas",
                 botoes
         );
-
 
         configurarBotaoResiduo(
                 btnOleo,
@@ -1153,14 +1023,12 @@ public class InicioClienteFragment extends Fragment {
                 botoes
         );
 
-
         configurarBotaoResiduo(
                 btnOutros,
                 "Outros",
                 botoes
         );
     }
-
 
     private void configurarBotaoResiduo(
             Button botao,
@@ -1173,13 +1041,11 @@ public class InicioClienteFragment extends Fragment {
             return;
         }
 
-
         botao.setOnClickListener(
                 view -> {
 
                     tipoResiduoSelecionado =
                             tipo;
-
 
                     for (Button item : todosOsBotoes) {
 
@@ -1188,7 +1054,6 @@ public class InicioClienteFragment extends Fragment {
                             item.setSelected(
                                     false
                             );
-
 
                             item.setTextColor(
                                     ContextCompat.getColor(
@@ -1199,11 +1064,9 @@ public class InicioClienteFragment extends Fragment {
                         }
                     }
 
-
                     botao.setSelected(
                             true
                     );
-
 
                     botao.setTextColor(
                             Color.WHITE
@@ -1211,7 +1074,6 @@ public class InicioClienteFragment extends Fragment {
                 }
         );
     }
-
 
     // =====================================================
     // FOTOS
@@ -1229,7 +1091,6 @@ public class InicioClienteFragment extends Fragment {
                 "Foto 1"
         );
 
-
         configurarCampoFoto(
                 dialog,
                 R.id.fotoPedido2,
@@ -1237,7 +1098,6 @@ public class InicioClienteFragment extends Fragment {
                 R.id.txtFotoPedido2,
                 "Foto 2"
         );
-
 
         configurarCampoFoto(
                 dialog,
@@ -1248,117 +1108,14 @@ public class InicioClienteFragment extends Fragment {
         );
     }
 
-
-    private void configurarCampoFoto(
-            BottomSheetDialog dialog,
-            int idCampo,
-            int idImagem,
-            int idTexto,
-            String textoFoto
-    ) {
-
-        LinearLayout campo =
-                dialog.findViewById(
-                        idCampo
-                );
-
-
-        ImageView imagem =
-                dialog.findViewById(
-                        idImagem
-                );
-
-
-        TextView texto =
-                dialog.findViewById(
-                        idTexto
-                );
-
-
-        if (
-                campo == null
-                        || imagem == null
-                        || texto == null
-        ) {
-
-            return;
-        }
-
-
-        campo.setOnClickListener(
-                view -> {
-
-                    boolean selecionado =
-                            !campo.isSelected();
-
-
-                    campo.setSelected(
-                            selecionado
-                    );
-
-
-                    if (selecionado) {
-
-                        imagem.setImageResource(
-                                R.drawable.ic_check
-                        );
-
-
-                        imagem.setImageTintList(
-                                ColorStateList.valueOf(
-                                        ContextCompat.getColor(
-                                                requireContext(),
-                                                R.color.brand_700
-                                        )
-                                )
-                        );
-
-
-                        texto.setText(
-                                textoFoto
-                        );
-
-
-                        texto.setTextColor(
-                                ContextCompat.getColor(
-                                        requireContext(),
-                                        R.color.brand_700
-                                )
-                        );
-
-                    } else {
-
-                        imagem.setImageResource(
-                                R.drawable.ic_camera
-                        );
-
-
-                        imagem.setImageTintList(
-                                ColorStateList.valueOf(
-                                        ContextCompat.getColor(
-                                                requireContext(),
-                                                R.color.ink_400
-                                        )
-                                )
-                        );
-
-
-                        texto.setText(
-                                "Adicionar"
-                        );
-
-
-                        texto.setTextColor(
-                                ContextCompat.getColor(
-                                        requireContext(),
-                                        R.color.ink_400
-                                )
-                        );
-                    }
-                }
-        );
+    private void configurarCampoFoto(BottomSheetDialog dialog, int idCampo,
+                                     int idImagem, int idTexto, String textoFoto) {
+        View campo = dialog.findViewById(idCampo);
+        TextView texto = dialog.findViewById(idTexto);
+        if (texto != null) texto.setText(R.string.texto_em_breve);
+        if (campo != null) campo.setOnClickListener(v -> Toast.makeText(requireContext(),
+                "Anexar fotos ainda não está disponível nesta versão.", Toast.LENGTH_SHORT).show());
     }
-
 
     // =====================================================
     // ENDEREÇOS
@@ -1375,46 +1132,37 @@ public class InicioClienteFragment extends Fragment {
                         R.id.opcaoLocalizacaoAtual
                 );
 
-
         LinearLayout opcaoSalvo =
                 dialog.findViewById(
                         R.id.opcaoEnderecoSalvo
                 );
-
 
         LinearLayout opcaoOutro =
                 dialog.findViewById(
                         R.id.opcaoOutroEndereco
                 );
 
-
         ImageView checkAtual =
                 dialog.findViewById(
                         R.id.checkLocalizacaoAtual
                 );
-
 
         ImageView checkSalvo =
                 dialog.findViewById(
                         R.id.checkEnderecoSalvo
                 );
 
-
         ImageView checkOutro =
                 dialog.findViewById(
                         R.id.checkOutroEndereco
                 );
 
-
         if (spinnerEndereco != null) {
 
-            String[] enderecos = {
-
-                    "Selecionar endereço",
-                    "Casa — Rua das Flores, 234",
-                    "Trabalho — Av. Paulista, 1578"
-            };
-
+            String salvo = requireContext().getSharedPreferences("coletai", Context.MODE_PRIVATE)
+                    .getString("endereco_salvo_cliente", "");
+            String[] enderecos = salvo.isEmpty() ? new String[]{"Selecionar endereço"}
+                    : new String[]{"Selecionar endereço", salvo};
 
             ArrayAdapter<String> adapter =
                     new ArrayAdapter<>(
@@ -1423,17 +1171,14 @@ public class InicioClienteFragment extends Fragment {
                             enderecos
                     );
 
-
             adapter.setDropDownViewResource(
                     android.R.layout.simple_spinner_dropdown_item
             );
-
 
             spinnerEndereco.setAdapter(
                     adapter
             );
         }
-
 
         if (opcaoAtual != null) {
 
@@ -1452,7 +1197,6 @@ public class InicioClienteFragment extends Fragment {
             );
         }
 
-
         if (opcaoSalvo != null) {
 
             opcaoSalvo.setOnClickListener(
@@ -1470,7 +1214,6 @@ public class InicioClienteFragment extends Fragment {
             );
         }
 
-
         if (opcaoOutro != null) {
 
             opcaoOutro.setOnClickListener(
@@ -1487,8 +1230,11 @@ public class InicioClienteFragment extends Fragment {
                     )
             );
         }
-    }
+        if (opcaoAtual != null) opcaoAtual.setVisibility(View.GONE);
+        selecionarLocalizacao("outro", opcaoAtual, opcaoSalvo, opcaoOutro,
+                checkAtual, checkSalvo, checkOutro, spinnerEndereco, edtOutroEndereco);
 
+    }
 
     private void selecionarLocalizacao(
             String tipo,
@@ -1505,13 +1251,11 @@ public class InicioClienteFragment extends Fragment {
         localizacaoSelecionada =
                 tipo;
 
-
         opcaoAtual.setBackgroundResource(
                 tipo.equals("atual")
                         ? R.drawable.bg_location_selected
                         : R.drawable.bg_location_option
         );
-
 
         opcaoSalvo.setBackgroundResource(
                 tipo.equals("salvo")
@@ -1519,13 +1263,11 @@ public class InicioClienteFragment extends Fragment {
                         : R.drawable.bg_location_option
         );
 
-
         opcaoOutro.setBackgroundResource(
                 tipo.equals("outro")
                         ? R.drawable.bg_location_selected
                         : R.drawable.bg_location_option
         );
-
 
         checkAtual.setVisibility(
                 tipo.equals("atual")
@@ -1533,13 +1275,11 @@ public class InicioClienteFragment extends Fragment {
                         : View.INVISIBLE
         );
 
-
         checkSalvo.setVisibility(
                 tipo.equals("salvo")
                         ? View.VISIBLE
                         : View.INVISIBLE
         );
-
 
         checkOutro.setVisibility(
                 tipo.equals("outro")
@@ -1547,13 +1287,11 @@ public class InicioClienteFragment extends Fragment {
                         : View.INVISIBLE
         );
 
-
         spinnerEndereco.setVisibility(
                 tipo.equals("salvo")
                         ? View.VISIBLE
                         : View.GONE
         );
-
 
         edtOutroEndereco.setVisibility(
                 tipo.equals("outro")
@@ -1561,7 +1299,6 @@ public class InicioClienteFragment extends Fragment {
                         : View.GONE
         );
     }
-
 
     // =====================================================
     // VALIDAR PEDIDO
@@ -1587,13 +1324,11 @@ public class InicioClienteFragment extends Fragment {
             return;
         }
 
-
         String descricao =
                 edtDescricao
                         .getText()
                         .toString()
                         .trim();
-
 
         String peso =
                 edtPeso
@@ -1601,13 +1336,11 @@ public class InicioClienteFragment extends Fragment {
                         .toString()
                         .trim();
 
-
         String observacao =
                 edtObservacoes
                         .getText()
                         .toString()
                         .trim();
-
 
         if (descricao.isEmpty()) {
 
@@ -1620,7 +1353,13 @@ public class InicioClienteFragment extends Fragment {
             return;
         }
 
-
+        try {
+            peso = DecimalValues.positive(peso, 3).stripTrailingZeros().toPlainString();
+        } catch (IllegalArgumentException e) {
+            edtPeso.setError("Informe um peso positivo de até 1.000.000 kg, com até 3 casas decimais");
+            edtPeso.requestFocus();
+            return;
+        }
         if (peso.isEmpty()) {
 
             edtPeso.setError(
@@ -1631,7 +1370,6 @@ public class InicioClienteFragment extends Fragment {
 
             return;
         }
-
 
         if (
                 localizacaoSelecionada.equals(
@@ -1648,7 +1386,6 @@ public class InicioClienteFragment extends Fragment {
 
             return;
         }
-
 
         if (
                 localizacaoSelecionada.equals(
@@ -1670,13 +1407,16 @@ public class InicioClienteFragment extends Fragment {
             return;
         }
 
-
+        if ("atual".equals(localizacaoSelecionada)) {
+            Toast.makeText(requireContext(), "Selecione um endereço salvo ou informe o endereço da coleta.",
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
         String enderecoCompleto =
                 obterEnderecoCompleto(
                         edtOutroEndereco,
                         spinnerEndereco
                 );
-
 
         enviarPedido(
                 dialog,
@@ -1686,7 +1426,6 @@ public class InicioClienteFragment extends Fragment {
                 enderecoCompleto
         );
     }
-
 
     // =====================================================
     // ENVIAR PEDIDO
@@ -1707,10 +1446,10 @@ public class InicioClienteFragment extends Fragment {
                                 Context.MODE_PRIVATE
                         );
 
-
         SharedPreferences.Editor editor =
                 preferencias.edit();
 
+        new PedidoRepository(preferencias).novoPedido(editor);
 
         // STATUS
 
@@ -1719,14 +1458,12 @@ public class InicioClienteFragment extends Fragment {
                 "waiting"
         );
 
-
         // PEDIDO
 
         editor.putString(
                 "pedido_tipo",
                 tipoResiduoSelecionado
         );
-
 
         editor.putString(
                 "pedido_emoji",
@@ -1735,86 +1472,64 @@ public class InicioClienteFragment extends Fragment {
                 )
         );
 
-
         editor.putString(
                 "pedido_descricao",
                 descricao
         );
-
 
         editor.putString(
                 "pedido_peso",
                 peso + " kg"
         );
 
-
         editor.putString(
                 "pedido_regiao",
-                "Consolação"
+                ""
         );
-
 
         editor.putString(
                 "pedido_cidade",
-                "São Paulo"
+                ""
         );
-
 
         editor.putString(
                 "pedido_observacao",
                 observacao
         );
 
-
         editor.putString(
                 "pedido_endereco_completo",
                 enderecoCompleto
         );
 
+        try {
+            ProfileRepository profiles = new ProfileRepository(preferencias);
+            org.json.JSONObject profile = profiles.current();
+            if (!enderecoCompleto.equals(profile.optString("address"))) {
+                LocalJson.put(profile, "address", enderecoCompleto);
+                profiles.save(profile, false);
+            }
+        } catch (RuntimeException e) {
+            Toast.makeText(requireContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+            return;
+        }
+        editor.putString("endereco_salvo_cliente", enderecoCompleto);
 
         // LIMPAR PROPOSTA ANTIGA
 
-        editor.remove(
-                "proposta_preco"
-        );
-
-
-        editor.remove(
-                "proposta_mensagem"
-        );
-
-
-        editor.remove(
-                "proposta_coletor_nome"
-        );
-
-
-        editor.remove(
-                "proposta_coletor_avaliacao"
-        );
-
-
-        editor.remove(
-                "proposta_coletor_coletas"
-        );
-
-
+        PedidoRepository.limparProposta(editor);
         editor.apply();
-
 
         dialog.dismiss();
 
-
         Toast.makeText(
                 requireContext(),
-                "Pedido enviado com sucesso!",
+                "Pedido salvo. Aguardando confirmação do outro celular pelo Bluetooth.",
                 Toast.LENGTH_LONG
         ).show();
 
-
         atualizarEstadoPedido();
     }
-
 
     // =====================================================
     // ENDEREÇO COMPLETO
@@ -1835,13 +1550,11 @@ public class InicioClienteFragment extends Fragment {
                     spinnerEndereco
                             .getSelectedItem();
 
-
             if (endereco != null) {
 
                 return endereco.toString();
             }
         }
-
 
         if (
                 localizacaoSelecionada.equals(
@@ -1855,10 +1568,8 @@ public class InicioClienteFragment extends Fragment {
                     .trim();
         }
 
-
         return "Localização atual do cliente";
     }
-
 
     // =====================================================
     // EMOJI
@@ -1873,45 +1584,37 @@ public class InicioClienteFragment extends Fragment {
             return "📦";
         }
 
-
         switch (tipo) {
 
             case "Pilhas":
 
                 return "🔋";
 
-
             case "Baterias":
 
                 return "⚡";
-
 
             case "Eletrônicos":
 
                 return "💻";
 
-
             case "Medicamentos":
 
                 return "💊";
-
 
             case "Agulhas":
 
                 return "💉";
 
-
             case "Óleo":
 
                 return "🫙";
-
 
             default:
 
                 return "📦";
         }
     }
-
 
     // =====================================================
     // INICIAIS DO COLETOR
@@ -1929,12 +1632,10 @@ public class InicioClienteFragment extends Fragment {
             return "JS";
         }
 
-
         String[] partes =
                 nome.trim().split(
                         "\\s+"
                 );
-
 
         if (partes.length == 1) {
 
@@ -1943,9 +1644,8 @@ public class InicioClienteFragment extends Fragment {
                             0,
                             1
                     )
-                    .toUpperCase();
+                    .toUpperCase(java.util.Locale.getDefault());
         }
-
 
         String primeira =
                 partes[0]
@@ -1953,7 +1653,6 @@ public class InicioClienteFragment extends Fragment {
                                 0,
                                 1
                         );
-
 
         String ultima =
                 partes[
@@ -1964,10 +1663,9 @@ public class InicioClienteFragment extends Fragment {
                                 1
                         );
 
-
         return (
                 primeira
                         + ultima
-        ).toUpperCase();
+        ).toUpperCase(java.util.Locale.getDefault());
     }
 }

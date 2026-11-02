@@ -16,7 +16,7 @@
     <LinearLayout
         android:id="@+id/headerDetalhes"
         android:layout_width="0dp"
-        android:layout_height="58dp"
+        android:layout_height="wrap_content" android:minHeight="58dp"
         android:background="@android:color/white"
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -35,7 +35,7 @@
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
-            android:text="‹"
+            android:text="@string/texto_simbolo"
             android:textColor="@color/brand_700"
             android:textSize="28sp"
             android:textStyle="bold" />
@@ -46,7 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_weight="1"
-            android:text="Detalhes do pedido"
+            android:text="@string/texto_detalhes_do_pedido"
             android:textColor="@color/ink_900"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -61,9 +61,9 @@
             android:paddingTop="6dp"
             android:paddingEnd="10dp"
             android:paddingBottom="6dp"
-            android:text="💻 Eletrônicos"
+            android:text="@string/texto_eletronicos"
             android:textColor="@color/brand_700"
-            android:textSize="10sp"
+            android:textSize="11sp"
             android:textStyle="bold" />
 
     </LinearLayout>
@@ -124,7 +124,7 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:gravity="center"
-                    android:text="💻"
+                    android:text="@string/texto_simbolo_4"
                     android:textSize="24sp" />
 
 
@@ -140,7 +140,7 @@
                         android:id="@+id/txtTipoPedido"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Eletrônicos"
+                        android:text="@string/texto_eletronicos_2"
                         android:textColor="@color/ink_900"
                         android:textSize="17sp"
                         android:textStyle="bold" />
@@ -153,7 +153,7 @@
                         android:layout_marginTop="3dp"
                         android:drawableStart="@drawable/ic_location_small"
                         android:drawablePadding="5dp"
-                        android:text="Consolação, São Paulo"
+                        android:text="@string/texto_consolacao_sao_paulo"
                         android:textColor="@color/ink_500"
                         android:textSize="11sp"
                         app:drawableTint="@color/brand_700" />
@@ -189,9 +189,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:letterSpacing="0.08"
-                        android:text="DESCRIÇÃO DO CLIENTE"
+                        android:text="@string/texto_descricao_do_cliente"
                         android:textColor="#9CA3AF"
-                        android:textSize="9sp"
+                        android:textSize="11sp"
                         android:textStyle="bold" />
 
 
@@ -201,7 +201,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:lineSpacingExtra="2dp"
-                        android:text="TV de tubo 29&quot; e um rádio antigo. Estão na garagem."
+                        android:text="@string/texto_tv_de_tubo_29_e_um_radio_antigo_estao_na_gara"
                         android:textColor="#374151"
                         android:textSize="13sp" />
 
@@ -246,9 +246,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:letterSpacing="0.06"
-                            android:text="PESO EST."
+                            android:text="@string/texto_peso_est"
                             android:textColor="#9CA3AF"
-                            android:textSize="9sp"
+                            android:textSize="11sp"
                             android:textStyle="bold" />
 
 
@@ -257,7 +257,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="7dp"
-                            android:text="14 kg"
+                            android:text="@string/texto_14_kg"
                             android:textColor="@color/ink_900"
                             android:textSize="16sp"
                             android:textStyle="bold" />
@@ -291,9 +291,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:letterSpacing="0.06"
-                            android:text="REGIÃO"
+                            android:text="@string/texto_regiao"
                             android:textColor="#9CA3AF"
-                            android:textSize="9sp"
+                            android:textSize="11sp"
                             android:textStyle="bold" />
 
 
@@ -302,7 +302,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="7dp"
-                            android:text="Consolação"
+                            android:text="@string/texto_consolacao"
                             android:textColor="@color/brand_700"
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -340,9 +340,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:letterSpacing="0.06"
-                        android:text="LOCALIZAÇÃO"
+                        android:text="@string/texto_localizacao"
                         android:textColor="#9CA3AF"
-                        android:textSize="9sp"
+                        android:textSize="11sp"
                         android:textStyle="bold" />
 
 
@@ -357,7 +357,7 @@
                         <ImageView
                             android:layout_width="22dp"
                             android:layout_height="22dp"
-                            android:contentDescription="Localização"
+                            android:contentDescription="@string/texto_localizacao_2"
                             android:padding="2dp"
                             android:src="@drawable/ic_location_small"
                             app:tint="@color/brand_700" />
@@ -375,7 +375,7 @@
                                 android:id="@+id/txtLocalizacaoPedido"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Consolação, São Paulo"
+                                android:text="@string/texto_consolacao_sao_paulo"
                                 android:textColor="#374151"
                                 android:textSize="12sp" />
 
@@ -384,9 +384,9 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="2dp"
-                                android:text="Endereço completo após aceite"
+                                android:text="@string/texto_endereco_completo_apos_aceite"
                                 android:textColor="#9CA3AF"
-                                android:textSize="9sp" />
+                                android:textSize="11sp" />
 
                         </LinearLayout>
 
@@ -425,9 +425,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:letterSpacing="0.06"
-                        android:text="OBSERVAÇÃO"
+                        android:text="@string/texto_observacao"
                         android:textColor="#B45309"
-                        android:textSize="9sp"
+                        android:textSize="11sp"
                         android:textStyle="bold" />
 
 
@@ -470,15 +470,16 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:letterSpacing="0.06"
-                        android:text="FOTOS"
+                        android:text="@string/texto_fotos"
                         android:textColor="#9CA3AF"
-                        android:textSize="9sp"
+                        android:textSize="11sp"
                         android:textStyle="bold" />
 
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="76dp"
+                        android:id="@+id/orderPhotos"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:orientation="horizontal">
 
@@ -493,8 +494,8 @@
                                 android:layout_width="26dp"
                                 android:layout_height="26dp"
                                 android:layout_gravity="center"
-                                android:contentDescription="Foto adicionada"
-                                android:src="@drawable/ic_check"
+                                android:contentDescription="@string/texto_foto"
+                                android:src="@drawable/ic_camera"
                                 app:tint="@color/brand_700" />
 
                         </FrameLayout>
@@ -511,7 +512,7 @@
                                 android:layout_width="25dp"
                                 android:layout_height="25dp"
                                 android:layout_gravity="center"
-                                android:contentDescription="Foto"
+                                android:contentDescription="@string/texto_foto"
                                 android:src="@drawable/ic_camera"
                                 app:tint="#9CA3AF" />
 
@@ -529,7 +530,7 @@
                                 android:layout_width="25dp"
                                 android:layout_height="25dp"
                                 android:layout_gravity="center"
-                                android:contentDescription="Foto"
+                                android:contentDescription="@string/texto_foto"
                                 android:src="@drawable/ic_camera"
                                 app:tint="#9CA3AF" />
 
@@ -554,7 +555,7 @@
     <LinearLayout
         android:id="@+id/footerDetalhes"
         android:layout_width="0dp"
-        android:layout_height="76dp"
+        android:layout_height="wrap_content" android:minHeight="76dp"
         android:background="@android:color/white"
         android:elevation="12dp"
         android:gravity="center"
@@ -570,13 +571,13 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnRecusar"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:gravity="center" android:layout_width="0dp"
+            android:layout_height="wrap_content" android:minHeight="50dp"
             android:layout_marginEnd="5dp"
             android:layout_weight="1"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="Recusar"
+            android:text="@string/texto_recusar"
             android:textAllCaps="false"
             android:textColor="#6B7280"
             android:textStyle="bold"
@@ -588,13 +589,13 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnEnviarProposta"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:gravity="center" android:layout_width="0dp"
+            android:layout_height="wrap_content" android:minHeight="50dp"
             android:layout_marginStart="5dp"
             android:layout_weight="1"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="Enviar proposta"
+            android:text="@string/texto_enviar_proposta"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
             android:textStyle="bold"

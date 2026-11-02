@@ -18,6 +18,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HistoricoAmbulanteFragment extends Fragment {
+    private final BluetoothColetai.SyncListener atualizacao = () -> {
+        if (getView() != null) { carregarHistorico(); atualizarResumo(); carregarLista(); }
+    };
+
+    @Override public void onStart() {
+        super.onStart();
+        BluetoothColetai.getInstance(requireContext()).addSyncListener(atualizacao);
+    }
+
+    @Override public void onStop() {
+        BluetoothColetai.getInstance(requireContext()).removeSyncListener(atualizacao);
+        super.onStop();
+    }
+
 
     private LinearLayout layoutHistorico;
     private LinearLayout layoutDetalhe;
@@ -39,14 +53,12 @@ public class HistoricoAmbulanteFragment extends Fragment {
     private final List<ColetaHistorico> coletas =
             new ArrayList<>();
 
-
     public HistoricoAmbulanteFragment() {
 
         super(
                 R.layout.fragment_historico_ambulante
         );
     }
-
 
     @Override
     public void onViewCreated(
@@ -61,7 +73,7 @@ public class HistoricoAmbulanteFragment extends Fragment {
 
         iniciarComponentes(view);
 
-        criarHistoricoMvp();
+        carregarHistorico();
 
         atualizarResumo();
 
@@ -69,7 +81,6 @@ public class HistoricoAmbulanteFragment extends Fragment {
 
         configurarEventos();
     }
-
 
     // =====================================================
     // COMPONENTES
@@ -94,7 +105,6 @@ public class HistoricoAmbulanteFragment extends Fragment {
                         R.id.listaHistorico
                 );
 
-
         txtTotalColetas =
                 view.findViewById(
                         R.id.txtTotalColetas
@@ -105,12 +115,10 @@ public class HistoricoAmbulanteFragment extends Fragment {
                         R.id.txtGanhos
                 );
 
-
         btnVoltarDetalhe =
                 view.findViewById(
                         R.id.btnVoltarDetalhe
                 );
-
 
         txtDetalheResiduo =
                 view.findViewById(
@@ -148,7 +156,6 @@ public class HistoricoAmbulanteFragment extends Fragment {
                 );
     }
 
-
     // =====================================================
     // EVENTOS
     // =====================================================
@@ -160,146 +167,31 @@ public class HistoricoAmbulanteFragment extends Fragment {
         );
     }
 
-
     // =====================================================
     // DADOS EXATOS DO MVP
     // =====================================================
 
-    private void criarHistoricoMvp() {
-
+    private void carregarHistorico() {
         coletas.clear();
-
-
-        coletas.add(
-                new ColetaHistorico(
-                        "Baterias",
-                        "Bateria de moto e 2 baterias de nobreak",
-                        "8 kg",
-                        "Rua das Flores, 234 — Jardim Paulista, São Paulo",
-                        "18 ago. 2025",
-                        "concluido",
-                        35.00
-                )
-        );
-
-
-        coletas.add(
-                new ColetaHistorico(
-                        "Eletrônicos",
-                        "Impressora HP e scanner antigo",
-                        "6 kg",
-                        "Rua Oscar Freire, 620 — Jardins, São Paulo",
-                        "10 ago. 2025",
-                        "concluido",
-                        55.00
-                )
-        );
-
-
-        coletas.add(
-                new ColetaHistorico(
-                        "Óleo",
-                        "Óleo de motor e óleo de cozinha",
-                        "7 kg",
-                        "Av. Brasil, 1200 — Água Branca, São Paulo",
-                        "28 jul. 2025",
-                        "concluido",
-                        40.00
-                )
-        );
-
-
-        coletas.add(
-                new ColetaHistorico(
-                        "Medicamentos",
-                        "Medicamentos e pomadas vencidas",
-                        "1.2 kg",
-                        "Rua Pamplona, 410 — Bela Vista, São Paulo",
-                        "12 jul. 2025",
-                        "concluido",
-                        26.00
-                )
-        );
-
-
-        coletas.add(
-                new ColetaHistorico(
-                        "Eletrônicos",
-                        "Computador antigo completo",
-                        "12 kg",
-                        "Rua da Consolação, 980 — Consolação, São Paulo",
-                        "30 jun. 2025",
-                        "cancelado",
-                        0
-                )
-        );
-
-
-        coletas.add(
-                new ColetaHistorico(
-                        "Agulhas",
-                        "Recipiente com agulhas descartáveis",
-                        "0.7 kg",
-                        "Alameda Campinas, 700 — Jardins, São Paulo",
-                        "17 jun. 2025",
-                        "concluido",
-                        32.00
-                )
-        );
-
-
-        coletas.add(
-                new ColetaHistorico(
-                        "Pilhas",
-                        "Caixa com pilhas e baterias pequenas",
-                        "2.1 kg",
-                        "Rua Bela Cintra, 350 — Consolação, São Paulo",
-                        "25 mai. 2025",
-                        "concluido",
-                        24.00
-                )
-        );
-
-
-        coletas.add(
-                new ColetaHistorico(
-                        "Baterias",
-                        "Bateria automotiva sem uso",
-                        "18 kg",
-                        "Alameda Lorena, 820 — Jardim Paulista, São Paulo",
-                        "08 mai. 2025",
-                        "cancelado",
-                        0
-                )
-        );
-
-
-        coletas.add(
-                new ColetaHistorico(
-                        "Óleo",
-                        "Óleo de cozinha em cinco garrafas PET",
-                        "5 kg",
-                        "Rua Frei Caneca, 540 — Consolação, São Paulo",
-                        "19 abr. 2025",
-                        "concluido",
-                        30.00
-                )
-        );
-
-
-        coletas.add(
-                new ColetaHistorico(
-                        "Outros",
-                        "Lâminas protegidas em recipiente rígido",
-                        "0.4 kg",
-                        "Rua Haddock Lobo, 290 — Cerqueira César, São Paulo",
-                        "27 mar. 2025",
-                        "concluido",
-                        20.00
-                )
-        );
+        PedidoRepository repository = new PedidoRepository(requireContext()
+                .getSharedPreferences("coletai", android.content.Context.MODE_PRIVATE));
+        for (org.json.JSONObject item : repository.historico()) {
+            double valor = 0;
+            try { valor = DecimalValues.positive(item.optString("proposta_preco"), 2).doubleValue(); }
+            catch (IllegalArgumentException ignored) { /* Cancelamento sem proposta. */ }
+            coletas.add(new ColetaHistorico(item.optString("pedido_tipo"), item.optString("pedido_descricao"),
+                    item.optString("pedido_peso"), item.optString("pedido_endereco_completo"),
+                    new java.text.SimpleDateFormat("dd MMM yyyy", java.util.Locale.getDefault()).format(new java.util.Date(item.optLong("data"))), item.optString("status"), valor));
+        }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        carregarHistorico();
+        atualizarResumo();
+        carregarLista();
+    }
 
     // =====================================================
     // RESUMO
@@ -312,7 +204,6 @@ public class HistoricoAmbulanteFragment extends Fragment {
 
         double ganhos =
                 0;
-
 
         for (ColetaHistorico coleta : coletas) {
 
@@ -329,13 +220,11 @@ public class HistoricoAmbulanteFragment extends Fragment {
             }
         }
 
-
         txtTotalColetas.setText(
                 String.valueOf(
                         concluidas
                 )
         );
-
 
         txtGanhos.setText(
                 "R$ "
@@ -347,7 +236,6 @@ public class HistoricoAmbulanteFragment extends Fragment {
         );
     }
 
-
     // =====================================================
     // LISTA
     // =====================================================
@@ -356,7 +244,6 @@ public class HistoricoAmbulanteFragment extends Fragment {
 
         listaHistorico.removeAllViews();
 
-
         for (ColetaHistorico coleta : coletas) {
 
             adicionarCard(
@@ -364,7 +251,6 @@ public class HistoricoAmbulanteFragment extends Fragment {
             );
         }
     }
-
 
     private void adicionarCard(
             ColetaHistorico coleta
@@ -375,42 +261,34 @@ public class HistoricoAmbulanteFragment extends Fragment {
                         requireContext()
                 );
 
-
         LinearLayout.LayoutParams parametrosCard =
                 new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
                 );
 
-
         parametrosCard.bottomMargin =
                 dp(10);
-
 
         card.setLayoutParams(
                 parametrosCard
         );
 
-
         card.setCardBackgroundColor(
                 Color.WHITE
         );
-
 
         card.setRadius(
                 dp(16)
         );
 
-
         card.setCardElevation(
                 0
         );
 
-
         card.setStrokeWidth(
                 dp(1)
         );
-
 
         card.setStrokeColor(
                 Color.parseColor(
@@ -418,27 +296,22 @@ public class HistoricoAmbulanteFragment extends Fragment {
                 )
         );
 
-
         card.setClickable(
                 true
         );
 
-
         card.setFocusable(
                 true
         );
-
 
         LinearLayout conteudo =
                 new LinearLayout(
                         requireContext()
                 );
 
-
         conteudo.setOrientation(
                 LinearLayout.VERTICAL
         );
-
 
         conteudo.setPadding(
                 dp(15),
@@ -446,7 +319,6 @@ public class HistoricoAmbulanteFragment extends Fragment {
                 dp(15),
                 dp(14)
         );
-
 
         // =================================================
         // CABEÇALHO
@@ -457,22 +329,18 @@ public class HistoricoAmbulanteFragment extends Fragment {
                         requireContext()
                 );
 
-
         cabecalho.setOrientation(
                 LinearLayout.HORIZONTAL
         );
-
 
         cabecalho.setGravity(
                 Gravity.CENTER_VERTICAL
         );
 
-
         TextView badgeResiduo =
                 new TextView(
                         requireContext()
                 );
-
 
         badgeResiduo.setText(
                 obterEmoji(
@@ -482,34 +350,28 @@ public class HistoricoAmbulanteFragment extends Fragment {
                         + coleta.tipo
         );
 
-
         badgeResiduo.setTextSize(
                 11
         );
-
 
         badgeResiduo.setTypeface(
                 null,
                 android.graphics.Typeface.BOLD
         );
 
-
         configurarBadgeResiduo(
                 badgeResiduo,
                 coleta.tipo
         );
 
-
         cabecalho.addView(
                 badgeResiduo
         );
-
 
         View espaco =
                 new View(
                         requireContext()
                 );
-
 
         LinearLayout.LayoutParams parametrosEspaco =
                 new LinearLayout.LayoutParams(
@@ -518,22 +380,18 @@ public class HistoricoAmbulanteFragment extends Fragment {
                         1
                 );
 
-
         espaco.setLayoutParams(
                 parametrosEspaco
         );
-
 
         cabecalho.addView(
                 espaco
         );
 
-
         TextView valorStatus =
                 new TextView(
                         requireContext()
                 );
-
 
         if (
                 coleta.status.equals(
@@ -541,17 +399,13 @@ public class HistoricoAmbulanteFragment extends Fragment {
                 )
         ) {
 
-            valorStatus.setText(
-                    "Cancelado"
-            );
-
+            valorStatus.setText(R.string.texto_cancelado);
 
             valorStatus.setTextColor(
                     Color.parseColor(
                             "#DC2626"
                     )
             );
-
 
             valorStatus.setBackground(
                     criarFundo(
@@ -560,14 +414,12 @@ public class HistoricoAmbulanteFragment extends Fragment {
                     )
             );
 
-
             valorStatus.setPadding(
                     dp(9),
                     dp(5),
                     dp(9),
                     dp(5)
             );
-
 
             valorStatus.setTextSize(
                     11
@@ -582,18 +434,15 @@ public class HistoricoAmbulanteFragment extends Fragment {
                     )
             );
 
-
             valorStatus.setTextColor(
                     Color.parseColor(
                             "#1F7A4D"
                     )
             );
 
-
             valorStatus.setTextSize(
                     14
             );
-
 
             valorStatus.setTypeface(
                     null,
@@ -601,16 +450,13 @@ public class HistoricoAmbulanteFragment extends Fragment {
             );
         }
 
-
         cabecalho.addView(
                 valorStatus
         );
 
-
         conteudo.addView(
                 cabecalho
         );
-
 
         // =================================================
         // DESCRIÇÃO
@@ -621,11 +467,9 @@ public class HistoricoAmbulanteFragment extends Fragment {
                         requireContext()
                 );
 
-
         descricao.setText(
                 coleta.descricao
         );
-
 
         descricao.setTextColor(
                 Color.parseColor(
@@ -633,16 +477,13 @@ public class HistoricoAmbulanteFragment extends Fragment {
                 )
         );
 
-
         descricao.setTextSize(
                 13
         );
 
-
         descricao.setMaxLines(
                 1
         );
-
 
         LinearLayout.LayoutParams parametrosDescricao =
                 new LinearLayout.LayoutParams(
@@ -650,20 +491,16 @@ public class HistoricoAmbulanteFragment extends Fragment {
                         LinearLayout.LayoutParams.WRAP_CONTENT
                 );
 
-
         parametrosDescricao.topMargin =
                 dp(10);
-
 
         descricao.setLayoutParams(
                 parametrosDescricao
         );
 
-
         conteudo.addView(
                 descricao
         );
-
 
         // =================================================
         // RODAPÉ
@@ -674,16 +511,13 @@ public class HistoricoAmbulanteFragment extends Fragment {
                         requireContext()
                 );
 
-
         rodape.setOrientation(
                 LinearLayout.HORIZONTAL
         );
 
-
         rodape.setGravity(
                 Gravity.CENTER_VERTICAL
         );
-
 
         LinearLayout.LayoutParams parametrosRodape =
                 new LinearLayout.LayoutParams(
@@ -691,21 +525,17 @@ public class HistoricoAmbulanteFragment extends Fragment {
                         LinearLayout.LayoutParams.WRAP_CONTENT
                 );
 
-
         parametrosRodape.topMargin =
                 dp(12);
-
 
         rodape.setLayoutParams(
                 parametrosRodape
         );
 
-
         TextView local =
                 new TextView(
                         requireContext()
                 );
-
 
         local.setText(
                 obterRegiao(
@@ -713,18 +543,15 @@ public class HistoricoAmbulanteFragment extends Fragment {
                 )
         );
 
-
         local.setTextColor(
                 Color.parseColor(
                         "#6B7280"
                 )
         );
 
-
         local.setTextSize(
                 12
         );
-
 
         LinearLayout.LayoutParams parametrosLocal =
                 new LinearLayout.LayoutParams(
@@ -733,27 +560,22 @@ public class HistoricoAmbulanteFragment extends Fragment {
                         1
                 );
 
-
         local.setLayoutParams(
                 parametrosLocal
         );
 
-
         rodape.addView(
                 local
         );
-
 
         TextView data =
                 new TextView(
                         requireContext()
                 );
 
-
         data.setText(
                 coleta.data
         );
-
 
         data.setTextColor(
                 Color.parseColor(
@@ -761,26 +583,21 @@ public class HistoricoAmbulanteFragment extends Fragment {
                 )
         );
 
-
         data.setTextSize(
                 11
         );
-
 
         rodape.addView(
                 data
         );
 
-
         conteudo.addView(
                 rodape
         );
 
-
         card.addView(
                 conteudo
         );
-
 
         card.setOnClickListener(
                 view -> abrirDetalhe(
@@ -788,12 +605,10 @@ public class HistoricoAmbulanteFragment extends Fragment {
                 )
         );
 
-
         listaHistorico.addView(
                 card
         );
     }
-
 
     // =====================================================
     // DETALHE
@@ -807,11 +622,9 @@ public class HistoricoAmbulanteFragment extends Fragment {
                 View.GONE
         );
 
-
         layoutDetalhe.setVisibility(
                 View.VISIBLE
         );
-
 
         txtDetalheResiduo.setText(
                 obterEmoji(
@@ -821,25 +634,21 @@ public class HistoricoAmbulanteFragment extends Fragment {
                         + coleta.tipo
         );
 
-
         configurarBadgeResiduo(
                 txtDetalheResiduo,
                 coleta.tipo
         );
-
 
         boolean concluido =
                 coleta.status.equals(
                         "concluido"
                 );
 
-
         txtDetalheStatus.setText(
                 concluido
                         ? "Concluído"
                         : "Cancelado"
         );
-
 
         txtDetalheStatus.setTextColor(
                 Color.parseColor(
@@ -848,7 +657,6 @@ public class HistoricoAmbulanteFragment extends Fragment {
                                 : "#DC2626"
                 )
         );
-
 
         txtDetalheStatus.setBackground(
                 criarFundo(
@@ -859,26 +667,21 @@ public class HistoricoAmbulanteFragment extends Fragment {
                 )
         );
 
-
         txtDetalheDescricao.setText(
                 coleta.descricao
         );
-
 
         txtDetalheData.setText(
                 coleta.data
         );
 
-
         txtDetalheEndereco.setText(
                 coleta.endereco
         );
 
-
         txtDetalhePeso.setText(
                 coleta.peso
         );
-
 
         txtDetalheValor.setText(
                 concluido
@@ -890,19 +693,16 @@ public class HistoricoAmbulanteFragment extends Fragment {
         );
     }
 
-
     private void fecharDetalhe() {
 
         layoutDetalhe.setVisibility(
                 View.GONE
         );
 
-
         layoutHistorico.setVisibility(
                 View.VISIBLE
         );
     }
-
 
     // =====================================================
     // VISUAL
@@ -919,7 +719,6 @@ public class HistoricoAmbulanteFragment extends Fragment {
         String texto =
                 "#6B7280";
 
-
         switch (tipo) {
 
             case "Pilhas":
@@ -929,14 +728,12 @@ public class HistoricoAmbulanteFragment extends Fragment {
 
                 break;
 
-
             case "Baterias":
 
                 fundo = "#FEE2E2";
                 texto = "#DC2626";
 
                 break;
-
 
             case "Eletrônicos":
 
@@ -945,7 +742,6 @@ public class HistoricoAmbulanteFragment extends Fragment {
 
                 break;
 
-
             case "Medicamentos":
 
                 fundo = "#E0F2FE";
@@ -953,14 +749,12 @@ public class HistoricoAmbulanteFragment extends Fragment {
 
                 break;
 
-
             case "Agulhas":
 
                 fundo = "#FCE7F3";
                 texto = "#BE185D";
 
                 break;
-
 
             case "Óleo":
 
@@ -970,13 +764,11 @@ public class HistoricoAmbulanteFragment extends Fragment {
                 break;
         }
 
-
         badge.setTextColor(
                 Color.parseColor(
                         texto
                 )
         );
-
 
         badge.setBackground(
                 criarFundo(
@@ -984,7 +776,6 @@ public class HistoricoAmbulanteFragment extends Fragment {
                         20
                 )
         );
-
 
         badge.setPadding(
                 dp(9),
@@ -994,7 +785,6 @@ public class HistoricoAmbulanteFragment extends Fragment {
         );
     }
 
-
     private GradientDrawable criarFundo(
             String cor,
             int raio
@@ -1003,22 +793,18 @@ public class HistoricoAmbulanteFragment extends Fragment {
         GradientDrawable drawable =
                 new GradientDrawable();
 
-
         drawable.setColor(
                 Color.parseColor(
                         cor
                 )
         );
 
-
         drawable.setCornerRadius(
                 dp(raio)
         );
 
-
         return drawable;
     }
-
 
     // =====================================================
     // UTILIDADES
@@ -1036,7 +822,6 @@ public class HistoricoAmbulanteFragment extends Fragment {
         );
     }
 
-
     private String formatarValor(
             double valor
     ) {
@@ -1051,7 +836,6 @@ public class HistoricoAmbulanteFragment extends Fragment {
         );
     }
 
-
     private String obterRegiao(
             String endereco
     ) {
@@ -1065,7 +849,6 @@ public class HistoricoAmbulanteFragment extends Fragment {
             return "Jardim Paulista, São Paulo";
         }
 
-
         if (
                 endereco.contains(
                         "Jardins"
@@ -1074,7 +857,6 @@ public class HistoricoAmbulanteFragment extends Fragment {
 
             return "Jardins, São Paulo";
         }
-
 
         if (
                 endereco.contains(
@@ -1085,7 +867,6 @@ public class HistoricoAmbulanteFragment extends Fragment {
             return "Água Branca, São Paulo";
         }
 
-
         if (
                 endereco.contains(
                         "Bela Vista"
@@ -1094,7 +875,6 @@ public class HistoricoAmbulanteFragment extends Fragment {
 
             return "Bela Vista, São Paulo";
         }
-
 
         if (
                 endereco.contains(
@@ -1105,10 +885,8 @@ public class HistoricoAmbulanteFragment extends Fragment {
             return "Cerqueira César, São Paulo";
         }
 
-
         return "Consolação, São Paulo";
     }
-
 
     private String obterEmoji(
             String tipo
@@ -1139,7 +917,6 @@ public class HistoricoAmbulanteFragment extends Fragment {
         }
     }
 
-
     // =====================================================
     // MODELO
     // =====================================================
@@ -1154,7 +931,6 @@ public class HistoricoAmbulanteFragment extends Fragment {
         String status;
 
         double valor;
-
 
         ColetaHistorico(
                 String tipo,

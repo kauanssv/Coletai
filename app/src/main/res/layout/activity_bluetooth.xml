@@ -16,7 +16,7 @@
     <LinearLayout
         android:id="@+id/cabecalhoBluetooth"
         android:layout_width="0dp"
-        android:layout_height="62dp"
+        android:layout_height="wrap_content" android:minHeight="62dp"
         android:background="@android:color/white"
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -35,7 +35,7 @@
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
-            android:text="‹"
+            android:text="@string/texto_simbolo"
             android:textColor="@color/ink_700"
             android:textSize="30sp"
             android:textStyle="bold" />
@@ -52,7 +52,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Modo demonstração"
+                android:text="@string/texto_modo_demonstracao"
                 android:textColor="@color/ink_900"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -62,7 +62,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="1dp"
-                android:text="Bluetooth"
+                android:text="@string/texto_bluetooth"
                 android:textColor="@color/ink_500"
                 android:textSize="11sp" />
 
@@ -104,7 +104,7 @@
                 android:layout_height="64dp"
                 android:background="@drawable/bg_demo_icon"
                 android:gravity="center"
-                android:text="🔵"
+                android:text="@string/texto_simbolo_2"
                 android:textSize="27sp" />
 
 
@@ -112,7 +112,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Conectar os celulares"
+                android:text="@string/texto_conectar_os_celulares"
                 android:textColor="@color/ink_900"
                 android:textSize="22sp"
                 android:textStyle="bold" />
@@ -123,7 +123,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="7dp"
                 android:lineSpacingExtra="2dp"
-                android:text="Use esta opção para conectar dois celulares durante a apresentação do Coletaí."
+                android:text="@string/texto_use_esta_opcao_para_conectar_dois_celulares_d"
                 android:textColor="@color/ink_500"
                 android:textSize="13sp" />
 
@@ -145,7 +145,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="14dp"
-                    android:text="Antes de conectar, pareie os dois celulares normalmente nas Configurações de Bluetooth do Android."
+                    android:text="@string/texto_antes_de_conectar_pareie_os_dois_celulares_no"
                     android:textColor="#92400E"
                     android:textSize="12sp" />
 
@@ -158,7 +158,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="23dp"
-                android:text="STATUS"
+                android:text="@string/texto_status"
                 android:textColor="@color/ink_500"
                 android:textSize="11sp"
                 android:textStyle="bold" />
@@ -186,7 +186,7 @@
                         android:id="@+id/txtStatusBluetooth"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="● Aguardando conexão"
+                        android:text="@string/texto_aguardando_conexao"
                         android:textColor="@color/ink_500"
                         android:textSize="13sp"
                         android:textStyle="bold" />
@@ -197,7 +197,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:text="Nenhum celular conectado"
+                        android:text="@string/texto_nenhum_celular_conectado"
                         android:textColor="@color/ink_900"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -213,7 +213,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="23dp"
-                android:text="DISPOSITIVO PAREADO"
+                android:text="@string/texto_dispositivo_pareado"
                 android:textColor="@color/ink_500"
                 android:textSize="11sp"
                 android:textStyle="bold" />
@@ -239,13 +239,13 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnAtualizarDispositivos"
-                    android:layout_width="0dp"
+                    android:gravity="center" android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="5dp"
                     android:layout_weight="1"
                     android:insetTop="0dp"
                     android:insetBottom="0dp"
-                    android:text="Atualizar"
+                    android:text="@string/texto_atualizar"
                     android:textAllCaps="false"
                     android:textColor="@color/ink_700"
                     app:backgroundTint="@android:color/white"
@@ -256,13 +256,13 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnConectarBluetooth"
-                    android:layout_width="0dp"
+                    android:gravity="center" android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginStart="5dp"
                     android:layout_weight="1"
                     android:insetTop="0dp"
                     android:insetBottom="0dp"
-                    android:text="Conectar"
+                    android:text="@string/texto_conectar"
                     android:textAllCaps="false"
                     android:textColor="@android:color/white"
                     android:textStyle="bold"
@@ -278,7 +278,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="27dp"
-                android:text="TESTE DE COMUNICAÇÃO"
+                android:text="@string/texto_teste_de_comunicacao"
                 android:textColor="@color/ink_500"
                 android:textSize="11sp"
                 android:textStyle="bold" />
@@ -286,13 +286,13 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnEnviarTeste"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:gravity="center" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:minHeight="50dp"
                 android:layout_marginTop="9dp"
                 android:enabled="false"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                android:text="Enviar “Olá do Coletaí!”"
+                android:text="@string/texto_enviar_ola_do_coletai"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 android:textStyle="bold"
@@ -321,7 +321,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Última mensagem recebida"
+                        android:text="@string/texto_ultima_mensagem_recebida"
                         android:textColor="@color/ink_500"
                         android:textSize="11sp"
                         android:textStyle="bold" />
@@ -332,7 +332,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="7dp"
-                        android:text="Nenhuma mensagem recebida ainda."
+                        android:text="@string/texto_nenhuma_mensagem_recebida_ainda"
                         android:textColor="@color/ink_900"
                         android:textSize="13sp" />
 
@@ -343,13 +343,13 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnDesconectarBluetooth"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:gravity="center" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:minHeight="48dp"
                 android:layout_marginTop="20dp"
                 android:enabled="false"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                android:text="Desconectar"
+                android:text="@string/texto_desconectar"
                 android:textAllCaps="false"
                 android:textColor="#DC2626"
                 app:backgroundTint="#FEF2F2"

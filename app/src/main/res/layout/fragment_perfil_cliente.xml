@@ -36,7 +36,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:letterSpacing="0.08"
-                android:text="SUA CONTA"
+                android:text="@string/texto_sua_conta"
                 android:textColor="@color/brand_700"
                 android:textSize="11sp"
                 android:textStyle="bold" />
@@ -45,7 +45,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Perfil"
+                android:text="@string/texto_perfil"
                 android:textColor="@color/ink_900"
                 android:textSize="28sp"
                 android:textStyle="bold" />
@@ -72,7 +72,7 @@
                         android:layout_gravity="start|top"
                         android:background="@drawable/bg_demo_icon"
                         android:gravity="center"
-                        android:text="LF"
+                        android:text="@string/texto_lf"
                         android:textColor="@color/brand_700"
                         android:textSize="22sp"
                         android:textStyle="bold" />
@@ -86,7 +86,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
-                        android:text="✎"
+                        android:text="@string/texto_simbolo_9"
                         android:textColor="@android:color/white"
                         android:textSize="13sp"
                         android:textStyle="bold" />
@@ -104,7 +104,7 @@
                         android:id="@+id/txtNomeCabecalho"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Lucas Ferreira"
+                        android:text="@string/texto_lucas_ferreira"
                         android:textColor="@color/ink_900"
                         android:textSize="17sp"
                         android:textStyle="bold" />
@@ -114,7 +114,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
-                        android:text="cliente@gmail.com"
+                        android:text="@string/texto_cliente_gmail_com"
                         android:textColor="@color/ink_500"
                         android:textSize="13sp" />
 
@@ -127,7 +127,7 @@
                         android:paddingTop="4dp"
                         android:paddingEnd="9dp"
                         android:paddingBottom="4dp"
-                        android:text="Cliente"
+                        android:text="@string/texto_cliente"
                         android:textColor="@color/brand_700"
                         android:textSize="11sp"
                         android:textStyle="bold" />
@@ -144,7 +144,7 @@
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="22dp"
                 android:letterSpacing="0.08"
-                android:text="DADOS PESSOAIS"
+                android:text="@string/texto_dados_pessoais"
                 android:textColor="@color/ink_500"
                 android:textSize="11sp"
                 android:textStyle="bold" />
@@ -159,7 +159,7 @@
                 <LinearLayout
                     android:id="@+id/rowNome"
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:layout_height="wrap_content" android:minHeight="52dp"
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center_vertical"
@@ -171,7 +171,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Nome completo"
+                        android:text="@string/texto_nome_completo_2"
                         android:textColor="@color/ink_500"
                         android:textSize="13sp" />
 
@@ -182,7 +182,7 @@
                         android:maxWidth="180dp"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:text="Lucas Ferreira"
+                        android:text="@string/texto_lucas_ferreira"
                         android:textColor="@color/ink_900"
                         android:textSize="13sp"
                         android:textStyle="bold" />
@@ -191,7 +191,7 @@
                         android:layout_width="18dp"
                         android:layout_height="wrap_content"
                         android:gravity="end"
-                        android:text="›"
+                        android:text="@string/texto_simbolo_10"
                         android:textColor="@color/ink_400"
                         android:textSize="21sp" />
 
@@ -206,7 +206,7 @@
                 <LinearLayout
                     android:id="@+id/rowCpf"
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:layout_height="wrap_content" android:minHeight="52dp"
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center_vertical"
@@ -218,7 +218,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="CPF"
+                        android:text="@string/texto_cpf"
                         android:textColor="@color/ink_500"
                         android:textSize="13sp" />
 
@@ -226,7 +226,7 @@
                         android:id="@+id/txtCpfPerfil"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="123.456.789-00"
+                        android:text="@string/texto_123_456_789_00"
                         android:textColor="@color/ink_900"
                         android:textSize="13sp"
                         android:textStyle="bold" />
@@ -235,7 +235,7 @@
                         android:layout_width="18dp"
                         android:layout_height="wrap_content"
                         android:gravity="end"
-                        android:text="›"
+                        android:text="@string/texto_simbolo_10"
                         android:textColor="@color/ink_400"
                         android:textSize="21sp" />
 
@@ -250,7 +250,7 @@
                 <LinearLayout
                     android:id="@+id/rowTelefone"
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:layout_height="wrap_content" android:minHeight="52dp"
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center_vertical"
@@ -262,7 +262,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Telefone"
+                        android:text="@string/texto_telefone"
                         android:textColor="@color/ink_500"
                         android:textSize="13sp" />
 
@@ -270,7 +270,7 @@
                         android:id="@+id/txtTelefonePerfil"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="(11) 99999-1234"
+                        android:text="@string/texto_11_99999_1234"
                         android:textColor="@color/ink_900"
                         android:textSize="13sp"
                         android:textStyle="bold" />
@@ -279,7 +279,7 @@
                         android:layout_width="18dp"
                         android:layout_height="wrap_content"
                         android:gravity="end"
-                        android:text="›"
+                        android:text="@string/texto_simbolo_10"
                         android:textColor="@color/ink_400"
                         android:textSize="21sp" />
 
@@ -294,7 +294,7 @@
                 <LinearLayout
                     android:id="@+id/rowEmail"
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:layout_height="wrap_content" android:minHeight="52dp"
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center_vertical"
@@ -306,7 +306,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="E-mail"
+                        android:text="@string/texto_e_mail"
                         android:textColor="@color/ink_500"
                         android:textSize="13sp" />
 
@@ -317,7 +317,7 @@
                         android:maxWidth="175dp"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:text="cliente@gmail.com"
+                        android:text="@string/texto_cliente_gmail_com"
                         android:textColor="@color/ink_900"
                         android:textSize="13sp"
                         android:textStyle="bold" />
@@ -326,7 +326,7 @@
                         android:layout_width="18dp"
                         android:layout_height="wrap_content"
                         android:gravity="end"
-                        android:text="›"
+                        android:text="@string/texto_simbolo_10"
                         android:textColor="@color/ink_400"
                         android:textSize="21sp" />
 
@@ -341,7 +341,7 @@
                 <LinearLayout
                     android:id="@+id/rowSenha"
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:layout_height="wrap_content" android:minHeight="52dp"
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center_vertical"
@@ -353,14 +353,14 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Senha"
+                        android:text="@string/texto_senha"
                         android:textColor="@color/ink_500"
                         android:textSize="13sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="••••••••"
+                        android:text="@string/texto_simbolo_5"
                         android:textColor="@color/ink_900"
                         android:textSize="13sp"
                         android:textStyle="bold" />
@@ -369,7 +369,7 @@
                         android:layout_width="18dp"
                         android:layout_height="wrap_content"
                         android:gravity="end"
-                        android:text="›"
+                        android:text="@string/texto_simbolo_10"
                         android:textColor="@color/ink_400"
                         android:textSize="21sp" />
 
@@ -385,7 +385,7 @@
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="22dp"
                 android:letterSpacing="0.08"
-                android:text="ENDEREÇOS"
+                android:text="@string/texto_enderecos"
                 android:textColor="@color/ink_500"
                 android:textSize="11sp"
                 android:textStyle="bold" />
@@ -400,7 +400,7 @@
                 <LinearLayout
                     android:id="@+id/rowEnderecoCasa"
                     android:layout_width="match_parent"
-                    android:layout_height="58dp"
+                    android:layout_height="wrap_content" android:minHeight="58dp"
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center_vertical"
@@ -411,7 +411,7 @@
                     <TextView
                         android:layout_width="65dp"
                         android:layout_height="wrap_content"
-                        android:text="Casa"
+                        android:text="@string/texto_casa"
                         android:textColor="@color/ink_500"
                         android:textSize="13sp" />
 
@@ -422,7 +422,7 @@
                         android:layout_weight="1"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:text="Rua das Flores, 234"
+                        android:text="@string/texto_rua_das_flores_234"
                         android:textColor="@color/ink_900"
                         android:textSize="13sp"
                         android:textStyle="bold" />
@@ -431,7 +431,7 @@
                         android:layout_width="18dp"
                         android:layout_height="wrap_content"
                         android:gravity="end"
-                        android:text="›"
+                        android:text="@string/texto_simbolo_10"
                         android:textColor="@color/ink_400"
                         android:textSize="21sp" />
 
@@ -446,7 +446,7 @@
                 <LinearLayout
                     android:id="@+id/rowEnderecoTrabalho"
                     android:layout_width="match_parent"
-                    android:layout_height="58dp"
+                    android:layout_height="wrap_content" android:minHeight="58dp"
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center_vertical"
@@ -457,7 +457,7 @@
                     <TextView
                         android:layout_width="65dp"
                         android:layout_height="wrap_content"
-                        android:text="Trabalho"
+                        android:text="@string/texto_trabalho"
                         android:textColor="@color/ink_500"
                         android:textSize="13sp" />
 
@@ -468,7 +468,7 @@
                         android:layout_weight="1"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:text="Av. Paulista, 1578"
+                        android:text="@string/texto_av_paulista_1578"
                         android:textColor="@color/ink_900"
                         android:textSize="13sp"
                         android:textStyle="bold" />
@@ -477,7 +477,7 @@
                         android:layout_width="18dp"
                         android:layout_height="wrap_content"
                         android:gravity="end"
-                        android:text="›"
+                        android:text="@string/texto_simbolo_10"
                         android:textColor="@color/ink_400"
                         android:textSize="21sp" />
 
@@ -492,7 +492,7 @@
                 <LinearLayout
                     android:id="@+id/rowAdicionarEndereco"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
+                    android:layout_height="wrap_content" android:minHeight="50dp"
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center_vertical"
@@ -503,7 +503,7 @@
                     <TextView
                         android:layout_width="24dp"
                         android:layout_height="wrap_content"
-                        android:text="+"
+                        android:text="@string/texto_simbolo_11"
                         android:textColor="@color/brand_700"
                         android:textSize="20sp"
                         android:textStyle="bold" />
@@ -511,7 +511,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Adicionar endereço"
+                        android:text="@string/texto_adicionar_endereco"
                         android:textColor="@color/brand_700"
                         android:textSize="13sp"
                         android:textStyle="bold" />
@@ -522,10 +522,10 @@
 
             <Button
                 android:id="@+id/btnSairConta"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:gravity="center" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:minHeight="50dp"
                 android:layout_marginTop="20dp"
-                android:text="Sair da conta"
+                android:text="@string/texto_sair_da_conta"
                 android:textAllCaps="false"
                 android:textColor="#DC2626"
                 android:textSize="14sp"
@@ -575,7 +575,7 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center"
-                    android:text="×"
+                    android:text="@string/texto_simbolo_6"
                     android:textColor="@color/ink_700"
                     android:textSize="23sp" />
 
@@ -584,7 +584,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:layout_weight="1"
-                    android:text="Editar perfil"
+                    android:text="@string/texto_editar_perfil"
                     android:textColor="@color/ink_900"
                     android:textSize="17sp"
                     android:textStyle="bold" />
@@ -598,7 +598,7 @@
                     android:gravity="center"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
-                    android:text="Salvar"
+                    android:text="@string/texto_salvar"
                     android:textColor="@color/brand_700"
                     android:textSize="14sp"
                     android:textStyle="bold" />
@@ -617,97 +617,97 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="NOME COMPLETO"
+                    android:text="@string/texto_nome_completo"
                     android:textColor="@color/ink_700"
                     android:textSize="12sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"     android:labelFor="@id/edtNomePerfil" />
 
                 <EditText
                     android:id="@+id/edtNomePerfil"
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:gravity="start|center_vertical" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:minHeight="52dp"
                     android:layout_marginTop="8dp"
                     android:background="@drawable/bg_input"
-                    android:hint="Nome completo"
+                    android:hint="@string/texto_nome_completo_2"
                     android:inputType="textPersonName"
                     android:maxLines="1"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
                     android:textColor="@color/ink_900"
                     android:textColorHint="@color/ink_400"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"     android:importantForAutofill="no"     android:maxLength="500" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:text="TELEFONE"
+                    android:text="@string/texto_telefone_2"
                     android:textColor="@color/ink_700"
                     android:textSize="12sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"     android:labelFor="@id/edtTelefonePerfil" />
 
                 <EditText
                     android:id="@+id/edtTelefonePerfil"
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:gravity="start|center_vertical" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:minHeight="52dp"
                     android:layout_marginTop="8dp"
                     android:background="@drawable/bg_input"
-                    android:hint="(11) 99999-9999"
+                    android:hint="@string/texto_11_99999_9999"
                     android:inputType="phone"
                     android:maxLines="1"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
                     android:textColor="@color/ink_900"
                     android:textColorHint="@color/ink_400"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"     android:importantForAutofill="no"     android:maxLength="500" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:text="CPF"
+                    android:text="@string/texto_cpf"
                     android:textColor="@color/ink_700"
                     android:textSize="12sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"     android:labelFor="@id/edtCpfPerfil" />
 
                 <EditText
                     android:id="@+id/edtCpfPerfil"
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:gravity="start|center_vertical" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:minHeight="52dp"
                     android:layout_marginTop="8dp"
                     android:background="@drawable/bg_input"
                     android:enabled="false"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
                     android:textColor="@color/ink_400"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"     android:inputType="number"     android:importantForAutofill="no"     android:maxLength="500" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:text="E-MAIL"
+                    android:text="@string/texto_e_mail_2"
                     android:textColor="@color/ink_700"
                     android:textSize="12sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"     android:labelFor="@id/edtEmailPerfil" />
 
                 <EditText
                     android:id="@+id/edtEmailPerfil"
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:gravity="start|center_vertical" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:minHeight="52dp"
                     android:layout_marginTop="8dp"
                     android:background="@drawable/bg_input"
                     android:enabled="false"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
                     android:textColor="@color/ink_400"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"     android:inputType="textEmailAddress"     android:importantForAutofill="no"     android:maxLength="500" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
-                    android:text="CPF e e-mail ficam bloqueados nesta versão do MVP."
+                    android:text="@string/texto_cpf_e_e_mail_ficam_bloqueados_nesta_versao_do"
                     android:textColor="@color/ink_500"
                     android:textSize="12sp" />
 

@@ -46,14 +46,11 @@ public class BluetoothActivity
     private Button btnEnviarTeste;
     private Button btnDesconectar;
 
-
     private BluetoothColetai bluetoothColetai;
-
 
     private final List<BluetoothDevice>
             dispositivosPareados =
             new ArrayList<>();
-
 
     // =====================================================
     // PERMISSÃO BLUETOOTH
@@ -75,7 +72,6 @@ public class BluetoothActivity
                                     "Permissão Bluetooth negada"
                             );
 
-
                             Toast.makeText(
                                     this,
                                     "Permita o acesso a dispositivos próximos para usar o modo Bluetooth.",
@@ -84,7 +80,6 @@ public class BluetoothActivity
                         }
                     }
             );
-
 
     // =====================================================
     // ATIVAR BLUETOOTH
@@ -96,10 +91,10 @@ public class BluetoothActivity
                     new ActivityResultContracts.StartActivityForResult(),
                     resultado -> {
 
-                        prepararBluetooth();
+                        if (resultado.getResultCode() == RESULT_OK) prepararBluetooth();
+                        else atualizarStatus("Ativação do Bluetooth cancelada");
                     }
             );
-
 
     @Override
     protected void onCreate(
@@ -110,16 +105,13 @@ public class BluetoothActivity
                 savedInstanceState
         );
 
-
         EdgeToEdge.enable(
                 this
         );
 
-
         setContentView(
                 R.layout.activity_bluetooth
         );
-
 
         ViewCompat.setOnApplyWindowInsetsListener(
                 findViewById(
@@ -132,7 +124,6 @@ public class BluetoothActivity
                                     WindowInsetsCompat.Type.systemBars()
                             );
 
-
                     view.setPadding(
                             systemBars.left,
                             systemBars.top,
@@ -140,17 +131,14 @@ public class BluetoothActivity
                             systemBars.bottom
                     );
 
-
                     return insets;
                 }
         );
-
 
         bluetoothColetai =
                 BluetoothColetai.getInstance(
                         this
                 );
-
 
         iniciarComponentes();
 
@@ -159,27 +147,22 @@ public class BluetoothActivity
         verificarPermissaoBluetooth();
     }
 
-
     @Override
     protected void onStart() {
 
         super.onStart();
 
-
         bluetoothColetai.setListener(
                 this
         );
 
-
         atualizarEstadoDaTela();
     }
-
 
     @Override
     protected void onStop() {
 
         super.onStop();
-
 
         /*
          * Não desconectamos.
@@ -192,7 +175,6 @@ public class BluetoothActivity
         );
     }
 
-
     // =====================================================
     // COMPONENTES
     // =====================================================
@@ -204,55 +186,46 @@ public class BluetoothActivity
                         R.id.btnVoltarBluetooth
                 );
 
-
         txtStatusBluetooth =
                 findViewById(
                         R.id.txtStatusBluetooth
                 );
-
 
         txtDispositivoConectado =
                 findViewById(
                         R.id.txtDispositivoConectado
                 );
 
-
         txtUltimaMensagem =
                 findViewById(
                         R.id.txtUltimaMensagem
                 );
-
 
         spinnerDispositivos =
                 findViewById(
                         R.id.spinnerDispositivos
                 );
 
-
         btnAtualizar =
                 findViewById(
                         R.id.btnAtualizarDispositivos
                 );
-
 
         btnConectar =
                 findViewById(
                         R.id.btnConectarBluetooth
                 );
 
-
         btnEnviarTeste =
                 findViewById(
                         R.id.btnEnviarTeste
                 );
-
 
         btnDesconectar =
                 findViewById(
                         R.id.btnDesconectarBluetooth
                 );
     }
-
 
     // =====================================================
     // EVENTOS
@@ -263,7 +236,6 @@ public class BluetoothActivity
         btnVoltar.setOnClickListener(
                 view -> finish()
         );
-
 
         btnAtualizar.setOnClickListener(
                 view -> {
@@ -277,22 +249,18 @@ public class BluetoothActivity
                 }
         );
 
-
         btnConectar.setOnClickListener(
                 view -> conectarSelecionado()
         );
-
 
         btnEnviarTeste.setOnClickListener(
                 view -> enviarMensagemTeste()
         );
 
-
         btnDesconectar.setOnClickListener(
                 view -> bluetoothColetai.desconectar()
         );
     }
-
 
     // =====================================================
     // PERMISSÃO
@@ -315,10 +283,8 @@ public class BluetoothActivity
             }
         }
 
-
         prepararBluetooth();
     }
-
 
     private boolean temPermissaoBluetooth() {
 
@@ -330,7 +296,6 @@ public class BluetoothActivity
             return true;
         }
 
-
         return ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.BLUETOOTH_CONNECT
@@ -338,7 +303,6 @@ public class BluetoothActivity
                 ==
                 PackageManager.PERMISSION_GRANTED;
     }
-
 
     // =====================================================
     // PREPARAR
@@ -351,27 +315,22 @@ public class BluetoothActivity
             return;
         }
 
-
         if (!bluetoothColetai.temBluetooth()) {
 
             atualizarStatus(
                     "Este celular não possui Bluetooth"
             );
 
-
             btnConectar.setEnabled(
                     false
             );
-
 
             btnEnviarTeste.setEnabled(
                     false
             );
 
-
             return;
         }
-
 
         if (!bluetoothColetai.bluetoothAtivado()) {
 
@@ -379,31 +338,24 @@ public class BluetoothActivity
                     "Bluetooth desligado"
             );
 
-
             Intent intent =
                     new Intent(
                             BluetoothAdapter.ACTION_REQUEST_ENABLE
                     );
 
-
             launcherAtivarBluetooth.launch(
                     intent
             );
 
-
             return;
         }
 
-
         bluetoothColetai.iniciarServidor();
-
 
         carregarDispositivosPareados();
 
-
         atualizarEstadoDaTela();
     }
-
 
     // =====================================================
     // PAREADOS
@@ -416,14 +368,11 @@ public class BluetoothActivity
             return;
         }
 
-
         Set<BluetoothDevice> pareados =
                 bluetoothColetai
                         .getDispositivosPareados();
 
-
         dispositivosPareados.clear();
-
 
         if (pareados != null) {
 
@@ -432,7 +381,6 @@ public class BluetoothActivity
             );
         }
 
-
         dispositivosPareados.sort(
                 Comparator.comparing(
                         this::obterNomeSeguro,
@@ -440,10 +388,8 @@ public class BluetoothActivity
                 )
         );
 
-
         List<String> nomes =
                 new ArrayList<>();
-
 
         for (
                 BluetoothDevice dispositivo
@@ -456,12 +402,10 @@ public class BluetoothActivity
                             dispositivo
                     );
 
-
             String endereco =
                     obterEnderecoSeguro(
                             dispositivo
                     );
-
 
             nomes.add(
                     nome
@@ -470,14 +414,12 @@ public class BluetoothActivity
             );
         }
 
-
         if (nomes.isEmpty()) {
 
             nomes.add(
                     "Nenhum dispositivo pareado"
             );
         }
-
 
         ArrayAdapter<String> adapter =
                 new ArrayAdapter<>(
@@ -486,16 +428,13 @@ public class BluetoothActivity
                         nomes
                 );
 
-
         adapter.setDropDownViewResource(
                 android.R.layout.simple_spinner_dropdown_item
         );
 
-
         spinnerDispositivos.setAdapter(
                 adapter
         );
-
 
         btnConectar.setEnabled(
                 !dispositivosPareados.isEmpty()
@@ -503,7 +442,6 @@ public class BluetoothActivity
                         !bluetoothColetai.estaConectado()
         );
     }
-
 
     // =====================================================
     // CONECTAR
@@ -518,7 +456,6 @@ public class BluetoothActivity
             return;
         }
 
-
         if (
                 dispositivosPareados.isEmpty()
         ) {
@@ -532,11 +469,9 @@ public class BluetoothActivity
             return;
         }
 
-
         int posicao =
                 spinnerDispositivos
                         .getSelectedItemPosition();
-
 
         if (
                 posicao < 0
@@ -548,23 +483,19 @@ public class BluetoothActivity
             return;
         }
 
-
         BluetoothDevice dispositivo =
                 dispositivosPareados.get(
                         posicao
                 );
 
-
         btnConectar.setEnabled(
                 false
         );
-
 
         bluetoothColetai.conectar(
                 dispositivo
         );
     }
-
 
     // =====================================================
     // MENSAGEM TESTE
@@ -583,18 +514,15 @@ public class BluetoothActivity
             return;
         }
 
-
         String mensagem =
                 "{"
                         + "\"evento\":\"TESTE\","
                         + "\"mensagem\":\"Olá do Coletaí!\""
                         + "}";
 
-
         bluetoothColetai.enviar(
                 mensagem
         );
-
 
         Toast.makeText(
                 this,
@@ -602,7 +530,6 @@ public class BluetoothActivity
                 Toast.LENGTH_SHORT
         ).show();
     }
-
 
     // =====================================================
     // ESTADO DA TELA
@@ -617,25 +544,19 @@ public class BluetoothActivity
             return;
         }
 
-
         boolean conectado =
                 bluetoothColetai
                         .estaConectado();
 
-
         if (conectado) {
 
-            txtStatusBluetooth.setText(
-                    "● Conectado"
-            );
-
+            txtStatusBluetooth.setText(R.string.texto_conectado);
 
             txtStatusBluetooth.setTextColor(
                     getColor(
                             R.color.brand_700
                     )
             );
-
 
             txtDispositivoConectado.setText(
                     bluetoothColetai
@@ -644,10 +565,7 @@ public class BluetoothActivity
 
         } else {
 
-            txtStatusBluetooth.setText(
-                    "● Aguardando conexão"
-            );
-
+            txtStatusBluetooth.setText(R.string.texto_aguardando_conexao);
 
             txtStatusBluetooth.setTextColor(
                     getColor(
@@ -655,12 +573,8 @@ public class BluetoothActivity
                     )
             );
 
-
-            txtDispositivoConectado.setText(
-                    "Nenhum celular conectado"
-            );
+            txtDispositivoConectado.setText(R.string.texto_nenhum_celular_conectado);
         }
-
 
         btnConectar.setEnabled(
                 !conectado
@@ -668,17 +582,14 @@ public class BluetoothActivity
                         !dispositivosPareados.isEmpty()
         );
 
-
         btnEnviarTeste.setEnabled(
                 conectado
         );
-
 
         btnDesconectar.setEnabled(
                 conectado
         );
     }
-
 
     private void atualizarStatus(
             String status
@@ -688,7 +599,6 @@ public class BluetoothActivity
                 "● " + status
         );
     }
-
 
     // =====================================================
     // CALLBACKS BLUETOOTH
@@ -702,16 +612,11 @@ public class BluetoothActivity
         runOnUiThread(
                 () -> {
 
-                    atualizarStatus(
-                            status
-                    );
-
-
                     atualizarEstadoDaTela();
+                    atualizarStatus(status);
                 }
         );
     }
-
 
     @Override
     public void onConectado(
@@ -721,10 +626,7 @@ public class BluetoothActivity
         runOnUiThread(
                 () -> {
 
-                    txtStatusBluetooth.setText(
-                            "● Conectado"
-                    );
-
+                    txtStatusBluetooth.setText(R.string.texto_conectado);
 
                     txtStatusBluetooth.setTextColor(
                             getColor(
@@ -732,26 +634,21 @@ public class BluetoothActivity
                             )
                     );
 
-
                     txtDispositivoConectado.setText(
                             nomeDispositivo
                     );
-
 
                     btnConectar.setEnabled(
                             false
                     );
 
-
                     btnEnviarTeste.setEnabled(
                             true
                     );
 
-
                     btnDesconectar.setEnabled(
                             true
                     );
-
 
                     Toast.makeText(
                             this,
@@ -761,7 +658,6 @@ public class BluetoothActivity
                 }
         );
     }
-
 
     @Override
     public void onMensagemRecebida(
@@ -775,7 +671,6 @@ public class BluetoothActivity
                             mensagem
                     );
 
-
                     Toast.makeText(
                             this,
                             "Mensagem recebida do outro celular!",
@@ -785,7 +680,6 @@ public class BluetoothActivity
         );
     }
 
-
     @Override
     public void onErro(
             String mensagem
@@ -794,10 +688,7 @@ public class BluetoothActivity
         runOnUiThread(
                 () -> {
 
-                    txtStatusBluetooth.setText(
-                            "● Erro na conexão"
-                    );
-
+                    txtStatusBluetooth.setText(R.string.texto_erro_na_conexao);
 
                     Toast.makeText(
                             this,
@@ -805,12 +696,10 @@ public class BluetoothActivity
                             Toast.LENGTH_LONG
                     ).show();
 
-
                     atualizarEstadoDaTela();
                 }
         );
     }
-
 
     // =====================================================
     // DADOS SEGUROS
@@ -825,12 +714,10 @@ public class BluetoothActivity
             return "Dispositivo";
         }
 
-
         try {
 
             String nome =
                     dispositivo.getName();
-
 
             if (
                     nome == null
@@ -840,7 +727,6 @@ public class BluetoothActivity
 
                 return "Dispositivo Bluetooth";
             }
-
 
             return nome;
 
@@ -852,7 +738,6 @@ public class BluetoothActivity
         }
     }
 
-
     private String obterEnderecoSeguro(
             @NonNull BluetoothDevice dispositivo
     ) {
@@ -861,7 +746,6 @@ public class BluetoothActivity
 
             return "";
         }
-
 
         try {
 

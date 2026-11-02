@@ -16,14 +16,13 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.viewpager2.widget.ViewPager2;
 
-public class tela_inicial_ambulante extends AppCompatActivity {
+public class tela_inicial_ambulante extends ContaActivity {
 
     // =====================================================
     // VIEWPAGER
     // =====================================================
 
     private ViewPager2 viewPagerAmbulante;
-
 
     // =====================================================
     // MENU INFERIOR
@@ -33,60 +32,24 @@ public class tela_inicial_ambulante extends AppCompatActivity {
     private LinearLayout navHistorico;
     private LinearLayout navPerfil;
 
-
     private ImageView imgNavInicio;
     private ImageView imgNavHistorico;
     private ImageView imgNavPerfil;
 
-
     private TextView txtNavInicio;
     private TextView txtNavHistorico;
     private TextView txtNavPerfil;
-
 
     // =====================================================
     // ON CREATE
     // =====================================================
 
     @Override
-    protected void onCreate(
-            Bundle savedInstanceState
-    ) {
-
-        super.onCreate(
-                savedInstanceState
-        );
-
-
-        EdgeToEdge.enable(
-                this
-        );
-
-
-        setContentView(
-                R.layout.activity_tela_inicial_ambulante
-        );
-
-
-        configurarBarrasDoSistema();
-
-        iniciarComponentes();
-
-        configurarViewPager();
-
-        configurarMenuInferior();
-
-
-        /*
-         * O ambulante começa sempre
-         * na tela inicial.
-         */
-        selecionarPagina(
-                0,
-                false
-        );
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        startActivity(new android.content.Intent(this, WorkspaceActivity.class));
+        finish();
     }
-
 
     // =====================================================
     // BARRAS DO SISTEMA
@@ -100,16 +63,13 @@ public class tela_inicial_ambulante extends AppCompatActivity {
                         getWindow().getDecorView()
                 );
 
-
         controller.setAppearanceLightStatusBars(
                 true
         );
 
-
         controller.setAppearanceLightNavigationBars(
                 true
         );
-
 
         ViewCompat.setOnApplyWindowInsetsListener(
                 findViewById(
@@ -122,7 +82,6 @@ public class tela_inicial_ambulante extends AppCompatActivity {
                                     WindowInsetsCompat.Type.systemBars()
                             );
 
-
                     view.setPadding(
                             systemBars.left,
                             systemBars.top,
@@ -130,12 +89,10 @@ public class tela_inicial_ambulante extends AppCompatActivity {
                             systemBars.bottom
                     );
 
-
                     return insets;
                 }
         );
     }
-
 
     // =====================================================
     // COMPONENTES
@@ -148,61 +105,51 @@ public class tela_inicial_ambulante extends AppCompatActivity {
                         R.id.viewPagerAmbulante
                 );
 
-
         navInicio =
                 findViewById(
                         R.id.navInicio
                 );
-
 
         navHistorico =
                 findViewById(
                         R.id.navHistorico
                 );
 
-
         navPerfil =
                 findViewById(
                         R.id.navPerfil
                 );
-
 
         imgNavInicio =
                 findViewById(
                         R.id.imgNavInicio
                 );
 
-
         imgNavHistorico =
                 findViewById(
                         R.id.imgNavHistorico
                 );
-
 
         imgNavPerfil =
                 findViewById(
                         R.id.imgNavPerfil
                 );
 
-
         txtNavInicio =
                 findViewById(
                         R.id.txtNavInicio
                 );
-
 
         txtNavHistorico =
                 findViewById(
                         R.id.txtNavHistorico
                 );
 
-
         txtNavPerfil =
                 findViewById(
                         R.id.txtNavPerfil
                 );
     }
-
 
     // =====================================================
     // VIEWPAGER
@@ -215,11 +162,9 @@ public class tela_inicial_ambulante extends AppCompatActivity {
                         this
                 );
 
-
         viewPagerAmbulante.setAdapter(
                 adapter
         );
-
 
         /*
          * Mantém as três páginas carregadas.
@@ -228,7 +173,6 @@ public class tela_inicial_ambulante extends AppCompatActivity {
                 2
         );
 
-
         /*
          * Permite trocar de tela
          * arrastando para os lados.
@@ -236,7 +180,6 @@ public class tela_inicial_ambulante extends AppCompatActivity {
         viewPagerAmbulante.setUserInputEnabled(
                 true
         );
-
 
         viewPagerAmbulante.registerOnPageChangeCallback(
                 new ViewPager2.OnPageChangeCallback() {
@@ -250,7 +193,6 @@ public class tela_inicial_ambulante extends AppCompatActivity {
                                 position
                         );
 
-
                         atualizarMenu(
                                 position
                         );
@@ -258,7 +200,6 @@ public class tela_inicial_ambulante extends AppCompatActivity {
                 }
         );
     }
-
 
     // =====================================================
     // MENU INFERIOR
@@ -274,7 +215,6 @@ public class tela_inicial_ambulante extends AppCompatActivity {
                         )
         );
 
-
         navHistorico.setOnClickListener(
                 view ->
                         selecionarPagina(
@@ -282,7 +222,6 @@ public class tela_inicial_ambulante extends AppCompatActivity {
                                 true
                         )
         );
-
 
         navPerfil.setOnClickListener(
                 view ->
@@ -292,7 +231,6 @@ public class tela_inicial_ambulante extends AppCompatActivity {
                         )
         );
     }
-
 
     // =====================================================
     // SELECIONAR PÁGINA
@@ -308,12 +246,10 @@ public class tela_inicial_ambulante extends AppCompatActivity {
                 animar
         );
 
-
         atualizarMenu(
                 pagina
         );
     }
-
 
     // =====================================================
     // ATUALIZAR MENU
@@ -329,20 +265,17 @@ public class tela_inicial_ambulante extends AppCompatActivity {
                         R.color.brand_700
                 );
 
-
         int corIconeNormal =
                 ContextCompat.getColor(
                         this,
                         R.color.ink_400
                 );
 
-
         int corTextoNormal =
                 ContextCompat.getColor(
                         this,
                         R.color.ink_500
                 );
-
 
         atualizarItemMenu(
                 imgNavInicio,
@@ -353,7 +286,6 @@ public class tela_inicial_ambulante extends AppCompatActivity {
                 corTextoNormal
         );
 
-
         atualizarItemMenu(
                 imgNavHistorico,
                 txtNavHistorico,
@@ -362,7 +294,6 @@ public class tela_inicial_ambulante extends AppCompatActivity {
                 corIconeNormal,
                 corTextoNormal
         );
-
 
         atualizarItemMenu(
                 imgNavPerfil,
@@ -373,7 +304,6 @@ public class tela_inicial_ambulante extends AppCompatActivity {
                 corTextoNormal
         );
     }
-
 
     // =====================================================
     // ITEM DO MENU
@@ -396,13 +326,11 @@ public class tela_inicial_ambulante extends AppCompatActivity {
                 )
         );
 
-
         texto.setTextColor(
                 selecionado
                         ? corSelecionada
                         : corTextoNormal
         );
-
 
         texto.setTypeface(
                 null,
