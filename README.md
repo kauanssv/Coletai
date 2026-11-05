@@ -40,7 +40,3 @@ O projeto foi desenvolvido utilizando:
 - XML
 - Android Studio
 - Git e GitHub
-
-## Status do projeto
-
-O Coletaí está em desenvolvimento e novas funcionalidades continuam sendo implementadas para completar o MVP.
