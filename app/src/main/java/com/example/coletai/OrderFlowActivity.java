@@ -190,6 +190,8 @@ public class OrderFlowActivity extends ContaActivity {
     toolbar.setNavigationOnClickListener(v -> finish());
     LinearLayout body = findViewById(R.id.orderFlowBody);
     String title = PlatformUi.status(status), instruction = "";
+    if (citizen && "editando".equals(status))
+      instruction = "Este pedido está indisponível para aceite. Continue a edição para publicar suas alterações.";
     int step = 0;
     if ("proposta".equals(status)) {
       title = citizen ? "Confira a proposta" : "Proposta enviada";
@@ -249,6 +251,9 @@ public class OrderFlowActivity extends ContaActivity {
       action(primary, "Aceitar proposta", () -> confirm("Aceitar esta proposta pelo valor informado?", "approve", false));
       action(secondary, "Recusar proposta", () -> confirm("Recusar e continuar procurando outro coletor?", "decline", false));
     } else if (citizen && !CollectionRepository.ended(order)) {
+      if ("aberta".equals(status) || "editando".equals(status))
+        action(primary, "editando".equals(status) ? "Continuar edição" : "Editar pedido",
+            () -> RequestFormDialog.edit(this, id));
       action(secondary, "Cancelar pedido", () -> confirm("Cancelar este pedido?", "cancel", false));
     } else if (assigned() && !CollectionRepository.ended(order)) {
       if ("aceita".equals(status)) action(primary, "Ir até o cliente", () -> change("going", false));

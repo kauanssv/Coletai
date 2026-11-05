@@ -43,6 +43,88 @@ public class BluetoothEngineTest {
     return okAction(role, "request.transition", payload).optJSONArray("requests").optJSONObject(0);
   }
 
+  @Test public void edicaoDeContaBluetoothValidaConfirmacaoEFotoPropria() {
+    JSONObject upload = send(tokens.get("cliente"), "photo.upload", LocalJson.object("{\"data\":\"010203\"}"));
+    assertTrue(upload.toString(), upload.optBoolean("ok"));
+    JSONObject photo = upload.optJSONObject("photo");
+    JSONObject profile = state("cliente").optJSONArray("profiles").optJSONObject(0);
+    LocalJson.put(profile, "name", "Novo nome");
+    LocalJson.put(profile, "profile_photo", photo);
+    LocalJson.put(profile, "current_password", "12345");
+    LocalJson.put(profile, "password", "nova-senha");
+    LocalJson.put(profile, "password_confirmation", "outra-senha");
+    assertFalse(action("cliente", "profile.account", profile).optBoolean("ok"));
+    assertNotEquals("Novo nome", state("cliente").optJSONArray("profiles").optJSONObject(0).optString("name"));
+    LocalJson.put(profile, "password_confirmation", "nova-senha");
+    JSONObject updated = okAction("cliente", "profile.account", profile).optJSONArray("profiles").optJSONObject(0);
+    assertEquals("Novo nome", updated.optString("name"));
+    assertEquals(photo.optString("id"), updated.optJSONObject("profile_photo").optString("id"));
+    assertEquals("remote", updated.optJSONObject("profile_photo").optString("source"));
+    JSONObject other = state("empresa").optJSONArray("profiles").optJSONObject(0);
+    LocalJson.put(other, "profile_photo", photo);
+    assertFalse(action("empresa", "profile.account", other).optBoolean("ok"));
+    JSONObject login = LocalJson.object("{\"email\":\"cliente@gmail.com\",\"password\":\"nova-senha\"}");
+    assertTrue(send("", "login", login).optBoolean("ok"));
+  }
+
+  @Test public void fotoDoResponsavelAcompanhaTodasEtapasApenasAposAprovacao() {
+    for (String role : new String[]{"ambulante", "empresa"}) {
+      JSONObject photoPayload = new JSONObject();
+      LocalJson.put(photoPayload, "data", BluetoothBytes.encode(new byte[]{1, 2, 3}));
+      JSONObject upload = send(tokens.get(role), "photo.upload", photoPayload);
+      assertTrue(upload.toString(), upload.optBoolean("ok"));
+      JSONObject photo = upload.optJSONObject("photo");
+      JSONObject profile = state(role).optJSONArray("profiles").optJSONObject(0);
+      LocalJson.put(profile, "profile_photo", photo);
+      okAction(role, "profile.account", profile);
+      JSONObject order = transition(role, transition(role, create(), "accept"), "propose");
+      JSONObject download = new JSONObject();
+      LocalJson.put(download, "photo_id", photo.optString("id"));
+      assertFalse(send(tokens.get("cliente"), "photo.download", download).optBoolean("ok"));
+      assertNull(state("cliente").optJSONArray("requests").optJSONObject(0).optJSONObject("responsible_photo"));
+      order = transition("cliente", order, "approve");
+      for (String step : new String[]{"", "going", "arrive", "collect", "complete"}) {
+        if (!step.isEmpty()) order = transition(role, order, step);
+        JSONObject citizenOrder = null;
+        JSONArray requests = state("cliente").optJSONArray("requests");
+        for (int i = 0; i < requests.length(); i++)
+          if (order.optString("id").equals(requests.optJSONObject(i).optString("id"))) citizenOrder = requests.optJSONObject(i);
+        assertNotNull(citizenOrder);
+        assertEquals(photo.optString("id"), citizenOrder.optJSONObject("responsible_photo").optString("id"));
+        assertTrue(send(tokens.get("cliente"), "photo.download", download).optBoolean("ok"));
+        String outsider = "ambulante".equals(role) ? "empresa" : "ambulante";
+        assertFalse(send(tokens.get(outsider), "photo.download", download).optBoolean("ok"));
+      }
+      profile = state(role).optJSONArray("profiles").optJSONObject(0);
+      LocalJson.put(profile, "profile_photo", JSONObject.NULL);
+      okAction(role, "profile.account", profile);
+      assertFalse(send(tokens.get("cliente"), "photo.download", download).optBoolean("ok"));
+    }
+  }
+
+  @Test public void exclusaoBluetoothPreservaContaERestauracaoExigeNovoLogin() {
+    for (String role : new String[]{"cliente", "ambulante", "empresa"}) {
+      JSONObject profile = state(role).optJSONArray("profiles").optJSONObject(0);
+      JSONObject deleted = action(role, "profile.delete", profile);
+      assertTrue(deleted.toString(), deleted.optBoolean("ok"));
+      assertFalse(deleted.has("state"));
+      assertEquals(401, send(tokens.get(role), "state", new JSONObject()).optInt("code"));
+      JSONArray accounts = state("admin").optJSONArray("profiles");
+      JSONObject stored = null;
+      for (int i = 0; i < accounts.length(); i++) if (role.equals(accounts.optJSONObject(i).optString("id"))) stored = accounts.optJSONObject(i);
+      assertNotNull(stored);
+      assertEquals("deleted", stored.optString("status"));
+      assertEquals(profile.optString("email"), stored.optString("email"));
+      JSONObject restore = new JSONObject();
+      LocalJson.put(restore, "id", role); LocalJson.put(restore, "status", "active");
+      okAction("admin", "profile.status", restore);
+      assertEquals(401, send(tokens.get(role), "state", new JSONObject()).optInt("code"));
+      JSONObject credentials = new JSONObject();
+      LocalJson.put(credentials, "email", profile.optString("email")); LocalJson.put(credentials, "password", "12345");
+      assertTrue(send("", "login", credentials).optBoolean("ok"));
+    }
+  }
+
   @Test public void quatroCelularesCompartilhamFluxoInteiroEAuditoria() {
     for (String collector : new String[]{"ambulante", "empresa"}) {
       JSONObject order = create();

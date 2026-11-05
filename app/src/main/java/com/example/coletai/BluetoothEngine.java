@@ -69,6 +69,14 @@ final class BluetoothEngine {
         sessions.remove(token);
       } else if ("action".equals(operation)) {
         mutate(tx, profiles, orders, payload.optString("action"), payload.optJSONObject("payload"));
+        if ("profile.delete".equals(payload.optString("action"))) {
+          List<String> revoked = new ArrayList<>();
+          for (Iterator<String> keys = sessions.keys(); keys.hasNext();) {
+            String key = keys.next();
+            if (account.equals(sessions.optJSONObject(key).optString("account"))) revoked.add(key);
+          }
+          for (String key : revoked) sessions.remove(key);
+        }
       } else if ("photo.upload".equals(operation)) {
         byte[] bytes = BluetoothBytes.decode(payload.optString("data"));
         if (bytes.length == 0 || bytes.length > PhotoRefs.MAX_BYTES) throw new IllegalArgumentException("Foto muito grande");
@@ -78,15 +86,20 @@ final class BluetoothEngine {
       } else if ("photo.download".equals(operation)) {
         String id = payload.optString("photo_id");
         boolean allowed = account.equals(tx.getString("bt_photo_owner_" + id, ""));
-        for (JSONObject order : orders.orders())
+        for (JSONObject order : orders.orders()) {
           if (hasPhoto(order, id)) allowed = true;
+          JSONObject avatar = order.optJSONObject("responsible_photo");
+          if (account.equals(order.optString("citizen_id")) && CollectionRepository.approved(order)
+              && avatar != null && "remote".equals(avatar.optString("source")) && id.equals(avatar.optString("id"))) allowed = true;
+        }
         if (!allowed) throw new SecurityException("Foto indisponível para esta conta");
         String data = tx.getString("bt_photo_" + id, "");
         if (data.isEmpty()) throw new IllegalArgumentException("Foto não encontrada");
         LocalJson.put(response, "data", data);
       } else if (!"state".equals(operation)) throw new IllegalArgumentException("Operação Bluetooth desconhecida");
       LocalJson.put(response, "ok", true);
-      if (!account.isEmpty() && !"logout".equals(operation) && !operation.startsWith("photo."))
+      if (!account.isEmpty() && !"logout".equals(operation) && !operation.startsWith("photo.")
+          && !("action".equals(operation) && "profile.delete".equals(payload.optString("action"))))
         LocalJson.put(response, "state", state(tx, profiles, orders));
       tx.edit().putString("bt_sessions", sessions.toString()).commit();
       if ("action".equals(operation) || "photo.upload".equals(operation) || "register".equals(operation)) {
@@ -123,7 +136,17 @@ final class BluetoothEngine {
   private void mutate(SharedPreferences tx, ProfileRepository profiles, CollectionRepository orders, String action, JSONObject p) {
     if (p == null) throw new IllegalArgumentException("Dados da operação ausentes");
     String id = p.optString("id");
+    if ("profile.account".equals(action) || "profile.save".equals(action)) {
+      JSONObject photo = p.optJSONObject("profile_photo");
+      if (photo != null && (!"remote".equals(photo.optString("source"))
+          || !id.equals(tx.getString("bt_photo_owner_" + photo.optString("id"), ""))))
+        throw new SecurityException("Foto de outra conta");
+    }
     switch (action) {
+      case "profile.delete": profiles.deleteAccount(id, p.optInt("revision", -1)); break;
+      case "profile.account":
+        profiles.updateAccount(p, p.optString("current_password"), p.optString("password"), p.optString("password_confirmation"));
+        break;
       case "profile.save":
         boolean admin = "admin".equals(profiles.current().optString("role"));
         if (id.isEmpty()) profiles.createByAdmin(p, p.optString("password")); else profiles.save(p, admin);

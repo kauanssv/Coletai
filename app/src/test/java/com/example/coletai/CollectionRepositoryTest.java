@@ -58,6 +58,35 @@ public class CollectionRepositoryTest {
     return repo.orders().get(0);
   }
 
+  @Test public void edicaoOcultaPedidoEPermiteNovoAceiteAposRecusa() {
+    JSONObject order = create();
+    String id = order.optString("id");
+    collector();
+    repo.transition(id, "reject", order.optInt("revision"));
+    as("cliente");
+    order = repo.order(id);
+    int stale = order.optInt("revision");
+    repo.transition(id, "begin_edit", stale);
+    order = repo.order(id);
+    collector();
+    assertTrue(repo.orders().isEmpty());
+    try { repo.transition(id, "accept", stale); fail(); }
+    catch (SecurityException expected) { }
+    as("cliente");
+    LocalJson.put(order, "description", "Materiais atualizados");
+    repo.saveOrder(order);
+    order = repo.order(id);
+    assertEquals("aberta", order.optString("status"));
+    assertEquals(0, order.optJSONArray("rejected_by").length());
+    collector();
+    assertEquals("Materiais atualizados", repo.order(id).optString("description"));
+    repo.transition(id, "accept", order.optInt("revision"));
+    as("cliente");
+    order = repo.order(id);
+    try { repo.transition(id, "begin_edit", order.optInt("revision")); fail(); }
+    catch (SecurityException expected) { }
+  }
+
   @Test public void enderecoRejeitaCamposMaioresQueBancoSemAlterarOriginal() {
     String[] fields = {"nickname", "number", "complement", "district", "city"};
     int[] limits = {50, 20, 100, 100, 100};

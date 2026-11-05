@@ -119,8 +119,13 @@ public class ReviewFlowTest {
         scenario.recreate();
         onView(isAssignableFrom(RatingBar.class)).check(androidx.test.espresso.assertion.ViewAssertions.doesNotExist());
       }
-      // An older unrated collection must not trigger a new popup whenever the profile opens.
-      completed(prefs, repo, address);
+      // Completion arriving while the citizen is on the home screen opens the rating.
+      try (ActivityScenario<WorkspaceActivity> scenario = ActivityScenario.launch(WorkspaceActivity.class)) {
+        scenario.onActivity(activity -> completed(prefs, repo, address));
+        onView(withText("Enviar avalia\u00e7\u00e3o")).inRoot(isDialog()).check(matches(isDisplayed()));
+        onView(withText("Agora n\u00e3o")).inRoot(isDialog()).perform(click());
+      }
+      // Dismissing the prompt must prevent repeated popups on navigation or reopening.
       for (int reopen = 0; reopen < 2; reopen++) {
         try (ActivityScenario<WorkspaceActivity> scenario = ActivityScenario.launch(WorkspaceActivity.class)) {
           scenario.onActivity(activity -> ((BottomNavigationView) activity.findViewById(R.id.workNavigation)).setSelectedItemId(R.id.workProfile));

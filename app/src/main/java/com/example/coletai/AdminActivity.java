@@ -72,6 +72,7 @@ public class AdminActivity extends AppCompatActivity {
     list.setLayoutManager(new LinearLayoutManager(this));
     list.setAdapter(adapter);
     findViewById(R.id.adminExit).setOnClickListener(v -> exit());
+    findViewById(R.id.adminEditAccount).setOnClickListener(v -> startActivity(new Intent(this, AccountEditActivity.class)));
     findViewById(R.id.adminBluetooth).setOnClickListener(v -> startActivity(new android.content.Intent(this, OfflineBluetoothActivity.class)));
     findViewById(R.id.adminNewProfile)
         .setOnClickListener(v -> {

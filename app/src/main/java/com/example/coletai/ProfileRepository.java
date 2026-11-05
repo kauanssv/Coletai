@@ -217,6 +217,35 @@ public final class ProfileRepository {
             .putString("credential_" + account.optString("id"), PasswordHashes.hash(newPassword)));
   }
 
+  public static void validatePasswordChange(String current, String password, String confirmation) {
+    if (current.isEmpty() && password.isEmpty() && confirmation.isEmpty()) return;
+    if (!password.equals(confirmation)) throw new IllegalArgumentException("As senhas não são iguais");
+    if (password.length() < 8 || password.length() > 128) throw new IllegalArgumentException("Use uma senha de 8 a 128 caracteres");
+    if (current.isEmpty()) throw new IllegalArgumentException("Informe a senha atual");
+  }
+
+  /** Personal data and optional password are committed together, including offline sessions. */
+  public void updateAccount(JSONObject changed, String current, String password, String confirmation) {
+    validatePasswordChange(current, password, confirmation);
+    if (!LocalJson.account(prefs).equals(changed.optString("id"))) throw new SecurityException("Conta de outra pessoa");
+    String role = current().optString("role"), document = changed.optString("document").replaceAll("\\D", "");
+    if (!"admin".equals(role) && !document.matches("empresa".equals(role) ? "[0-9]{14}" : "[0-9]{11}"))
+      throw new IllegalArgumentException("empresa".equals(role) ? "Informe um CNPJ com 14 dígitos" : "Informe um CPF com 11 dígitos");
+    if (PlatformGateway.configured()) {
+      JSONObject payload = LocalJson.object(changed.toString());
+      LocalJson.put(payload, "current_password", current);
+      LocalJson.put(payload, "password", password);
+      LocalJson.put(payload, "password_confirmation", confirmation);
+      PlatformGateway.mutate(prefs, "profile.account", payload);
+      return;
+    }
+    SnapshotPreferences transaction = new SnapshotPreferences(prefs);
+    ProfileRepository staged = new ProfileRepository(transaction);
+    if (!password.isEmpty()) staged.changePassword(current, password);
+    staged.save(changed, false);
+    transaction.persistTo(prefs);
+  }
+
   public void requireAdmin() {
     if (!"admin".equals(prefs.getString("usuario_tipo_atual", ""))
         || !"admin".equals(current().optString("role"))
@@ -237,6 +266,11 @@ public final class ProfileRepository {
       throw new SecurityException("Não é possível editar esta conta");
     }
     JSONObject after = before == null ? new JSONObject() : LocalJson.object(before.toString());
+    if (changed.has("profile_photo")) {
+      JSONObject photo = changed.optJSONObject("profile_photo");
+      if (!changed.isNull("profile_photo") && photo == null) throw new IllegalArgumentException("Foto de perfil inválida");
+      LocalJson.put(after, "profile_photo", photo == null ? JSONObject.NULL : PhotoRefs.copy(new JSONArray().put(photo)).optJSONObject(0));
+    }
     String role = before == null ? changed.optString("role") : before.optString("role");
     if (!"cliente".equals(role)
         && !PedidoRules.coletor(role)
@@ -313,7 +347,7 @@ public final class ProfileRepository {
     }
     requireAdmin();
     JSONObject before = get(id);
-    if ("admin".equals(before.optString("role")))
+    if ("admin".equals(before.optString("role")) && !"active".equals(status))
       throw new IllegalArgumentException("A conta administrativa deve permanecer ativa");
     if (!"active".equals(status) && !"blocked".equals(status) && !"deleted".equals(status)) {
       throw new IllegalArgumentException("Situação inválida");
@@ -330,6 +364,28 @@ public final class ProfileRepository {
         "deleted".equals(status)
             ? "Conta excluída"
             : "blocked".equals(status) ? "Conta bloqueada" : "Conta reativada");
+  }
+
+  public void deleteAccount(String id, int revision) {
+    if (!id.equals(LocalJson.account(prefs)) || !available(id)) throw new SecurityException("Não é possível excluir esta conta");
+    if (PlatformGateway.configured()) {
+      PlatformGateway.deleteAccount(prefs, id, revision);
+      return;
+    }
+    JSONObject before = current();
+    if (revision != before.optInt("revision")) throw new IllegalStateException("A conta foi alterada. Reabra a edição antes de excluir.");
+    if ("admin".equals(before.optString("role"))) {
+      boolean anotherAdmin = false;
+      for (JSONObject account : list())
+        if (!id.equals(account.optString("id")) && "admin".equals(account.optString("role")) && "active".equals(account.optString("status"))) anotherAdmin = true;
+      if (!anotherAdmin) throw new IllegalStateException("Mantenha outro administrador ativo antes de excluir esta conta.");
+    }
+    JSONObject after = LocalJson.object(before.toString());
+    LocalJson.put(after, "status", "deleted");
+    LocalJson.put(after, "deleted_at", System.currentTimeMillis());
+    LocalJson.put(after, "updated_at", System.currentTimeMillis());
+    LocalJson.put(after, "revision", revision + 1);
+    persist(before, after, "Conta excluída pelo titular");
   }
 
   private void persist(JSONObject before, JSONObject after, String action) {

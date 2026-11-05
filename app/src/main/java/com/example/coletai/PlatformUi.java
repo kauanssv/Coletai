@@ -110,6 +110,7 @@ final class PlatformUi {
 
   static String status(String status) {
     switch (status) {
+      case "editando": return "Em edição";
       case "aberta":
         return "Procurando um coletor";
       case "negociando":

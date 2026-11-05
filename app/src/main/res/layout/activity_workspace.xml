@@ -31,4 +31,6 @@
   </LinearLayout>
  </FrameLayout>
  <com.google.android.material.bottomnavigation.BottomNavigationView android:id="@+id/workNavigation" android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@color/white" app:backgroundTint="@color/white" app:labelVisibilityMode="labeled" app:menu="@menu/workspace_navigation" />
+ <View android:id="@+id/workSystemNavigationBackground" android:layout_width="match_parent" android:layout_height="0dp"
+     android:background="@color/brand_900" android:importantForAccessibility="no" />
 </LinearLayout>

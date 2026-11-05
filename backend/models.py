@@ -24,6 +24,7 @@ class User(Base):
     document: Mapped[str] = mapped_column("documento", String(30), default="")
     created_at: Mapped[datetime] = mapped_column("data_cadastro", DateTime, default=now)
     revision: Mapped[int] = mapped_column(default=1)
+    profile_photo: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
 class Citizen(Base):
     __tablename__ = "cidadao"
@@ -104,7 +105,7 @@ class Request(Base):
     revision: Mapped[int] = mapped_column(default=1)
     deleted: Mapped[bool] = mapped_column("excluido", Boolean, default=False)
     rejected_by: Mapped[list] = mapped_column(JSON, default=list)
-    __table_args__ = (ForeignKeyConstraint(["fk_id_cidadao","fk_id_endereco"],["endereco.fk_id_cidadao","endereco.pk_id_endereco"]),CheckConstraint("(status in ('negociando','proposta','aceita','a_caminho','coletando','descartando','concluida') and fk_id_responsavel_aceito is not null) or (status in ('aberta','cancelada') and fk_id_responsavel_aceito is null)"),)
+    __table_args__ = (ForeignKeyConstraint(["fk_id_cidadao","fk_id_endereco"],["endereco.fk_id_cidadao","endereco.pk_id_endereco"]),CheckConstraint("(status in ('negociando','proposta','aceita','a_caminho','coletando','descartando','concluida') and fk_id_responsavel_aceito is not null) or (status in ('aberta','editando','cancelada') and fk_id_responsavel_aceito is null)"),)
 
 class Snapshot(Base):
     __tablename__ = "endereco_solicitacao"

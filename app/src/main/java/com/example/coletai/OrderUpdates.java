@@ -20,11 +20,14 @@ final class OrderUpdates implements DefaultLifecycleObserver {
   OrderUpdates(FragmentActivity owner, SharedPreferences prefs, Runnable changed) {
     this.owner = owner;
     this.prefs = prefs;
-    this.changed = changed;
+    this.changed = () -> {
+      changed.run();
+      ReviewDialog.promptPending(owner, prefs);
+    };
     listener = (p, key) -> {
       if (CollectionRepository.ORDERS.equals(key)) {
-        handler.removeCallbacks(changed);
-        if (active) handler.post(changed);
+        handler.removeCallbacks(this.changed);
+        if (active) handler.post(this.changed);
       }
     };
     owner.getLifecycle().addObserver(this);
@@ -51,5 +54,10 @@ final class OrderUpdates implements DefaultLifecycleObserver {
     prefs.unregisterOnSharedPreferenceChangeListener(listener);
     handler.removeCallbacks(changed);
     handler.removeCallbacks(refresh);
+  }
+
+  @Override public void onResume(LifecycleOwner owner) {
+    handler.removeCallbacks(changed);
+    handler.post(changed);
   }
 }

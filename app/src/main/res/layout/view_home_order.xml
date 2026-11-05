@@ -8,12 +8,38 @@
         app:cardCornerRadius="14dp" app:cardElevation="0dp">
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="vertical" android:padding="16dp">
-            <TextView android:id="@+id/orderHomeStatus" android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:textSize="17sp" android:textStyle="bold" android:textColor="@color/ink_900" />
-            <TextView android:id="@+id/orderHomeSummary" android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_marginTop="6dp" android:maxLines="2" android:ellipsize="end" android:textSize="13sp" android:textColor="@color/ink_500" />
-            <Chronometer android:id="@+id/orderHomeTimer" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" android:textSize="24sp" android:textStyle="bold" android:textColor="@color/brand_700" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical">
+                <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView android:id="@+id/orderHomeStatus" android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:textSize="17sp" android:textStyle="bold" android:textColor="@color/ink_900" />
+                    <TextView android:id="@+id/orderHomeSummary" android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp" android:maxLines="2" android:ellipsize="end" android:textSize="13sp" android:textColor="@color/ink_500" />
+                </LinearLayout>
+                <FrameLayout android:id="@+id/orderHomeResponsiblePhoto" android:layout_width="48dp" android:layout_height="48dp"
+                    android:layout_marginStart="12dp" android:visibility="gone" />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/orderHomeActions" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="8dp">
+                <Chronometer android:id="@+id/orderHomeTimer" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:textSize="24sp" android:textStyle="bold" android:textColor="@color/brand_700" />
+                <Space android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/orderHomeEdit"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:minHeight="48dp" android:text="Editar pedido" android:textAllCaps="false"
+                    android:textSize="13sp" android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0" android:paddingStart="14dp" android:paddingEnd="14dp"
+                    android:insetTop="4dp" android:insetBottom="4dp"
+                    android:textColor="@color/brand_800" android:visibility="gone"
+                    app:backgroundTint="@color/brand_50" app:cornerRadius="20dp"
+                    app:strokeColor="@color/brand_100" app:strokeWidth="1dp"
+                    app:icon="@drawable/ic_order_edit" app:iconSize="16dp"
+                    app:iconPadding="6dp" app:iconGravity="textStart"
+                    app:iconTint="@color/brand_700" app:rippleColor="@color/brand_100" />
+            </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
     <com.google.android.material.button.MaterialButton android:id="@+id/orderHomeOpen"

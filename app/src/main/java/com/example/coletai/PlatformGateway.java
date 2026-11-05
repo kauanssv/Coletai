@@ -22,7 +22,7 @@ final class PlatformGateway {
   }
 
   static boolean demoAllowed() {
-    return BuildConfig.DEBUG && !configured();
+    return BuildConfig.DEBUG && (BluetoothPlatform.active() || !configured());
   }
 
   static JSONObject login(SharedPreferences prefs, String email, String password) {
@@ -120,6 +120,16 @@ final class PlatformGateway {
     } finally {
       LocalJson.commit(prefs.edit().clear());
     }
+  }
+
+  static void deleteAccount(SharedPreferences prefs, String id, int revision) {
+    JSONObject payload = new JSONObject(), envelope = new JSONObject();
+    LocalJson.put(payload, "id", id);
+    LocalJson.put(payload, "revision", revision);
+    LocalJson.put(envelope, "action", "profile.delete");
+    LocalJson.put(envelope, "payload", payload);
+    JSONObject response = call(prefs, "action", envelope, "POST");
+    if (!response.optBoolean("ok")) throw new IllegalStateException("Não foi possível confirmar a exclusão da conta. Tente novamente.");
   }
 
   private static JSONObject call(

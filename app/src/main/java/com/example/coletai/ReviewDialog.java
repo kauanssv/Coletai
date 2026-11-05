@@ -32,6 +32,17 @@ public class ReviewDialog extends DialogFragment {
     return "concluida".equals(request.optString("status")) && !request.has("review") && !request.optString("responsible_id").isEmpty();
   }
 
+  static void promptPending(FragmentActivity owner, android.content.SharedPreferences prefs) {
+    if (!"cliente".equals(prefs.getString("usuario_tipo_atual", ""))) return;
+    for (JSONObject request : new CollectionRepository(prefs).orders()) {
+      String key = "review_prompted_" + request.optString("citizen_id") + "_" + request.optString("id");
+      if (pending(request) && !prefs.getBoolean(key, false)) {
+        promptOnce(owner, request);
+        return;
+      }
+    }
+  }
+
   static void promptOnce(FragmentActivity owner, JSONObject request) {
     if (!pending(request)) return;
     String id = request.optString("id"), citizen = request.optString("citizen_id");

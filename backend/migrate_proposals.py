@@ -22,7 +22,7 @@ def plan(engine):
     for check in checks:
         if "fk_id_responsavel_aceito" in check["sqltext"] and "status" in check["sqltext"]:
             operations.append("DROP CHECK " + quote(check["name"]))
-    operations.append("ADD CONSTRAINT ck_request_proposal_flow CHECK ((status IN ('negociando','proposta','aceita','a_caminho','coletando','descartando','concluida') AND fk_id_responsavel_aceito IS NOT NULL) OR (status IN ('aberta','cancelada') AND fk_id_responsavel_aceito IS NULL))")
+    operations.append("ADD CONSTRAINT ck_request_proposal_flow CHECK ((status IN ('negociando','proposta','aceita','a_caminho','coletando','descartando','concluida') AND fk_id_responsavel_aceito IS NOT NULL) OR (status IN ('aberta','editando','cancelada') AND fk_id_responsavel_aceito IS NULL))")
     return "ALTER TABLE solicitacao_coleta\n  " + ",\n  ".join(operations)
 
 

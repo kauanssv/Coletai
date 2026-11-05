@@ -62,6 +62,31 @@ public class RequestFormDialog extends com.google.android.material.bottomsheet.B
         preparePhoto();
       });
 
+  public static void edit(ContaActivity activity, String id) {
+    CollectionRepository repository = new CollectionRepository(PlatformStore.open(activity));
+    JSONObject order = repository.order(id);
+    PlatformTasks.mutate(activity, () -> {
+      if ("aberta".equals(order.optString("status")))
+        repository.transition(id, "begin_edit", order.optInt("revision"));
+      else if (!"editando".equals(order.optString("status")))
+        throw new IllegalStateException("Este pedido não pode ser editado agora");
+    }, () -> create(id).show(activity.getSupportFragmentManager(), "request_form"));
+  }
+
+  @Override public void onDismiss(@NonNull android.content.DialogInterface dialog) {
+    super.onDismiss(dialog);
+    androidx.fragment.app.FragmentActivity activity = getActivity();
+    if (activity == null || activity.isChangingConfigurations() || repo == null || original == null
+        || (submission != null && submission.running) || !"editando".equals(original.optString("status"))) return;
+    String id = original.optString("id");
+    androidx.fragment.app.FragmentManager manager = getParentFragmentManager();
+    PlatformTasks.mutate(activity, () -> {
+      JSONObject current = repo.order(id);
+      if ("editando".equals(current.optString("status")))
+        repo.transition(id, "end_edit", original.optInt("revision"));
+    }, () -> manager.setFragmentResult("platform_updated", new Bundle()));
+  }
+
   public static RequestFormDialog create(String id) {
     RequestFormDialog d = new RequestFormDialog();
     Bundle b = new Bundle();

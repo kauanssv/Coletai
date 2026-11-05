@@ -60,7 +60,8 @@ def profile_json(db, user):
     return dict(id=str(user.id), name=user.name, email=user.email, phone=user.phone, role=user.role, status=user.status,
                 document=coop.cnpj if coop else user.document, company=coop.name if coop else "", legal_name=coop.legal_name if coop else "",
                 description=coop.description if coop else "", revision=user.revision, created_at=millis(user.created_at),
-                rating_count=rating_count, rating_average=float(rating_average) if rating_average is not None else 0)
+                rating_count=rating_count, rating_average=float(rating_average) if rating_average is not None else 0,
+                profile_photo=user.profile_photo)
 
 def request_json(db, req, viewer=None):
     items = db.scalars(select(Item).where(Item.request_id == req.id)).all()
@@ -77,6 +78,7 @@ def request_json(db, req, viewer=None):
     result["photos"] = [dict(id=photo.photo_id, source="remote") for photo in db.scalars(
         select(RequestPhoto).where(RequestPhoto.request_id == req.id).order_by(RequestPhoto.position))]
     if responsible and responsible.role == "empresa": result["responsible_name"] = db.get(Cooperative, responsible.id).name
+    result["responsible_photo"] = responsible.profile_photo if responsible and req.status in ("aceita", "a_caminho", "coletando", "descartando", "concluida") else None
     result.update(proposal_price=str(req.proposal_price) if req.proposal_price is not None else "",
                   proposal_message=req.proposal_message, proposed_at=millis(req.proposed_at),
                   going_at=millis(req.going_at), arrived_at=millis(req.arrived_at), collected_at=millis(req.collected_at))
@@ -101,6 +103,7 @@ def visible(db, user, req):
     if user.role == "admin": return True
     if req.deleted: return False
     if user.role == "cliente": return req.citizen_id == user.id
+    if req.status == "editando": return False
     if req.responsible_id == user.id: return True
     if db.scalar(select(Attendance).where(Attendance.request_id == req.id, Attendance.responsible_id == user.id)): return True
     item_ids = {i.material_id for i in db.scalars(select(Item).where(Item.request_id == req.id))}
@@ -181,7 +184,7 @@ def action(db, user, name, payload):
     elif name == "request.save":
         req = db.scalar(select(Request).where(Request.id == int(payload["id"])).with_for_update()) if payload.get("id") else None
         if req and not visible(db, user, req): fail("Solicitação de outra conta", 403)
-        if req and user.role != "admin" and (req.citizen_id != user.id or req.status != "aberta"): fail("Somente solicitações abertas podem ser editadas", 403)
+        if req and user.role != "admin" and (req.citizen_id != user.id or req.status not in ("aberta", "editando")): fail("Somente solicitações abertas podem ser editadas", 403)
         if not req and user.role != "cliente": fail("Apenas cidadãos criam solicitações", 403)
         if req and payload.get("revision") != req.revision: fail("Solicitação alterada. Atualize a lista.", 409)
         if req and req.deleted: fail("Solicitação excluída")
@@ -241,6 +244,8 @@ def action(db, user, name, payload):
             material = db.get(Material, record_id(item["material_id"])); weight = Decimal(str(item.get("weight", "")).replace(",", "."))
             if not material or (not material.active and material.id not in previous_materials) or material.id in used or not weight.is_finite() or not 0 < weight <= 1000000 or weight.as_tuple().exponent < -2: fail("Material ou peso inválido")
             used.add(material.id); db.add(Item(request_id=req.id, material_id=material.id, weight=weight))
+        if before and req.status in ("aberta", "editando"):
+            req.status = "aberta"; req.rejected_by = []
         req.revision += 1; req.updated_at = now(); db.flush(); audit(db, user, "Solicitação atualizada" if before else "Solicitação criada", "order", req.id, before, request_json(db, req))
     elif name in ("request.transition", "request.review", "request.deleted"):
         req = db.scalar(select(Request).where(Request.id == int(payload["id"])).with_for_update())
@@ -258,7 +263,11 @@ def action(db, user, name, payload):
         else:
             if req.deleted or req.revision != payload.get("revision"): fail("Solicitação alterada. Atualize a lista.", 409)
             transition = payload.get("action"); message = ""
-            if transition == "accept":
+            if transition in ("begin_edit", "end_edit"):
+                expected = "aberta" if transition == "begin_edit" else "editando"
+                if req.citizen_id != user.id or req.status != expected: fail("Pedido indisponivel para edicao", 403)
+                req.status = "editando" if transition == "begin_edit" else "aberta"
+            elif transition == "accept":
                 ids = {i.material_id for i in db.scalars(select(Item).where(Item.request_id == req.id))}
                 if user.role not in ("ambulante", "empresa") or req.status != "aberta" or (accepted(db, user.id) and not ids <= accepted(db, user.id)) or str(user.id) in (req.rejected_by or []): fail("Aceite não permitido", 403)
                 req.status = "negociando"; req.responsible_id = user.id
@@ -303,16 +312,44 @@ def action(db, user, name, payload):
             else: fail("Transição desconhecida")
             if message: db.add(Notification(owner_id=req.citizen_id, request_id=req.id, message=message,kind={"aceita":"solicitacao_aceita","a_caminho":"responsavel_a_caminho","concluida":"coleta_concluida","cancelada":"solicitacao_cancelada","aberta":"solicitacao_reaberta"}.get(req.status,"atualizacao")))
         req.revision += 1; req.updated_at = now(); db.flush(); audit(db, user, "Solicitação: " + payload.get("action", name), "order", req.id, before, request_json(db, req))
-    elif name in ("profile.save", "profile.status", "profile.password"):
+    elif name in ("profile.save", "profile.status", "profile.password", "profile.account", "profile.delete"):
         target = db.scalar(select(User).where(User.id == int(payload["id"])).with_for_update()) if payload.get("id") else None
         if payload.get("id") and target is None: fail("Cadastro não encontrado", 404)
         if name == "profile.save" and target is None:
             admin(user); create_user(db, payload, user); return
         if not target or (target.id != user.id and user.role != "admin"): fail("Cadastro de outra conta", 403)
         before = profile_json(db, target)
-        if name == "profile.status":
+        if name == "profile.account":
+            if target.id != user.id: fail("Conta de outra pessoa", 403)
+            current_password = payload.get("current_password", "")
+            new_password = payload.get("password", "")
+            confirmation = payload.get("password_confirmation", "")
+            if not all(isinstance(value, str) for value in (current_password, new_password, confirmation)): fail("Senha inválida")
+            if current_password or new_password or confirmation:
+                if new_password != confirmation: fail("As senhas não são iguais")
+                if not verify(current_password, user.password_hash): fail("Senha atual incorreta", 403)
+                target.password_hash = password_hash(new_password)
+            document = re.sub(r"\D", "", payload.get("document", ""))
+            if target.role != "admin" and len(document) != (14 if target.role == "empresa" else 11): fail("CPF ou CNPJ inválido")
+            if "profile_photo" in payload:
+                ref = payload["profile_photo"]
+                if ref is not None:
+                    if not isinstance(ref, dict) or ref.get("source") != "remote" or not isinstance(ref.get("id"), str): fail("Foto de perfil inválida")
+                    photo = db.get(UploadPhoto, ref["id"])
+                    if not photo or photo.owner_id != user.id: fail("Foto de outra conta", 403)
+                    ref = dict(id=photo.id, source="remote")
+                target.profile_photo = ref
+        if name == "profile.delete":
+            if target.id != user.id: fail("Não é possível excluir esta conta", 403)
+            if target.revision != payload.get("revision"): fail("A conta foi alterada. Reabra a edição antes de excluir.", 409)
+            if target.role == "admin":
+                administrators = db.scalars(select(User).where(User.role == "admin", User.status == "active", User.active.is_(True)).with_for_update()).all()
+                if not any(account.id != user.id for account in administrators): fail("Mantenha outro administrador ativo antes de excluir esta conta.")
+            target.status = "deleted"; target.active = False
+            db.execute(delete(SessionToken).where(SessionToken.user_id == target.id))
+        elif name == "profile.status":
             admin(user)
-            if target.role == "admin" or payload.get("status") not in ("active", "blocked", "deleted"): fail("Situação não permitida")
+            if (target.role == "admin" and payload.get("status") != "active") or payload.get("status") not in ("active", "blocked", "deleted"): fail("Situação não permitida")
             target.status = payload["status"]
             target.active = target.status == "active"
         elif name == "profile.password":
@@ -333,7 +370,7 @@ def action(db, user, name, payload):
                 if "description" in payload: coop.description = payload["description"]
                 if "document" in payload: coop.cnpj = re.sub(r"\D", "", payload["document"])
                 if len(coop.cnpj) != 14: fail("CNPJ deve possuir 14 dígitos")
-        target.revision += 1; db.flush(); audit(db, user, "Cadastro atualizado", "profile", target.id, before, profile_json(db, target))
+        target.revision += 1; db.flush(); audit(db, user, "Conta excluída pelo titular" if name == "profile.delete" else "Cadastro atualizado", "profile", target.id, before, profile_json(db, target))
     elif name == "material.save":
         admin(user); material = db.get(Material, int(payload["id"])) if payload.get("id") else Material()
         if not material or not payload.get("name", "").strip(): fail("Informe o nome do material")
@@ -406,7 +443,6 @@ def create_app(database_url=None, test_mode=False):
     def get_state(user=Depends(current), db=Depends(database)): return {"state": state(db, user)}
     @app.post("/v1/photos", status_code=201)
     async def upload_photo(request: HttpRequest, user=Depends(current), db=Depends(database)):
-        if user.role != "cliente": fail("Apenas cidadãos adicionam fotos aos pedidos", 403)
         if request.headers.get("content-type", "").split(";")[0].strip() != "image/jpeg": fail("Envie uma foto JPEG", 415)
         try: image = clean_jpeg(await request.body())
         except ValueError as error: fail(str(error))
@@ -421,6 +457,11 @@ def create_app(database_url=None, test_mode=False):
         if not allowed:
             requests = db.scalars(select(Request).join(RequestPhoto, RequestPhoto.request_id == Request.id).where(RequestPhoto.photo_id == photo.id)).all()
             allowed = any(visible(db, user, req) for req in requests)
+        if not allowed and user.role == "cliente":
+            requests = db.scalars(select(Request).where(Request.citizen_id == user.id, Request.responsible_id == photo.owner_id,
+                Request.deleted.is_(False), Request.status.in_(("aceita", "a_caminho", "coletando", "descartando", "concluida")))).all()
+            responsible = db.get(User, photo.owner_id)
+            allowed = bool(requests) and responsible.profile_photo == dict(id=photo.id, source="remote")
         if not allowed: fail("Foto não disponível para esta conta", 403)
         from fastapi.responses import Response
         return Response(content=photo.data, media_type="image/jpeg", headers={"Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff"})
@@ -428,6 +469,7 @@ def create_app(database_url=None, test_mode=False):
     def perform(payload: dict, user=Depends(current), db=Depends(database)):
         try: action(db, user, payload.get("action"), payload.get("payload", {})); db.flush()
         except (ValueError, TypeError, KeyError, InvalidOperation): fail("Dados inválidos para esta operação")
+        if payload.get("action") == "profile.delete": return {"ok": True}
         return {"state": state(db, user)}
     @app.post("/v1/logout")
     def logout(user=Depends(current), db=Depends(database), authorization: str = Header(default="")):

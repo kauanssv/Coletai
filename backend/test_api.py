@@ -38,6 +38,33 @@ class ApiTests(unittest.TestCase):
         return self.perform("c1@test.com", "request.save", dict(address_id=self.address["id"], desired_date="2099-01-02", description="Papel e papelão", items=[dict(material_id="1", weight="2.50"), dict(material_id="2", weight="1.00")]))["requests"][0]
     def transition(self, email, request, action): return self.perform(email, "request.transition", dict(id=request["id"], revision=request["revision"], action=action))["requests"][0]
 
+    def test_edicao_bloqueia_aceite_e_reapresenta_pedido_recusado(self):
+        req = self.order()
+        req = self.transition("r1@test.com", req, "reject")
+        old_revision = req["revision"]
+        req = self.transition("c1@test.com", req, "begin_edit")
+        self.assertEqual("editando", req["status"])
+        self.assertEqual([], self.state("r1@test.com")["requests"])
+        self.assertEqual([], self.state("r2@test.com")["requests"])
+        self.perform("r2@test.com", "request.transition", dict(id=req["id"], revision=old_revision, action="accept"), 403)
+        self.perform("c2@test.com", "request.save", dict(req), 403)
+        edited = dict(req, description="Novos materiais")
+        req = self.perform("c1@test.com", "request.save", edited)["requests"][0]
+        self.assertEqual("aberta", req["status"])
+        self.assertEqual([], req["rejected_by"])
+        self.assertEqual("Novos materiais", self.state("r1@test.com")["requests"][0]["description"])
+        self.perform("r2@test.com", "request.transition", dict(id=req["id"], revision=old_revision, action="accept"), 409)
+        req = self.transition("r1@test.com", req, "accept")
+        self.perform("c1@test.com", "request.transition", dict(id=req["id"], revision=req["revision"], action="begin_edit"), 403)
+
+    def test_desistir_da_edicao_preserva_recusas(self):
+        req = self.transition("r1@test.com", self.order(), "reject")
+        req = self.transition("c1@test.com", req, "begin_edit")
+        req = self.transition("c1@test.com", req, "end_edit")
+        self.assertEqual("aberta", req["status"])
+        self.assertTrue(req["rejected_by"])
+        self.perform("r1@test.com", "request.transition", dict(id=req["id"], revision=req["revision"], action="accept"), 403)
+
     def test_localizacao_atual_sem_cadastro_ou_geocodificacao(self):
         payload = dict(current_location=dict(latitude=-23.55, longitude=-46.63), desired_date="2099-01-02",
                        description="Pedido pelo GPS", items=[dict(material_id="1", weight="2.50")])
@@ -202,7 +229,7 @@ class ApiTests(unittest.TestCase):
         self.perform("c1@test.com", "request.save", dict(payload, photos=[photo, photo]), 400)
         self.perform("c1@test.com", "request.save", dict(payload, photos=[photo] * 4), 400)
         self.assertEqual([], self.state("c1@test.com")["requests"])
-        self.upload("r1@test.com", status=403)
+        self.upload("r1@test.com")
 
     def test_fotos_validam_formato_tamanho_e_removem_metadados(self):
         self.upload(data=b"not an image", status=400)

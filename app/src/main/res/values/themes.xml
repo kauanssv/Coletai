@@ -42,7 +42,7 @@
         parent="Theme.SplashScreen">
 
         <item name="windowSplashScreenBackground">
-            #083F39
+            @color/splash_background
         </item>
 
         <item name="windowSplashScreenAnimatedIcon">
@@ -54,16 +54,18 @@
         </item>
 
         <item name="android:statusBarColor">
-            #083F39
+            @color/splash_background
         </item>
 
         <item name="android:navigationBarColor">
-            #083F39
+            @color/splash_background
         </item>
 
         <item name="android:windowLightStatusBar">
-            false
+            true
         </item>
+
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
 
     </style>
 

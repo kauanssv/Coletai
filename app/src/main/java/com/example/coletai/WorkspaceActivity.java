@@ -65,12 +65,23 @@ public class WorkspaceActivity extends ContaActivity {
         (v, i) -> {
           androidx.core.graphics.Insets b =
               i.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
-          v.setPadding(b.left, b.top, b.right, b.bottom);
+          int navigationHeight = i.isVisible(WindowInsetsCompat.Type.ime()) ? 0
+              : i.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom;
+          View navigationBackground = findViewById(R.id.workSystemNavigationBackground);
+          android.view.ViewGroup.LayoutParams params = navigationBackground.getLayoutParams();
+          if (params.height != navigationHeight) {
+            params.height = navigationHeight;
+            navigationBackground.setLayoutParams(params);
+          }
+          v.setPadding(b.left, b.top, b.right, Math.max(0, b.bottom - navigationHeight));
           return WindowInsetsCompat.CONSUMED;
         });
     androidx.core.view.WindowInsetsControllerCompat systemBars = new androidx.core.view.WindowInsetsControllerCompat(getWindow(), findViewById(R.id.workRoot));
     systemBars.setAppearanceLightStatusBars(true);
-    systemBars.setAppearanceLightNavigationBars(true);
+    systemBars.setAppearanceLightNavigationBars(false);
+    getWindow().setNavigationBarColor(android.graphics.Color.TRANSPARENT);
+    if (android.os.Build.VERSION.SDK_INT >= 28) getWindow().setNavigationBarDividerColor(android.graphics.Color.TRANSPARENT);
+    if (android.os.Build.VERSION.SDK_INT >= 29) getWindow().setNavigationBarContrastEnforced(false);
     ((BottomNavigationView) findViewById(R.id.workNavigation)).setItemActiveIndicatorEnabled(true);
     ((BottomNavigationView) findViewById(R.id.workNavigation)).setBackgroundTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.WHITE));
     body = findViewById(R.id.workBody);
@@ -330,6 +341,15 @@ public class WorkspaceActivity extends ContaActivity {
       String summary = CollectionRepository.itemSummary(current);
       if ("proposta".equals(status)) summary = current.optString("responsible_name") + " - R$ " + current.optString("proposal_price").replace('.', ',');
       ((TextView) panel.findViewById(R.id.orderHomeSummary)).setText(summary);
+      android.widget.FrameLayout responsiblePhoto = panel.findViewById(R.id.orderHomeResponsiblePhoto);
+      if (citizen && CollectionRepository.approved(current) && !current.optString("responsible_id").isEmpty()) {
+        responsiblePhoto.setVisibility(View.VISIBLE);
+        JSONObject responsible = new JSONObject();
+        LocalJson.put(responsible, "name", current.optString("responsible_name"));
+        LocalJson.put(responsible, "profile_photo", current.optJSONObject("responsible_photo"));
+        responsiblePhoto.setContentDescription("Responsável pela coleta: " + current.optString("responsible_name"));
+        responsiblePhoto.addView(ProfileAvatar.create(this, responsible, 48));
+      }
       searchTimer = panel.findViewById(R.id.orderHomeTimer);
       searchTimer.setVisibility(citizen && searching ? View.VISIBLE : View.GONE);
       if (citizen && searching) {
@@ -337,6 +357,11 @@ public class WorkspaceActivity extends ContaActivity {
         searchTimer.setBase(android.os.SystemClock.elapsedRealtime() - elapsed);
         searchTimer.start();
       }
+      MaterialButton edit = panel.findViewById(R.id.orderHomeEdit);
+      edit.setVisibility(citizen && ("aberta".equals(status) || "editando".equals(status)) ? View.VISIBLE : View.GONE);
+      edit.setText("editando".equals(status) ? "Continuar edição" : "Editar pedido");
+      edit.setOnClickListener(v -> RequestFormDialog.edit(this, selected.optString("id")));
+      panel.findViewById(R.id.orderHomeActions).setVisibility(searchTimer.getVisibility() == View.VISIBLE || edit.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
       MaterialButton open = panel.findViewById(R.id.orderHomeOpen);
       open.setText("proposta".equals(status) && citizen ? "Ver proposta" : "negociando".equals(status) && !citizen ? "Escrever proposta" : "Acompanhar pedido");
       open.setOnClickListener(v -> openRequest(selected.optString("id")));
@@ -511,13 +536,13 @@ public class WorkspaceActivity extends ContaActivity {
               .setView(scroll)
               .setNegativeButton("Voltar", null)
               .create();
-      if (citizen && "aberta".equals(status))
+      if (citizen && ("aberta".equals(status) || "editando".equals(status)))
         PlatformUi.button(
             form,
             "Editar solicitação",
             () -> {
               dialog.dismiss();
-              RequestFormDialog.create(id).show(getSupportFragmentManager(), "request_form");
+              RequestFormDialog.edit(this, id);
             });
       if (citizen && !("concluida".equals(status) || "cancelada".equals(status)))
         PlatformUi.button(
@@ -680,16 +705,7 @@ public class WorkspaceActivity extends ContaActivity {
     LinearLayout identity = PlatformUi.card(body);
     identity.setOrientation(LinearLayout.HORIZONTAL);
     identity.setGravity(android.view.Gravity.CENTER_VERTICAL);
-    TextView avatar = new TextView(this);
-    StringBuilder initials = new StringBuilder();
-    for (String part : who.optString("name").trim().split("\\s+"))
-      if (!part.isEmpty() && initials.length() < 2) initials.append(part.charAt(0));
-    avatar.setText(initials.toString().toUpperCase(java.util.Locale.forLanguageTag("pt-BR")));
-    avatar.setTextSize(22);
-    avatar.setTextColor(0xFF0F7667);
-    avatar.setGravity(android.view.Gravity.CENTER);
-    avatar.setBackground(PlatformUi.surface(this, 0xFFEAF8F3, 32));
-    identity.addView(avatar, new LinearLayout.LayoutParams(PlatformUi.dp(this, 60), PlatformUi.dp(this, 60)));
+    identity.addView(ProfileAvatar.create(this, who, 60));
     LinearLayout identityText = PlatformUi.column(this);
     identityText.setPadding(PlatformUi.dp(this, 14), 0, 0, 0);
     identity.addView(identityText, new LinearLayout.LayoutParams(0, -2, 1));
@@ -728,46 +744,6 @@ public class WorkspaceActivity extends ContaActivity {
     }
     profileRow(personal, who, "phone", "Telefone", InputType.TYPE_CLASS_PHONE);
     profileRow(personal, who, "email", "E-mail", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-    PlatformUi.button(
-        personal,
-        "Alterar senha",
-        () -> {
-          LinearLayout form = PlatformUi.column(this);
-          int pad = PlatformUi.dp(this, 20);
-          form.setPadding(pad, 0, pad, pad);
-          TextInputEditText
-              current =
-                  PlatformUi.field(
-                      form,
-                      "Senha atual",
-                      "",
-                      InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD),
-              next =
-                  PlatformUi.field(
-                      form,
-                      "Nova senha (mínimo 8 caracteres)",
-                      "",
-                      InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-          androidx.appcompat.app.AlertDialog dialog =
-              new MaterialAlertDialogBuilder(this)
-                  .setTitle("Alterar senha")
-                  .setView(form)
-                  .setNegativeButton("Voltar", null)
-                  .setPositiveButton("Salvar", null)
-                  .create();
-          dialog.setOnShowListener(d ->
-              dialog
-                  .getButton(-1)
-                  .setOnClickListener(v ->
-                      PlatformTasks.run(
-                          this,
-                          () ->
-                              profiles.changePassword(
-                                  PlatformUi.value(current), PlatformUi.value(next)),
-                          dialog::dismiss)));
-          dialog.show();
-        });
-
     PlatformUi.section(body, citizen ? "ENDEREÇOS" : "PREFERÊNCIAS DE COLETA");
     LinearLayout preferences = PlatformUi.card(body);
     if (citizen) {
@@ -783,7 +759,7 @@ public class WorkspaceActivity extends ContaActivity {
           AddressEditorDialog.create(new JSONObject()).show(getSupportFragmentManager(), "address_editor"));
     } else PlatformUi.button(preferences, "Materiais que aceito coletar", this::materials);
     PlatformUi.button(preferences, "Configurações de localização", this::locationSettings);
-    PlatformUi.button(preferences, "Apresentação offline por Bluetooth", () -> startActivity(new Intent(this, OfflineBluetoothActivity.class)));
+    PlatformUi.button(body, "Editar conta", () -> startActivity(new Intent(this, AccountEditActivity.class)));
     MaterialButton logout = PlatformUi.button(
         body,
         "Sair da conta",
@@ -814,29 +790,11 @@ public class WorkspaceActivity extends ContaActivity {
     TextView title = PlatformUi.text(row, label, 13, false);
     title.setTextColor(0xFF7B8B98);
     title.setLayoutParams(new LinearLayout.LayoutParams(0, -2, 1));
-    TextView value = PlatformUi.text(row, who.optString(field).isEmpty() ? "Adicionar  ›" : who.optString(field) + "  ›", 13, false);
+    TextView value = PlatformUi.text(row, who.optString(field).isEmpty() ? "Não informado" : who.optString(field), 13, false);
     value.setMaxLines(2);
     value.setEllipsize(android.text.TextUtils.TruncateAt.END);
     value.setGravity(android.view.Gravity.END);
     value.setLayoutParams(new LinearLayout.LayoutParams(0, -2, 1.5f));
-    row.setBackgroundResource(android.R.drawable.list_selector_background);
-    row.setFocusable(true);
-    row.setContentDescription("Editar " + label + ": " + who.optString(field));
-    row.setOnClickListener(v -> {
-      LinearLayout form = PlatformUi.column(this);
-      int pad = PlatformUi.dp(this, 20);
-      form.setPadding(pad, 0, pad, pad);
-      TextInputEditText input = PlatformUi.field(form, label, who.optString(field), inputType);
-      androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(this)
-          .setTitle("Editar " + label.toLowerCase(java.util.Locale.forLanguageTag("pt-BR")))
-          .setView(form).setNegativeButton("Cancelar", null).setPositiveButton("Salvar", null).create();
-      dialog.setOnShowListener(d -> dialog.getButton(-1).setOnClickListener(button -> {
-        JSONObject changed = LocalJson.object(who.toString());
-        LocalJson.put(changed, field, PlatformUi.value(input));
-        PlatformTasks.mutate(this, () -> profiles.save(changed, false), () -> { dialog.dismiss(); render(); });
-      }));
-      dialog.show();
-    });
     View divider = new View(this);
     divider.setBackgroundColor(0xFFF0F4F2);
     card.addView(divider, new LinearLayout.LayoutParams(-1, PlatformUi.dp(this, 1)));

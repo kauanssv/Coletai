@@ -291,7 +291,7 @@ public final class CollectionRepository {
     if (before == null) citizen();
     else if (!admin
         && (!LocalJson.account(prefs).equals(before.optString("citizen_id"))
-            || !"aberta".equals(before.optString("status"))))
+            || !("aberta".equals(before.optString("status")) || "editando".equals(before.optString("status")))))
       throw new SecurityException("Somente solicitações abertas podem ser editadas pelo cidadão");
     if (before != null && input.optInt("revision", -1) != before.optInt("revision"))
       throw new IllegalStateException("A solicitação mudou. Reabra antes de editar.");
@@ -348,6 +348,10 @@ public final class CollectionRepository {
       put(after, "created_at", System.currentTimeMillis());
       put(after, "revision", 0);
     }
+    if (before != null && ("aberta".equals(before.optString("status")) || "editando".equals(before.optString("status")))) {
+      put(after, "status", "aberta");
+      put(after, "rejected_by", new JSONArray());
+    }
     persistOrder(
         before, after, before == null ? "Solicitação criada" : "Solicitação atualizada", "");
   }
@@ -390,13 +394,21 @@ public final class CollectionRepository {
     String id = who.optString("id"), role = who.optString("role");
     List<JSONObject> result = new ArrayList<>();
     for (JSONObject order : list(array(ORDERS))) {
+      if (!PlatformGateway.configured()) {
+        JSONObject photo = null;
+        if (approved(order) && !order.optString("responsible_id").isEmpty()) {
+          try { photo = profiles.get(order.optString("responsible_id")).optJSONObject("profile_photo"); }
+          catch (IllegalArgumentException unavailable) { }
+        }
+        put(order, "responsible_photo", photo == null ? JSONObject.NULL : photo);
+      }
       if ("admin".equals(role)) {
         result.add(order);
         continue;
       }
       if (order.optBoolean("deleted")) continue;
       if ("cliente".equals(role) && id.equals(order.optString("citizen_id"))) result.add(order);
-      if (PedidoRules.coletor(role)
+      if (PedidoRules.coletor(role) && !"editando".equals(order.optString("status"))
           && (id.equals(order.optString("responsible_id"))
               || id.equals(order.optString("previous_responsible_id"))
               || attended(order, id)
@@ -507,7 +519,11 @@ public final class CollectionRepository {
     boolean assigned = actorId.equals(before.optString("responsible_id"));
     boolean owner = actorId.equals(before.optString("citizen_id"));
     String notification = "";
-    if ("accept".equals(action)) {
+    if ("begin_edit".equals(action) || "end_edit".equals(action)) {
+      if (!owner || !("begin_edit".equals(action) ? "aberta" : "editando").equals(status))
+        throw new SecurityException("Este pedido não pode ser editado agora");
+      put(after, "status", "begin_edit".equals(action) ? "editando" : "aberta");
+    } else if ("accept".equals(action)) {
       if (!PedidoRules.coletor(who.optString("role")) || !"aberta".equals(status) || !accepts(who, before))
         throw new SecurityException("Pedido indisponivel para aceite");
       JSONArray rejected = before.optJSONArray("rejected_by");

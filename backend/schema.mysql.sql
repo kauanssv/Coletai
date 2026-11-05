@@ -31,7 +31,8 @@ CREATE TABLE IF NOT EXISTS usuario (
 	telefone VARCHAR(40) NOT NULL, 
 	documento VARCHAR(30) NOT NULL, 
 	data_cadastro DATETIME NOT NULL, 
-	revision INTEGER NOT NULL, 
+	revision INTEGER NOT NULL,
+	profile_photo JSON,
 	PRIMARY KEY (pk_id_usuario), 
 	UNIQUE (email)
 )
@@ -178,7 +179,7 @@ CREATE TABLE IF NOT EXISTS solicitacao_coleta (
 	rejected_by JSON NOT NULL, 
 	PRIMARY KEY (pk_id_solicitacao), 
 	FOREIGN KEY(fk_id_cidadao, fk_id_endereco) REFERENCES endereco (fk_id_cidadao, pk_id_endereco), 
-	CHECK ((status in ('negociando','proposta','aceita','a_caminho','coletando','descartando','concluida') and fk_id_responsavel_aceito is not null) or (status in ('aberta','cancelada') and fk_id_responsavel_aceito is null)), 
+	CHECK ((status in ('negociando','proposta','aceita','a_caminho','coletando','descartando','concluida') and fk_id_responsavel_aceito is not null) or (status in ('aberta','editando','cancelada') and fk_id_responsavel_aceito is null)),
 	FOREIGN KEY(fk_id_cidadao) REFERENCES cidadao (pk_fk_id_usuario), 
 	FOREIGN KEY(fk_id_endereco) REFERENCES endereco (pk_id_endereco), 
 	FOREIGN KEY(fk_id_responsavel_aceito) REFERENCES responsavel_coleta (pk_fk_id_usuario)

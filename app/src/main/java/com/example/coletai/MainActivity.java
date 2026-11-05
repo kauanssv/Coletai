@@ -66,9 +66,14 @@ public class MainActivity extends AppCompatActivity {
 
     iniciarComponentes();
 
-    configurarEventos();
     deviceLocation = new DeviceLocation(this, (location, status) -> {});
     deviceLocation.request(false);
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    if (edtEmail != null) configurarEventos();
   }
 
   // =====================================================
@@ -118,7 +123,12 @@ public class MainActivity extends AppCompatActivity {
             PlatformGateway.demoAllowed() ? android.view.View.VISIBLE : android.view.View.GONE);
     findViewById(R.id.btnBluetoothDemo).setVisibility(android.view.View.VISIBLE);
     ((android.widget.Button) findViewById(R.id.btnBluetoothDemo)).setText("Apresentação offline por Bluetooth");
-    findViewById(R.id.btnAdminDemo).setOnClickListener(view -> entrarNaConta("admin"));
+    findViewById(R.id.btnAdminDemo).setOnClickListener(view -> {
+      if (BluetoothPlatform.active()) {
+        preencherContaDemonstracao("admin", "admin@coletai.app");
+        realizarLogin();
+      } else entrarNaConta("admin");
+    });
 
     btnMostrarSenha.setOnClickListener(view -> alternarVisibilidadeSenha());
 
@@ -156,19 +166,27 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout card = findViewById(viewId);
 
     card.setOnClickListener(view -> {
-      ProfileRepository profiles = new ProfileRepository(PlatformStore.open(this));
       String id =
           email.startsWith("empresa")
               ? "empresa"
               : email.startsWith("ambulante") ? "ambulante" : "cliente";
-      edtEmail.setText(profiles.get(id).optString("email"));
-
-      edtSenha.setText(R.string.texto_12345);
-
-      edtEmail.clearFocus();
-
-      edtSenha.clearFocus();
+      preencherContaDemonstracao(id, email);
     });
+  }
+
+  private void preencherContaDemonstracao(String id, String defaultEmail) {
+    ProfileRepository profiles = new ProfileRepository(PlatformStore.open(this));
+    String email = defaultEmail;
+    for (org.json.JSONObject profile : profiles.list()) {
+      if (id.equals(profile.optString("id"))) {
+        email = profile.optString("email", defaultEmail);
+        break;
+      }
+    }
+    edtEmail.setText(email);
+    edtSenha.setText(R.string.texto_12345);
+    edtEmail.clearFocus();
+    edtSenha.clearFocus();
   }
 
   // =====================================================

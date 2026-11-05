@@ -150,6 +150,7 @@
         <activity android:name=".AdminActivity" android:exported="false" android:theme="@style/Theme.Coletai.Admin" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".WorkspaceActivity" android:theme="@style/Theme.Coletai.Platform" android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".RegistrationActivity" android:theme="@style/Theme.Coletai.Platform" android:exported="false" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".AccountEditActivity" android:theme="@style/Theme.Coletai.Platform" android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".LocationActivity" android:theme="@style/Theme.Coletai.Platform" android:exported="false" />
     </application>
 
