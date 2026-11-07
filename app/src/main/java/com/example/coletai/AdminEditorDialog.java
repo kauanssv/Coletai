@@ -1,7 +1,6 @@
 package com.example.coletai;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
@@ -67,7 +66,7 @@ public class AdminEditorDialog extends DialogFragment {
     id = requireArguments().getString("id", "");
     newProfile = "profile".equals(kind) && id.isEmpty();
     SharedPreferences prefs =
-        requireContext().getSharedPreferences("coletai", Context.MODE_PRIVATE);
+        PlatformStore.open(requireContext());
     profiles = new ProfileRepository(prefs);
     admin = new AdminRepository(prefs);
     profiles.requireAdmin();

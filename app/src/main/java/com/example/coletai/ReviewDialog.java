@@ -63,6 +63,8 @@ public class ReviewDialog extends DialogFragment {
   }
 
   @NonNull @Override public Dialog onCreateDialog(@Nullable Bundle state) {
+    android.content.Context dialogContext = new androidx.appcompat.view.ContextThemeWrapper(
+        requireContext(), R.style.Theme_Coletai_Platform);
     CollectionRepository repo = new CollectionRepository(PlatformStore.open(requireContext()));
     String id = requireArguments().getString("request_id", "");
     JSONObject request;
@@ -71,20 +73,20 @@ public class ReviewDialog extends DialogFragment {
       if (!pending(request) || !request.optString("citizen_id").equals(LocalJson.account(PlatformStore.open(requireContext()))))
         throw new IllegalStateException("Esta coleta não está disponível para avaliação.");
     } catch (RuntimeException error) {
-      return new MaterialAlertDialogBuilder(requireContext()).setTitle("Avaliar coleta")
+      return new MaterialAlertDialogBuilder(dialogContext).setTitle("Avaliar coleta")
           .setMessage(error.getMessage()).setPositiveButton("Fechar", null).create();
     }
-    LinearLayout content = PlatformUi.column(requireContext());
+    LinearLayout content = PlatformUi.column(dialogContext);
     content.setFocusableInTouchMode(true);
     content.requestFocus();
     int pad = PlatformUi.dp(requireContext(), 24);
     content.setPadding(pad, 0, pad, pad);
-    PlatformUi.text(content, "Como foi a coleta de " + request.optString("responsible_name", "seu coletor") + "?", 16, true);
+    centeredText(content, "Como foi a coleta de " + request.optString("responsible_name", "seu coletor") + "?", 16, true);
     PlatformUi.text(content, "A nota será incluída na média do perfil do coletor.", 14, false).setTextColor(0xFF6F817D);
-    LinearLayout row = PlatformUi.column(requireContext());
+    LinearLayout row = PlatformUi.column(dialogContext);
     row.setGravity(Gravity.CENTER);
     content.addView(row, new LinearLayout.LayoutParams(-1, -2));
-    stars = new RatingBar(requireContext());
+    stars = new RatingBar(dialogContext);
     stars.setNumStars(5);
     stars.setStepSize(1);
     stars.setRating(state == null ? 0 : state.getInt("score", 0));
@@ -92,9 +94,7 @@ public class ReviewDialog extends DialogFragment {
     stars.setProgressBackgroundTintList(android.content.res.ColorStateList.valueOf(0xFFDCE7E3));
     stars.setContentDescription("Nota da coleta, de 1 a 5 estrelas");
     row.addView(stars, new LinearLayout.LayoutParams(-2, -2));
-    TextView selected = PlatformUi.text(row, "", 13, false);
-    row.addView(selected);
-    selected.setGravity(Gravity.CENTER);
+    TextView selected = centeredText(row, "Toque nas estrelas para avaliar", 13, false);
     selected.setText(stars.getRating() == 0 ? "Toque nas estrelas para avaliar" : (int) stars.getRating() + " de 5 estrelas");
     comment = PlatformUi.field(content, "Comentário (opcional)", state == null ? "" : state.getString("comment", ""),
         android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE);
@@ -128,8 +128,21 @@ public class ReviewDialog extends DialogFragment {
       } else android.widget.Toast.makeText(requireContext(), result.error.getMessage(), android.widget.Toast.LENGTH_LONG).show();
     });
     updateState();
-    return new MaterialAlertDialogBuilder(requireContext()).setTitle("Avaliar coleta").setView(content)
+    TextView title = new TextView(dialogContext);
+    title.setText("Avaliar coleta");
+    title.setTextSize(24);
+    title.setTextColor(0xFF102522);
+    title.setGravity(Gravity.CENTER);
+    title.setPadding(pad, pad, pad, pad / 2);
+    return new MaterialAlertDialogBuilder(dialogContext).setCustomTitle(title).setView(content)
         .setNegativeButton("Agora não", (dialog, which) -> { }).create();
+  }
+
+  private static TextView centeredText(LinearLayout parent, String text, int size, boolean bold) {
+    TextView view = PlatformUi.text(parent, text, size, bold);
+    view.setLayoutParams(new LinearLayout.LayoutParams(-1, -2));
+    view.setGravity(Gravity.CENTER);
+    return view;
   }
 
   private void updateState() {
