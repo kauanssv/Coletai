@@ -2,13 +2,11 @@ package com.example.coletai;
 
 import android.content.res.ColorStateList;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
-import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -18,13 +16,17 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.android.material.card.MaterialCardView;
+public class tela_inicial_ambulante extends ContaActivity {
 
-public class tela_inicial_ambulante extends AppCompatActivity {
+    // =====================================================
+    // VIEWPAGER
+    // =====================================================
 
     private ViewPager2 viewPagerAmbulante;
 
-    private LinearLayout navegacaoInferior;
+    // =====================================================
+    // MENU INFERIOR
+    // =====================================================
 
     private LinearLayout navInicio;
     private LinearLayout navHistorico;
@@ -38,57 +40,16 @@ public class tela_inicial_ambulante extends AppCompatActivity {
     private TextView txtNavHistorico;
     private TextView txtNavPerfil;
 
-
     // =====================================================
-    // DETALHES DO PEDIDO
+    // ON CREATE
     // =====================================================
-
-    private View telaDetalhesPedido;
-
-    private TextView txtTagTipo;
-    private TextView txtEmoji;
-    private TextView txtTipoResiduo;
-    private TextView txtLocalizacaoTopo;
-
-    private TextView txtDescricao;
-    private TextView txtPeso;
-    private TextView txtRegiao;
-    private TextView txtLocalizacao;
-    private TextView txtObservacao;
-
-    private MaterialCardView cardObservacao;
-
-    private boolean detalhesAberto = false;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        EdgeToEdge.enable(this);
-
-        setContentView(
-                R.layout.activity_tela_inicial_ambulante
-        );
-
-        configurarBarrasDoSistema();
-
-        iniciarComponentes();
-
-        configurarViewPager();
-
-        configurarMenuInferior();
-
-        configurarTelaDetalhes();
-
-        configurarBotaoVoltarSistema();
-
-        selecionarPagina(
-                0,
-                false
-        );
+        startActivity(new android.content.Intent(this, WorkspaceActivity.class));
+        finish();
     }
-
 
     // =====================================================
     // BARRAS DO SISTEMA
@@ -102,12 +63,18 @@ public class tela_inicial_ambulante extends AppCompatActivity {
                         getWindow().getDecorView()
                 );
 
-        controller.setAppearanceLightStatusBars(true);
+        controller.setAppearanceLightStatusBars(
+                true
+        );
 
-        controller.setAppearanceLightNavigationBars(true);
+        controller.setAppearanceLightNavigationBars(
+                true
+        );
 
         ViewCompat.setOnApplyWindowInsetsListener(
-                findViewById(R.id.main),
+                findViewById(
+                        R.id.main
+                ),
                 (view, insets) -> {
 
                     Insets systemBars =
@@ -127,7 +94,6 @@ public class tela_inicial_ambulante extends AppCompatActivity {
         );
     }
 
-
     // =====================================================
     // COMPONENTES
     // =====================================================
@@ -137,11 +103,6 @@ public class tela_inicial_ambulante extends AppCompatActivity {
         viewPagerAmbulante =
                 findViewById(
                         R.id.viewPagerAmbulante
-                );
-
-        navegacaoInferior =
-                findViewById(
-                        R.id.navegacaoInferior
                 );
 
         navInicio =
@@ -188,66 +149,7 @@ public class tela_inicial_ambulante extends AppCompatActivity {
                 findViewById(
                         R.id.txtNavPerfil
                 );
-
-
-        // Tela de detalhes
-
-        telaDetalhesPedido =
-                findViewById(
-                        R.id.telaDetalhesPedido
-                );
-
-        txtTagTipo =
-                findViewById(
-                        R.id.txtTagTipo
-                );
-
-        txtEmoji =
-                findViewById(
-                        R.id.txtEmoji
-                );
-
-        txtTipoResiduo =
-                findViewById(
-                        R.id.txtTipoResiduo
-                );
-
-        txtLocalizacaoTopo =
-                findViewById(
-                        R.id.txtLocalizacaoTopo
-                );
-
-        txtDescricao =
-                findViewById(
-                        R.id.txtDescricao
-                );
-
-        txtPeso =
-                findViewById(
-                        R.id.txtPeso
-                );
-
-        txtRegiao =
-                findViewById(
-                        R.id.txtRegiao
-                );
-
-        txtLocalizacao =
-                findViewById(
-                        R.id.txtLocalizacao
-                );
-
-        txtObservacao =
-                findViewById(
-                        R.id.txtObservacao
-                );
-
-        cardObservacao =
-                findViewById(
-                        R.id.cardObservacao
-                );
     }
-
 
     // =====================================================
     // VIEWPAGER
@@ -264,10 +166,17 @@ public class tela_inicial_ambulante extends AppCompatActivity {
                 adapter
         );
 
+        /*
+         * Mantém as três páginas carregadas.
+         */
         viewPagerAmbulante.setOffscreenPageLimit(
                 2
         );
 
+        /*
+         * Permite trocar de tela
+         * arrastando para os lados.
+         */
         viewPagerAmbulante.setUserInputEnabled(
                 true
         );
@@ -291,7 +200,6 @@ public class tela_inicial_ambulante extends AppCompatActivity {
                 }
         );
     }
-
 
     // =====================================================
     // MENU INFERIOR
@@ -324,6 +232,9 @@ public class tela_inicial_ambulante extends AppCompatActivity {
         );
     }
 
+    // =====================================================
+    // SELECIONAR PÁGINA
+    // =====================================================
 
     private void selecionarPagina(
             int pagina,
@@ -340,6 +251,9 @@ public class tela_inicial_ambulante extends AppCompatActivity {
         );
     }
 
+    // =====================================================
+    // ATUALIZAR MENU
+    // =====================================================
 
     private void atualizarMenu(
             int paginaSelecionada
@@ -391,6 +305,9 @@ public class tela_inicial_ambulante extends AppCompatActivity {
         );
     }
 
+    // =====================================================
+    // ITEM DO MENU
+    // =====================================================
 
     private void atualizarItemMenu(
             @NonNull ImageView imagem,
@@ -420,180 +337,6 @@ public class tela_inicial_ambulante extends AppCompatActivity {
                 selecionado
                         ? android.graphics.Typeface.BOLD
                         : android.graphics.Typeface.NORMAL
-        );
-    }
-
-
-    // =====================================================
-    // DETALHES DO PEDIDO
-    // =====================================================
-
-    private void configurarTelaDetalhes() {
-
-        findViewById(
-                R.id.btnVoltar
-        ).setOnClickListener(
-                view ->
-                        fecharDetalhesPedido()
-        );
-
-
-        findViewById(
-                R.id.btnRecusar
-        ).setOnClickListener(
-                view ->
-                        fecharDetalhesPedido()
-        );
-
-
-        findViewById(
-                R.id.btnEnviarProposta
-        ).setOnClickListener(
-                view -> {
-
-                    // Próxima etapa:
-                    // abrir o formulário de proposta.
-
-                }
-        );
-    }
-
-
-    public void abrirDetalhesPedido(
-            String tipo,
-            String emoji,
-            String descricao,
-            String peso,
-            String regiao,
-            String cidade,
-            String observacao
-    ) {
-
-        txtTagTipo.setText(
-                emoji + " " + tipo
-        );
-
-        txtEmoji.setText(
-                emoji
-        );
-
-        txtTipoResiduo.setText(
-                tipo
-        );
-
-        txtDescricao.setText(
-                descricao
-        );
-
-        txtPeso.setText(
-                peso
-        );
-
-        txtRegiao.setText(
-                regiao
-        );
-
-        String localizacao =
-                regiao + ", " + cidade;
-
-        txtLocalizacaoTopo.setText(
-                localizacao
-        );
-
-        txtLocalizacao.setText(
-                localizacao
-        );
-
-
-        // OBSERVAÇÃO
-
-        if (
-                observacao == null
-                        || observacao.trim().isEmpty()
-        ) {
-
-            cardObservacao.setVisibility(
-                    View.GONE
-            );
-
-        } else {
-
-            cardObservacao.setVisibility(
-                    View.VISIBLE
-            );
-
-            txtObservacao.setText(
-                    observacao
-            );
-        }
-
-
-        // ESCONDE HOME + MENU
-
-        viewPagerAmbulante.setVisibility(
-                View.GONE
-        );
-
-        navegacaoInferior.setVisibility(
-                View.GONE
-        );
-
-
-        // MOSTRA DETALHES
-
-        telaDetalhesPedido.setVisibility(
-                View.VISIBLE
-        );
-
-        detalhesAberto = true;
-    }
-
-
-    public void fecharDetalhesPedido() {
-
-        telaDetalhesPedido.setVisibility(
-                View.GONE
-        );
-
-
-        viewPagerAmbulante.setVisibility(
-                View.VISIBLE
-        );
-
-        navegacaoInferior.setVisibility(
-                View.VISIBLE
-        );
-
-        detalhesAberto = false;
-    }
-
-
-    // =====================================================
-    // BOTÃO VOLTAR DO ANDROID
-    // =====================================================
-
-    private void configurarBotaoVoltarSistema() {
-
-        getOnBackPressedDispatcher().addCallback(
-                this,
-                new OnBackPressedCallback(true) {
-
-                    @Override
-                    public void handleOnBackPressed() {
-
-                        if (detalhesAberto) {
-
-                            fecharDetalhesPedido();
-
-                        } else {
-
-                            setEnabled(false);
-
-                            getOnBackPressedDispatcher()
-                                    .onBackPressed();
-                        }
-                    }
-                }
         );
     }
 }

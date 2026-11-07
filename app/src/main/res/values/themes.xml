@@ -7,6 +7,7 @@
         parent="Theme.Material3.DayNight.NoActionBar">
 
         <item name="colorPrimary">@color/brand_700</item>
+        <item name="colorOnPrimary">@color/white</item>
         <item name="colorPrimaryContainer">@color/brand_100</item>
         <item name="colorSecondary">@color/accent_amber</item>
 
@@ -20,10 +21,6 @@
 
         <item name="android:navigationBarColor">
             @android:color/transparent
-        </item>
-
-        <item name="android:windowLightNavigationBar">
-            true
         </item>
 
         <item
@@ -45,7 +42,7 @@
         parent="Theme.SplashScreen">
 
         <item name="windowSplashScreenBackground">
-            #083F39
+            @color/splash_background
         </item>
 
         <item name="windowSplashScreenAnimatedIcon">
@@ -57,20 +54,18 @@
         </item>
 
         <item name="android:statusBarColor">
-            #083F39
+            @color/splash_background
         </item>
 
         <item name="android:navigationBarColor">
-            #083F39
+            @color/splash_background
         </item>
 
         <item name="android:windowLightStatusBar">
-            false
+            true
         </item>
 
-        <item name="android:windowLightNavigationBar">
-            false
-        </item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
 
     </style>
 

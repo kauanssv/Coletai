@@ -25,7 +25,7 @@
             android:gravity="center"
             android:paddingStart="12dp"
             android:paddingEnd="12dp"
-            android:text="Eletrônicos"
+            android:text="@string/texto_eletronicos_2"
             android:textSize="11sp"
             android:textStyle="bold" />
 
@@ -41,7 +41,7 @@
             android:gravity="center"
             android:paddingStart="12dp"
             android:paddingEnd="12dp"
-            android:text="Concluído"
+            android:text="@string/texto_concluido"
             android:textSize="11sp"
             android:textStyle="bold" />
 
@@ -54,7 +54,7 @@
         android:layout_marginTop="12dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:text="Descrição do material descartado"
+        android:text="@string/texto_descricao_do_material_descartado"
         android:textColor="@color/ink_700"
         android:textSize="13sp" />
 
@@ -70,9 +70,9 @@
             android:layout_height="24dp"
             android:background="@drawable/bg_demo_icon"
             android:gravity="center"
-            android:text="●"
+            android:text="@string/texto_simbolo_8"
             android:textColor="@color/brand_700"
-            android:textSize="9sp" />
+            android:textSize="11sp" />
 
         <TextView
             android:id="@+id/txtColetor"
@@ -82,7 +82,7 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="João Santos"
+            android:text="@string/texto_joao_santos"
             android:textColor="@color/ink_500"
             android:textSize="12sp" />
 
@@ -91,7 +91,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="13dp"
-            android:text="R$ 42,00"
+            android:text="@string/texto_r_42_00"
             android:textColor="@color/brand_700"
             android:textSize="13sp"
             android:textStyle="bold" />
@@ -100,7 +100,7 @@
             android:id="@+id/txtData"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="18 set. 2026"
+            android:text="@string/texto_18_set_2026"
             android:textColor="@color/ink_400"
             android:textSize="11sp" />
 

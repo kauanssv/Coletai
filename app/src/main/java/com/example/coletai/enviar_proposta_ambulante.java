@@ -14,7 +14,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class enviar_proposta_ambulante extends AppCompatActivity {
+public class enviar_proposta_ambulante extends PedidoActivity {
+    @Override protected boolean aceitaStatus(String status) { return "waiting".equals(status); }
 
     private TextView btnVoltar;
 
@@ -32,7 +33,6 @@ public class enviar_proposta_ambulante extends AppCompatActivity {
     private String regiao;
     private String cidade;
     private String observacao;
-
 
     @Override
     protected void onCreate(
@@ -60,7 +60,6 @@ public class enviar_proposta_ambulante extends AppCompatActivity {
         configurarEventos();
     }
 
-
     // =====================================================
     // BARRAS
     // =====================================================
@@ -87,7 +86,6 @@ public class enviar_proposta_ambulante extends AppCompatActivity {
                 }
         );
     }
-
 
     // =====================================================
     // COMPONENTES
@@ -125,7 +123,6 @@ public class enviar_proposta_ambulante extends AppCompatActivity {
                         R.id.edtMensagem
                 );
     }
-
 
     // =====================================================
     // DADOS DO PEDIDO
@@ -168,14 +165,12 @@ public class enviar_proposta_ambulante extends AppCompatActivity {
                         "observacao"
                 );
 
-
         if (emoji != null) {
 
             txtEmoji.setText(
                     emoji
             );
         }
-
 
         if (
                 tipo != null
@@ -189,20 +184,14 @@ public class enviar_proposta_ambulante extends AppCompatActivity {
             );
         }
 
-
         if (
                 regiao != null
                         && cidade != null
         ) {
 
-            txtLocalizacao.setText(
-                    regiao
-                            + ", "
-                            + cidade
-            );
+            txtLocalizacao.setText(getSharedPreferences("coletai", MODE_PRIVATE).getString("pedido_endereco_completo", ""));
         }
     }
-
 
     // =====================================================
     // EVENTOS
@@ -214,14 +203,12 @@ public class enviar_proposta_ambulante extends AppCompatActivity {
                 view -> finish()
         );
 
-
         findViewById(
                 R.id.btnEnviarProposta
         ).setOnClickListener(
                 view -> enviarProposta()
         );
     }
-
 
     // =====================================================
     // ENVIAR PROPOSTA
@@ -235,14 +222,19 @@ public class enviar_proposta_ambulante extends AppCompatActivity {
                         .toString()
                         .trim();
 
-
         String mensagem =
                 edtMensagem
                         .getText()
                         .toString()
                         .trim();
 
-
+        try {
+            preco = DecimalValues.positive(preco, 2).setScale(2).toPlainString();
+        } catch (IllegalArgumentException e) {
+            edtPreco.setError("Informe um valor positivo com até 2 casas decimais");
+            edtPreco.requestFocus();
+            return;
+        }
         if (preco.isEmpty()) {
 
             edtPreco.setError(
@@ -254,13 +246,11 @@ public class enviar_proposta_ambulante extends AppCompatActivity {
             return;
         }
 
-
         if (mensagem.isEmpty()) {
 
             mensagem =
                     "Posso ir em até 30 minutos. Fico no bairro!";
         }
-
 
         SharedPreferences preferencias =
                 getSharedPreferences(
@@ -268,13 +258,13 @@ public class enviar_proposta_ambulante extends AppCompatActivity {
                         Context.MODE_PRIVATE
                 );
 
+        if (!verificarPedido()) return;
 
         String usuarioAtual =
                 preferencias.getString(
                         "usuario_tipo_atual",
                         "ambulante"
                 );
-
 
         String nomeColetor;
 
@@ -283,7 +273,6 @@ public class enviar_proposta_ambulante extends AppCompatActivity {
         int totalColetas;
 
         String email;
-
 
         // =================================================
         // EMPRESA
@@ -301,17 +290,14 @@ public class enviar_proposta_ambulante extends AppCompatActivity {
                             "EcoColeta"
                     );
 
-
             avaliacao =
                     4.8f;
-
 
             totalColetas =
                     1450;
 
-
             email =
-                    "empresa@gmail.com";
+                    preferencias.getString("empresa_email", "empresa@gmail.com");
 
         }
 
@@ -324,30 +310,24 @@ public class enviar_proposta_ambulante extends AppCompatActivity {
             usuarioAtual =
                     "ambulante";
 
-
             nomeColetor =
                     preferencias.getString(
                             "ambulante_nome",
                             "João Santos"
                     );
 
-
             avaliacao =
                     4.9f;
-
 
             totalColetas =
                     287;
 
-
             email =
-                    "ambulante@gmail.com";
+                    preferencias.getString("ambulante_email", "ambulante@gmail.com");
         }
-
 
         SharedPreferences.Editor editor =
                 preferencias.edit();
-
 
         // =================================================
         // STATUS DA PROPOSTA
@@ -357,7 +337,6 @@ public class enviar_proposta_ambulante extends AppCompatActivity {
                 "pedido_status",
                 "proposal"
         );
-
 
         // =================================================
         // MUITO IMPORTANTE:
@@ -369,7 +348,6 @@ public class enviar_proposta_ambulante extends AppCompatActivity {
                 "ready"
         );
 
-
         // =================================================
         // DADOS DA PROPOSTA
         // =================================================
@@ -379,42 +357,35 @@ public class enviar_proposta_ambulante extends AppCompatActivity {
                 preco
         );
 
-
         editor.putString(
                 "proposta_mensagem",
                 mensagem
         );
-
 
         editor.putString(
                 "proposta_coletor_nome",
                 nomeColetor
         );
 
-
         editor.putFloat(
                 "proposta_coletor_avaliacao",
                 avaliacao
         );
-
 
         editor.putInt(
                 "proposta_coletor_coletas",
                 totalColetas
         );
 
-
         editor.putString(
                 "proposta_coletor_tipo",
                 usuarioAtual
         );
 
-
         editor.putString(
                 "proposta_coletor_email",
                 email
         );
-
 
         // =================================================
         // MANTER DADOS DO PEDIDO
@@ -425,59 +396,49 @@ public class enviar_proposta_ambulante extends AppCompatActivity {
                 tipo
         );
 
-
         editor.putString(
                 "pedido_emoji",
                 emoji
         );
-
 
         editor.putString(
                 "pedido_descricao",
                 descricao
         );
 
-
         editor.putString(
                 "pedido_peso",
                 peso
         );
-
 
         editor.putString(
                 "pedido_regiao",
                 regiao
         );
 
-
         editor.putString(
                 "pedido_cidade",
                 cidade
         );
-
 
         editor.putString(
                 "pedido_observacao",
                 observacao
         );
 
-
         editor.apply();
-
 
         Toast.makeText(
                 this,
-                "Proposta enviada",
+                "Proposta salva. Aguardando confirmação pelo Bluetooth.",
                 Toast.LENGTH_SHORT
         ).show();
-
 
         // =================================================
         // VOLTAR PARA HOME CORRETA
         // =================================================
 
         Intent intent;
-
 
         if (
                 "empresa".equals(
@@ -500,18 +461,15 @@ public class enviar_proposta_ambulante extends AppCompatActivity {
                     );
         }
 
-
         intent.addFlags(
                 Intent.FLAG_ACTIVITY_CLEAR_TOP
                         |
                         Intent.FLAG_ACTIVITY_SINGLE_TOP
         );
 
-
         startActivity(
                 intent
         );
-
 
         finish();
     }

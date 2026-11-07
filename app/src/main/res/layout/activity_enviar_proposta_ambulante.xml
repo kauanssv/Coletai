@@ -16,7 +16,7 @@
     <LinearLayout
         android:id="@+id/cabecalho"
         android:layout_width="0dp"
-        android:layout_height="62dp"
+        android:layout_height="wrap_content" android:minHeight="62dp"
         android:background="@android:color/white"
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -34,7 +34,7 @@
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
-            android:text="‹"
+            android:text="@string/texto_simbolo"
             android:textColor="@color/ink_700"
             android:textSize="30sp"
             android:textStyle="bold" />
@@ -43,7 +43,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:text="Enviar Proposta"
+            android:text="@string/texto_enviar_proposta_2"
             android:textColor="@color/ink_900"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -113,7 +113,7 @@
                         android:layout_width="44dp"
                         android:layout_height="44dp"
                         android:gravity="center"
-                        android:text="💻"
+                        android:text="@string/texto_simbolo_4"
                         android:textSize="24sp" />
 
 
@@ -129,7 +129,7 @@
                             android:id="@+id/txtResumoPedido"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Eletrônicos · 14 kg"
+                            android:text="@string/texto_eletronicos_14_kg"
                             android:textColor="@color/ink_900"
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -140,7 +140,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:text="Consolação, São Paulo"
+                            android:text="@string/texto_consolacao_sao_paulo"
                             android:textColor="@color/ink_500"
                             android:textSize="12sp" />
 
@@ -161,7 +161,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:letterSpacing="0.05"
-                android:text="SEU PREÇO"
+                android:text="@string/texto_seu_preco"
                 android:textColor="#374151"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -190,10 +190,10 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="R$"
+                        android:text="@string/texto_r"
                         android:textColor="#6B7280"
                         android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"     android:labelFor="@id/edtPreco" />
 
 
                     <EditText
@@ -204,14 +204,14 @@
                         android:layout_weight="1"
                         android:background="@android:color/transparent"
                         android:gravity="center_vertical"
-                        android:hint="0,00"
+                        android:hint="@string/texto_0_00"
                         android:inputType="numberDecimal"
                         android:padding="0dp"
                         android:singleLine="true"
                         android:textColor="@color/ink_900"
                         android:textColorHint="#D1D5DB"
                         android:textSize="22sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"     android:importantForAutofill="no"     android:maxLength="16" />
 
                 </LinearLayout>
 
@@ -228,7 +228,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:letterSpacing="0.05"
-                android:text="MENSAGEM PARA O CLIENTE"
+                android:text="@string/texto_mensagem_para_o_cliente"
                 android:textColor="#374151"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -251,13 +251,13 @@
                     android:layout_height="match_parent"
                     android:background="@android:color/transparent"
                     android:gravity="top|start"
-                    android:hint="Ex.: Posso ir em 30 minutos. Trabalho na região diariamente…"
+                    android:hint="@string/texto_ex_posso_ir_em_30_minutos_trabalho_na_regiao"
                     android:inputType="textCapSentences|textMultiLine"
                     android:maxLines="5"
                     android:padding="14dp"
                     android:textColor="@color/ink_900"
                     android:textColorHint="#9CA3AF"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"     android:importantForAutofill="no"     android:maxLength="500" />
 
             </com.google.android.material.card.MaterialCardView>
 
@@ -288,7 +288,7 @@
                     <ImageView
                         android:layout_width="19dp"
                         android:layout_height="19dp"
-                        android:contentDescription="Informação"
+                        android:contentDescription="@string/texto_informacao"
                         android:src="@drawable/ic_leaf_small"
                         app:tint="@color/brand_700" />
 
@@ -299,7 +299,7 @@
                         android:layout_marginStart="10dp"
                         android:layout_weight="1"
                         android:lineSpacingExtra="2dp"
-                        android:text="Ao enviar, você se compromete a coletar pelo valor informado caso o cliente aceite."
+                        android:text="@string/texto_ao_enviar_voce_se_compromete_a_coletar_pelo_v"
                         android:textColor="@color/brand_700"
                         android:textSize="12sp" />
 
@@ -320,7 +320,7 @@
     <LinearLayout
         android:id="@+id/rodape"
         android:layout_width="0dp"
-        android:layout_height="82dp"
+        android:layout_height="wrap_content" android:minHeight="82dp"
         android:background="@android:color/white"
         android:elevation="12dp"
         android:gravity="center"
@@ -336,11 +336,11 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnEnviarProposta"
-            android:layout_width="match_parent"
-            android:layout_height="52dp"
+            android:gravity="center" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:minHeight="52dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="Enviar proposta"
+            android:text="@string/texto_enviar_proposta"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
             android:textSize="15sp"

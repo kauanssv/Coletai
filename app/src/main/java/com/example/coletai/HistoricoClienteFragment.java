@@ -17,6 +17,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HistoricoClienteFragment extends Fragment {
+    private final BluetoothColetai.SyncListener atualizacao = () -> {
+        if (getView() != null) { carregarPedidos(); carregarLista(); }
+    };
+
+    @Override public void onStart() {
+        super.onStart();
+        BluetoothColetai.getInstance(requireContext()).addSyncListener(atualizacao);
+    }
+
+    @Override public void onStop() {
+        BluetoothColetai.getInstance(requireContext()).removeSyncListener(atualizacao);
+        super.onStop();
+    }
+
 
     private TextView btnTodos;
     private TextView btnConcluidos;
@@ -54,7 +68,7 @@ public class HistoricoClienteFragment extends Fragment {
         }
 
         iniciarComponentes(view);
-        criarPedidosDemonstracao();
+        carregarPedidos();
         configurarEventos();
         selecionarFiltro("todos");
     }
@@ -94,108 +108,22 @@ public class HistoricoClienteFragment extends Fragment {
         );
     }
 
-    private void criarPedidosDemonstracao() {
-
+    private void carregarPedidos() {
         pedidos.clear();
+        PedidoRepository repository = new PedidoRepository(requireContext()
+                .getSharedPreferences("coletai", android.content.Context.MODE_PRIVATE));
+        for (org.json.JSONObject item : repository.historico()) {
+            pedidos.add(new PedidoHistorico(item.optString("pedido_tipo"), item.optString("pedido_descricao"),
+                    item.optString("proposta_coletor_nome"), item.optString("proposta_preco"),
+                    new java.text.SimpleDateFormat("dd MMM yyyy", java.util.Locale.getDefault()).format(new java.util.Date(item.optLong("data"))), item.optString("status")));
+        }
+    }
 
-        pedidos.add(new PedidoHistorico(
-                "Eletrônicos",
-                "2 celulares quebrados e carregadores antigos",
-                "João Santos",
-                "R$ 42,00",
-                "18 set. 2026",
-                "concluido"
-        ));
-
-        pedidos.add(new PedidoHistorico(
-                "Medicamentos",
-                "Medicamentos vencidos e cartelas vazias",
-                "EcoColeta",
-                "R$ 28,00",
-                "12 set. 2026",
-                "concluido"
-        ));
-
-        pedidos.add(new PedidoHistorico(
-                "Agulhas",
-                "Caixa lacrada com materiais perfurocortantes",
-                "—",
-                "—",
-                "4 set. 2026",
-                "cancelado"
-        ));
-
-        pedidos.add(new PedidoHistorico(
-                "Pilhas",
-                "Pilhas AA e AAA usadas",
-                "João Santos",
-                "R$ 18,50",
-                "29 ago. 2026",
-                "concluido"
-        ));
-
-        pedidos.add(new PedidoHistorico(
-                "Óleo",
-                "5 litros de óleo de cozinha usado",
-                "EcoColeta",
-                "R$ 24,00",
-                "21 ago. 2026",
-                "concluido"
-        ));
-
-        pedidos.add(new PedidoHistorico(
-                "Baterias",
-                "Bateria de notebook e duas baterias portáteis",
-                "—",
-                "—",
-                "13 ago. 2026",
-                "cancelado"
-        ));
-
-        pedidos.add(new PedidoHistorico(
-                "Eletrônicos",
-                "Teclado, mouse e cabos sem uso",
-                "João Santos",
-                "R$ 31,00",
-                "2 ago. 2026",
-                "concluido"
-        ));
-
-        pedidos.add(new PedidoHistorico(
-                "Medicamentos",
-                "Frascos e comprimidos vencidos",
-                "EcoColeta",
-                "R$ 20,00",
-                "24 jul. 2026",
-                "concluido"
-        ));
-
-        pedidos.add(new PedidoHistorico(
-                "Outros",
-                "Lâminas usadas em recipiente protegido",
-                "—",
-                "—",
-                "16 jul. 2026",
-                "cancelado"
-        ));
-
-        pedidos.add(new PedidoHistorico(
-                "Pilhas",
-                "Caixa com aproximadamente 30 pilhas",
-                "João Santos",
-                "R$ 22,00",
-                "5 jul. 2026",
-                "concluido"
-        ));
-
-        pedidos.add(new PedidoHistorico(
-                "Eletrônicos",
-                "Notebook antigo com carregador",
-                "EcoColeta",
-                "R$ 55,00",
-                "22 jun. 2026",
-                "concluido"
-        ));
+    @Override
+    public void onResume() {
+        super.onResume();
+        carregarPedidos();
+        carregarLista();
     }
 
     private void selecionarFiltro(

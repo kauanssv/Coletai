@@ -1,0 +1,29 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/orderFlowRoot" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@color/white">
+    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/orderFlowToolbar"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        app:titleTextColor="@color/ink_900" />
+    <FrameLayout android:id="@+id/orderFlowMap" android:layout_width="match_parent"
+        android:layout_height="200dp" android:visibility="gone" />
+    <TextView android:id="@+id/orderFlowRouteInfo" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:minHeight="48dp" android:visibility="gone"
+        android:gravity="center_vertical" android:paddingHorizontal="24dp" android:paddingVertical="8dp"
+        android:textSize="13sp" android:textColor="@color/brand_800" android:background="@color/brand_50"
+        android:clickable="true" android:focusable="true" />
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
+        android:fillViewport="true" android:clipToPadding="false">
+        <LinearLayout android:id="@+id/orderFlowBody" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:orientation="vertical" android:padding="24dp" />
+    </ScrollView>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:paddingHorizontal="24dp" android:paddingBottom="12dp">
+        <com.google.android.material.button.MaterialButton android:id="@+id/orderFlowPrimary"
+            android:textColor="@color/button_primary_text" app:iconTint="@color/button_primary_text" app:backgroundTint="@color/button_primary_background"
+            android:gravity="center" android:textAllCaps="false" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" app:cornerRadius="18dp" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/orderFlowSecondary"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:gravity="center" android:textAllCaps="false" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:textColor="#C62828" />
+    </LinearLayout>
+</LinearLayout>

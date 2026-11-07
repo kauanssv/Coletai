@@ -1,0 +1,5 @@
+<resources>
+    <style name="Theme.Coletaí" parent="Base.Theme.Coletaí">
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+</resources>

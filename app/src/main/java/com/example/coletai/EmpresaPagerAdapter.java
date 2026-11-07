@@ -14,7 +14,6 @@ public class EmpresaPagerAdapter extends FragmentStateAdapter {
         super(fragmentActivity);
     }
 
-
     @NonNull
     @Override
     public Fragment createFragment(
@@ -27,23 +26,19 @@ public class EmpresaPagerAdapter extends FragmentStateAdapter {
 
                 return new InicioEmpresaFragment();
 
-
             case 1:
 
                 return new HistoricoEmpresaFragment();
 
-
             case 2:
 
                 return new PerfilEmpresaFragment();
-
 
             default:
 
                 return new InicioEmpresaFragment();
         }
     }
-
 
     @Override
     public int getItemCount() {

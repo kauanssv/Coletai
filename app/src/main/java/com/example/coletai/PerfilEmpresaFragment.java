@@ -35,14 +35,12 @@ public class PerfilEmpresaFragment extends Fragment {
 
     private SharedPreferences preferencias;
 
-
     public PerfilEmpresaFragment() {
 
         super(
                 R.layout.fragment_perfil_empresa
         );
     }
-
 
     @Override
     public void onViewCreated(
@@ -55,7 +53,6 @@ public class PerfilEmpresaFragment extends Fragment {
                 savedInstanceState
         );
 
-
         preferencias =
                 requireContext()
                         .getSharedPreferences(
@@ -63,20 +60,16 @@ public class PerfilEmpresaFragment extends Fragment {
                                 Context.MODE_PRIVATE
                         );
 
-
         iniciarComponentes(
                 view
         );
 
-
         carregarDados();
-
 
         configurarEventos(
                 view
         );
     }
-
 
     private void iniciarComponentes(
             View view
@@ -91,7 +84,6 @@ public class PerfilEmpresaFragment extends Fragment {
                 view.findViewById(
                         R.id.layoutEdicao
                 );
-
 
         txtAvatar =
                 view.findViewById(
@@ -123,7 +115,6 @@ public class PerfilEmpresaFragment extends Fragment {
                         R.id.txtTelefone
                 );
 
-
         edtNome =
                 view.findViewById(
                         R.id.edtNome
@@ -139,7 +130,6 @@ public class PerfilEmpresaFragment extends Fragment {
                         R.id.edtNomeFantasia
                 );
 
-
         btnFecharEdicao =
                 view.findViewById(
                         R.id.btnFecharEdicao
@@ -151,12 +141,19 @@ public class PerfilEmpresaFragment extends Fragment {
                 );
     }
 
-
     // =====================================================
     // DADOS
     // =====================================================
 
     private void carregarDados() {
+        org.json.JSONObject profile = new ProfileRepository(preferencias).current();
+        android.widget.TextView header = requireView().findViewById(R.id.profileEmailHeader);
+        android.widget.TextView emailBody = requireView().findViewById(R.id.profileEmailBody);
+        android.widget.TextView document = requireView().findViewById(R.id.profileDocumentBody);
+        header.setText(profile.optString("email")); emailBody.setText(profile.optString("email"));
+        document.setText(profile.optString("document"));
+        android.widget.TextView documentEdit = requireView().findViewById(R.id.profileDocumentEdit);
+        if (documentEdit != null) documentEdit.setText(profile.optString("document"));
 
         String nome =
                 preferencias.getString(
@@ -164,13 +161,11 @@ public class PerfilEmpresaFragment extends Fragment {
                         "EcoColeta"
                 );
 
-
         String nomeFantasia =
                 preferencias.getString(
                         "empresa_nome_fantasia",
                         "EcoColeta"
                 );
-
 
         String razaoSocial =
                 preferencias.getString(
@@ -178,38 +173,31 @@ public class PerfilEmpresaFragment extends Fragment {
                         "EcoColeta Soluções Ambientais LTDA"
                 );
 
-
         String telefone =
                 preferencias.getString(
                         "empresa_telefone",
                         "(11) 3333-4444"
                 );
 
-
         txtNomePrincipal.setText(
                 nomeFantasia
         );
-
 
         txtNome.setText(
                 nome
         );
 
-
         txtRazaoSocial.setText(
                 razaoSocial
         );
-
 
         txtNomeFantasia.setText(
                 nomeFantasia
         );
 
-
         txtTelefone.setText(
                 telefone
         );
-
 
         txtAvatar.setText(
                 obterIniciais(
@@ -217,22 +205,18 @@ public class PerfilEmpresaFragment extends Fragment {
                 )
         );
 
-
         edtNome.setText(
                 nome
         );
-
 
         edtTelefone.setText(
                 telefone
         );
 
-
         edtNomeFantasia.setText(
                 nomeFantasia
         );
     }
-
 
     // =====================================================
     // EVENTOS
@@ -248,13 +232,11 @@ public class PerfilEmpresaFragment extends Fragment {
                 item -> abrirEdicao()
         );
 
-
         view.findViewById(
                 R.id.rowCnpj
         ).setOnClickListener(
                 item -> abrirEdicao()
         );
-
 
         view.findViewById(
                 R.id.rowRazaoSocial
@@ -262,13 +244,11 @@ public class PerfilEmpresaFragment extends Fragment {
                 item -> abrirEdicao()
         );
 
-
         view.findViewById(
                 R.id.rowNomeFantasia
         ).setOnClickListener(
                 item -> abrirEdicao()
         );
-
 
         view.findViewById(
                 R.id.rowTelefone
@@ -276,20 +256,17 @@ public class PerfilEmpresaFragment extends Fragment {
                 item -> abrirEdicao()
         );
 
-
         view.findViewById(
                 R.id.rowEmail
         ).setOnClickListener(
                 item -> abrirEdicao()
         );
 
-
         view.findViewById(
                 R.id.rowSenha
         ).setOnClickListener(
                 item -> abrirEdicao()
         );
-
 
         view.findViewById(
                 R.id.btnFotoPerfil
@@ -301,16 +278,13 @@ public class PerfilEmpresaFragment extends Fragment {
                 ).show()
         );
 
-
         btnFecharEdicao.setOnClickListener(
                 item -> fecharEdicao()
         );
 
-
         btnSalvarPerfil.setOnClickListener(
                 item -> salvarPerfil()
         );
-
 
         view.findViewById(
                 R.id.btnSair
@@ -318,7 +292,6 @@ public class PerfilEmpresaFragment extends Fragment {
                 item -> sairDaConta()
         );
     }
-
 
     // =====================================================
     // EDIÇÃO
@@ -328,17 +301,14 @@ public class PerfilEmpresaFragment extends Fragment {
 
         carregarDados();
 
-
         layoutPerfil.setVisibility(
                 View.GONE
         );
-
 
         layoutEdicao.setVisibility(
                 View.VISIBLE
         );
     }
-
 
     private void fecharEdicao() {
 
@@ -346,12 +316,10 @@ public class PerfilEmpresaFragment extends Fragment {
                 View.GONE
         );
 
-
         layoutPerfil.setVisibility(
                 View.VISIBLE
         );
     }
-
 
     private void salvarPerfil() {
 
@@ -361,20 +329,17 @@ public class PerfilEmpresaFragment extends Fragment {
                         .toString()
                         .trim();
 
-
         String telefone =
                 edtTelefone
                         .getText()
                         .toString()
                         .trim();
 
-
         String nomeFantasia =
                 edtNomeFantasia
                         .getText()
                         .toString()
                         .trim();
-
 
         if (nome.isEmpty()) {
 
@@ -387,7 +352,6 @@ public class PerfilEmpresaFragment extends Fragment {
             return;
         }
 
-
         if (telefone.isEmpty()) {
 
             edtTelefone.setError(
@@ -398,7 +362,6 @@ public class PerfilEmpresaFragment extends Fragment {
 
             return;
         }
-
 
         if (nomeFantasia.isEmpty()) {
 
@@ -411,30 +374,14 @@ public class PerfilEmpresaFragment extends Fragment {
             return;
         }
 
-
-        preferencias
-                .edit()
-
-                .putString(
-                        "empresa_nome",
-                        nome
-                )
-
-                .putString(
-                        "empresa_telefone",
-                        telefone
-                )
-
-                .putString(
-                        "empresa_nome_fantasia",
-                        nomeFantasia
-                )
-
-                .apply();
-
+        ProfileRepository repository = new ProfileRepository(preferencias);
+        org.json.JSONObject profile = repository.current();
+        LocalJson.put(profile, "name", nome); LocalJson.put(profile, "phone", telefone);
+        LocalJson.put(profile, "company", nomeFantasia);
+        try { repository.save(profile, false); }
+        catch (RuntimeException e) { Toast.makeText(requireContext(), e.getMessage(), Toast.LENGTH_LONG).show(); return; }
 
         carregarDados();
-
 
         Toast.makeText(
                 requireContext(),
@@ -442,16 +389,15 @@ public class PerfilEmpresaFragment extends Fragment {
                 Toast.LENGTH_SHORT
         ).show();
 
-
         fecharEdicao();
     }
-
 
     // =====================================================
     // LOGOUT
     // =====================================================
 
     private void sairDaConta() {
+        LocalJson.commit(PlatformStore.open(requireContext()).edit().remove("logged_in_account"));
 
         Intent intent =
                 new Intent(
@@ -459,22 +405,18 @@ public class PerfilEmpresaFragment extends Fragment {
                         MainActivity.class
                 );
 
-
         intent.addFlags(
                 Intent.FLAG_ACTIVITY_CLEAR_TOP
                         | Intent.FLAG_ACTIVITY_NEW_TASK
                         | Intent.FLAG_ACTIVITY_CLEAR_TASK
         );
 
-
         startActivity(
                 intent
         );
 
-
         requireActivity().finish();
     }
-
 
     private String obterIniciais(
             String nome
@@ -488,14 +430,12 @@ public class PerfilEmpresaFragment extends Fragment {
             return "EC";
         }
 
-
         String[] partes =
                 nome
                         .trim()
                         .split(
                                 "\\s+"
                         );
-
 
         if (partes.length == 1) {
 
@@ -506,24 +446,22 @@ public class PerfilEmpresaFragment extends Fragment {
                                 0,
                                 2
                         )
-                        .toUpperCase();
+                        .toUpperCase(java.util.Locale.getDefault());
             }
-
 
             return partes[0]
                     .substring(
                             0,
                             1
                     )
-                    .toUpperCase();
+                    .toUpperCase(java.util.Locale.getDefault());
         }
-
 
         return (
                 partes[0].substring(0, 1)
                         +
                         partes[partes.length - 1]
                                 .substring(0, 1)
-        ).toUpperCase();
+        ).toUpperCase(java.util.Locale.getDefault());
     }
 }

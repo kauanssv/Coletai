@@ -57,14 +57,14 @@ public class PerfilClienteFragment extends Fragment {
      * Mais para frente eles podem vir do banco/API.
      */
     private String nome = "Lucas Ferreira";
-    private final String cpf = "123.456.789-00";
+    private String cpf = "123.456.789-00";
     private String telefone = "(11) 99999-1234";
-    private final String email = "cliente@gmail.com";
+    private String email = "cliente@gmail.com";
 
-    private final String enderecoCasa =
+    private String enderecoCasa =
             "Rua das Flores, 234";
 
-    private final String enderecoTrabalho =
+    private String enderecoTrabalho =
             "Av. Paulista, 1578";
 
     public PerfilClienteFragment() {
@@ -79,6 +79,7 @@ public class PerfilClienteFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         iniciarComponentes(view);
+        carregarDados();
         configurarEventos();
         configurarBotaoVoltar();
         atualizarTela();
@@ -185,29 +186,11 @@ public class PerfilClienteFragment extends Fragment {
         rowEmail.setOnClickListener(abrirEdicao);
         rowSenha.setOnClickListener(abrirEdicao);
 
-        rowEnderecoCasa.setOnClickListener(view ->
-                Toast.makeText(
-                        requireContext(),
-                        "Edição de endereço será conectada ao banco depois.",
-                        Toast.LENGTH_SHORT
-                ).show()
-        );
+        rowEnderecoCasa.setOnClickListener(view -> editarEndereco());
 
-        rowEnderecoTrabalho.setOnClickListener(view ->
-                Toast.makeText(
-                        requireContext(),
-                        "Edição de endereço será conectada ao banco depois.",
-                        Toast.LENGTH_SHORT
-                ).show()
-        );
+        rowEnderecoTrabalho.setOnClickListener(view -> editarEndereco());
 
-        rowAdicionarEndereco.setOnClickListener(view ->
-                Toast.makeText(
-                        requireContext(),
-                        "Adicionar endereço será conectado ao banco depois.",
-                        Toast.LENGTH_SHORT
-                ).show()
-        );
+        rowAdicionarEndereco.setOnClickListener(view -> editarEndereco());
 
         btnFotoPerfil.setOnClickListener(view ->
                 Toast.makeText(
@@ -249,6 +232,36 @@ public class PerfilClienteFragment extends Fragment {
                 );
     }
 
+    private void carregarDados() {
+        org.json.JSONObject profile = new ProfileRepository(requireContext().getSharedPreferences("coletai", android.content.Context.MODE_PRIVATE)).current();
+        nome = profile.optString("name"); telefone = profile.optString("phone");
+        cpf = profile.optString("document"); email = profile.optString("email");
+        enderecoCasa = profile.optString("address");
+        if (enderecoCasa.isEmpty()) enderecoCasa = getString(R.string.admin_no_value);
+        rowEnderecoTrabalho.setVisibility(View.GONE);
+    }
+
+    @Override public void onResume() {
+        super.onResume();
+        if (getView() != null) { carregarDados(); atualizarTela(); }
+    }
+
+    private void editarEndereco() {
+        ProfileRepository repository = new ProfileRepository(requireContext().getSharedPreferences("coletai", android.content.Context.MODE_PRIVATE));
+        org.json.JSONObject profile = repository.current();
+        EditText input = new EditText(requireContext()); input.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_POSTAL_ADDRESS);
+        input.setHint(R.string.admin_address); input.setText(profile.optString("address"));
+        androidx.appcompat.app.AlertDialog dialog = new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.admin_address).setView(input).setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(R.string.admin_save, null).create();
+        dialog.setOnShowListener(d -> dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            LocalJson.put(profile, "address", input.getText().toString().trim());
+            try { repository.save(profile, false); carregarDados(); atualizarTela(); dialog.dismiss(); }
+            catch (RuntimeException e) { input.setError(e.getMessage()); }
+        }));
+        dialog.show();
+    }
+
     private void atualizarTela() {
 
         txtNomeCabecalho.setText(nome);
@@ -284,7 +297,7 @@ public class PerfilClienteFragment extends Fragment {
         if (partes.length == 1) {
             return partes[0]
                     .substring(0, 1)
-                    .toUpperCase();
+                    .toUpperCase(java.util.Locale.getDefault());
         }
 
         String primeira =
@@ -296,7 +309,7 @@ public class PerfilClienteFragment extends Fragment {
                         .substring(0, 1);
 
         return (primeira + ultima)
-                .toUpperCase();
+                .toUpperCase(java.util.Locale.getDefault());
     }
 
     private void abrirEdicao() {
@@ -368,8 +381,13 @@ public class PerfilClienteFragment extends Fragment {
             return;
         }
 
-        nome = novoNome;
-        telefone = novoTelefone;
+        ProfileRepository repository = new ProfileRepository(requireContext().getSharedPreferences("coletai", android.content.Context.MODE_PRIVATE));
+        org.json.JSONObject profile = repository.current();
+        LocalJson.put(profile, "name", novoNome);
+        LocalJson.put(profile, "phone", novoTelefone);
+        try { repository.save(profile, false); }
+        catch (RuntimeException e) { Toast.makeText(requireContext(), e.getMessage(), Toast.LENGTH_LONG).show(); return; }
+        carregarDados();
 
         atualizarTela();
         fecharEdicao();
@@ -382,6 +400,7 @@ public class PerfilClienteFragment extends Fragment {
     }
 
     private void sairDaConta() {
+        LocalJson.commit(PlatformStore.open(requireContext()).edit().remove("logged_in_account"));
 
         Intent intent =
                 new Intent(

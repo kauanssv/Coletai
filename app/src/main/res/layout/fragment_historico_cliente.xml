@@ -27,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:letterSpacing="0.08"
-            android:text="SEUS DESCARTES"
+            android:text="@string/texto_seus_descartes"
             android:textColor="@color/brand_700"
             android:textSize="11sp"
             android:textStyle="bold" />
@@ -36,7 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Histórico"
+            android:text="@string/texto_historico"
             android:textColor="@color/ink_900"
             android:textSize="28sp"
             android:textStyle="bold" />
@@ -64,7 +64,7 @@
                     android:minWidth="76dp"
                     android:paddingStart="18dp"
                     android:paddingEnd="18dp"
-                    android:text="Todos"
+                    android:text="@string/texto_todos"
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
@@ -79,7 +79,7 @@
                     android:minWidth="100dp"
                     android:paddingStart="18dp"
                     android:paddingEnd="18dp"
-                    android:text="Concluídos"
+                    android:text="@string/texto_concluidos"
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
@@ -94,7 +94,7 @@
                     android:minWidth="100dp"
                     android:paddingStart="18dp"
                     android:paddingEnd="18dp"
-                    android:text="Cancelados"
+                    android:text="@string/texto_cancelados"
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
@@ -135,7 +135,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="220dp"
                 android:gravity="center"
-                android:text="Nenhum pedido encontrado"
+                android:text="@string/texto_nenhum_pedido_encontrado"
                 android:textColor="@color/ink_500"
                 android:textSize="14sp"
                 android:visibility="gone" />
@@ -169,7 +169,7 @@
             <ImageView
                 android:layout_width="25dp"
                 android:layout_height="25dp"
-                android:contentDescription="Início"
+                android:contentDescription="@string/texto_inicio"
                 android:src="@drawable/ic_home"
                 app:tint="@color/ink_400" />
 
@@ -177,7 +177,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Início"
+                android:text="@string/texto_inicio"
                 android:textColor="@color/ink_500"
                 android:textSize="11sp" />
 
@@ -196,7 +196,7 @@
             <ImageView
                 android:layout_width="25dp"
                 android:layout_height="25dp"
-                android:contentDescription="Histórico"
+                android:contentDescription="@string/texto_historico"
                 android:src="@drawable/ic_history"
                 app:tint="@color/brand_700" />
 
@@ -204,7 +204,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Histórico"
+                android:text="@string/texto_historico"
                 android:textColor="@color/brand_700"
                 android:textSize="11sp"
                 android:textStyle="bold" />
@@ -224,7 +224,7 @@
             <ImageView
                 android:layout_width="25dp"
                 android:layout_height="25dp"
-                android:contentDescription="Perfil"
+                android:contentDescription="@string/texto_perfil"
                 android:src="@drawable/ic_person"
                 app:tint="@color/ink_400" />
 
@@ -232,7 +232,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Perfil"
+                android:text="@string/texto_perfil"
                 android:textColor="@color/ink_500"
                 android:textSize="11sp" />
 

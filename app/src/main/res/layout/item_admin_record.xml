@@ -1,0 +1,10 @@
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="10dp"
+    android:clickable="true" android:focusable="true" app:cardBackgroundColor="@color/admin_surface" app:cardCornerRadius="14dp" app:strokeColor="@color/admin_line" app:strokeWidth="1dp">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="12dp" android:orientation="vertical">
+        <TextView android:id="@+id/adminRowStatus" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="12sp" android:textStyle="bold" android:textColor="@color/admin_primary" />
+        <TextView android:id="@+id/adminRowTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="16sp" android:textStyle="bold" android:textColor="@color/admin_ink" android:maxLines="2" android:ellipsize="end" />
+        <TextView android:id="@+id/adminRowSubtitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:textSize="13sp" android:textColor="@color/admin_muted" android:maxLines="2" android:ellipsize="end" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

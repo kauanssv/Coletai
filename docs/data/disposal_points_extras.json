@@ -1,0 +1,147 @@
+[
+  {
+    "id": "sp-sucata-digital-matriz",
+    "name": "Sucata Digital - Matriz Vila Formosa",
+    "latitude": -23.5654215,
+    "longitude": -46.5571988,
+    "address": "Rua Templários, 192 - Vila Formosa, São Paulo - SP",
+    "category": "special",
+    "materials": [
+      "Eletrônicos"
+    ],
+    "public": true,
+    "hours": "Segunda a quinta: 08h–18h; sexta: 08h–17h",
+    "source": "https://sucatadigital.com.br/ponto-de-descarte/",
+    "source_label": "Sucata Digital",
+    "coordinate_source": "https://goo.gl/maps/evg8LVRdhi47iKUn8",
+    "verified_on": "2026-10-31",
+    "notes": "Ponto de recebimento de lixo eletrônico divulgado pela operadora. Confirme o recebimento dos equipamentos antes de levar grandes volumes."
+  },
+  {
+    "id": "sp-sucata-shopping-patio-paulista",
+    "name": "Shopping Pátio Paulista - Sucata Digital",
+    "address": "Rua Treze de Maio, 1947 - Bela Vista, São Paulo - SP",
+    "latitude": -23.570483,
+    "longitude": -46.643549,
+    "category": "special",
+    "materials": [
+      "Eletrônicos"
+    ],
+    "public": true,
+    "hours": "Todos os dias: 10h–20h",
+    "notes": "Somente itens pequenos. Coletor no piso G1, descendo a escada da DAISO; consulte o shopping para volumes maiores.",
+    "source": "https://sucatadigital.com.br/ponto-de-descarte/",
+    "source_label": "Sucata Digital",
+    "coordinate_source": "https://www.google.com/maps/d/viewer?mid=1kDydUMGvcK4ARHldsvhAc-U2ZdmDoXU4",
+    "verified_on": "2026-10-31"
+  },
+  {
+    "id": "sp-sucata-parque-luis-carlos-prestes",
+    "name": "Parque Luís Carlos Prestes - Sucata Digital",
+    "address": "Rua João Della Manna, 665 - Jardim Rolinópolis, São Paulo - SP",
+    "latitude": -23.583892,
+    "longitude": -46.729839,
+    "category": "special",
+    "materials": [
+      "Eletrônicos"
+    ],
+    "public": true,
+    "hours": "Segunda a sexta: 08h–17h",
+    "notes": "Coletor de eletrônicos divulgado pela operadora.",
+    "source": "https://sucatadigital.com.br/ponto-de-descarte/",
+    "source_label": "Sucata Digital",
+    "coordinate_source": "https://www.google.com/maps/d/viewer?mid=1kDydUMGvcK4ARHldsvhAc-U2ZdmDoXU4",
+    "verified_on": "2026-10-31"
+  },
+  {
+    "id": "sp-sucata-condominio-crystal-tower",
+    "name": "Crystal Tower - Sucata Digital",
+    "address": "Rua Lydia Ferrari Magnoli, 108 - Jardim Avelino, São Paulo - SP",
+    "latitude": -23.586618,
+    "longitude": -46.57248,
+    "category": "special",
+    "materials": [
+      "Eletrônicos"
+    ],
+    "public": true,
+    "hours": "Segunda a sexta: 09h–17h",
+    "notes": "Informe-se na recepção sobre o acesso ao coletor.",
+    "source": "https://sucatadigital.com.br/ponto-de-descarte/",
+    "source_label": "Sucata Digital",
+    "coordinate_source": "https://www.google.com/maps/d/viewer?mid=1kDydUMGvcK4ARHldsvhAc-U2ZdmDoXU4",
+    "verified_on": "2026-10-31"
+  },
+  {
+    "id": "sp-sucata-condominio-villa-lobos-office-park",
+    "name": "Villa Lobos Office Park - Sucata Digital",
+    "address": "Avenida Queiroz Filho, 1700 - Vila Hamburguesa, São Paulo - SP",
+    "latitude": -23.543629,
+    "longitude": -46.733194,
+    "category": "special",
+    "materials": [
+      "Eletrônicos"
+    ],
+    "public": true,
+    "hours": "Atendimento informado: 24 horas",
+    "notes": "Informe-se na recepção sobre o acesso ao coletor.",
+    "source": "https://sucatadigital.com.br/ponto-de-descarte/",
+    "source_label": "Sucata Digital",
+    "coordinate_source": "https://www.google.com/maps/d/viewer?mid=1kDydUMGvcK4ARHldsvhAc-U2ZdmDoXU4",
+    "verified_on": "2026-10-31"
+  },
+  {
+    "id": "sp-sucata-r-tabajaras-439",
+    "name": "Amplifique Coworking - Sucata Digital",
+    "address": "Rua Tabajaras, 439 - Mooca, São Paulo - SP",
+    "latitude": -23.564454,
+    "longitude": -46.59995,
+    "category": "special",
+    "materials": [
+      "Eletrônicos"
+    ],
+    "public": true,
+    "hours": "Segunda a sexta: 08h–18h",
+    "notes": "Ponto de coleta de eletrônicos divulgado pela operadora.",
+    "source": "https://sucatadigital.com.br/ponto-de-descarte/",
+    "source_label": "Sucata Digital",
+    "coordinate_source": "https://www.google.com/maps/d/viewer?mid=1kDydUMGvcK4ARHldsvhAc-U2ZdmDoXU4",
+    "verified_on": "2026-10-31"
+  },
+  {
+    "id": "sp-analia-franco-pilhas",
+    "name": "Shopping Anália Franco - coleta de pilhas e baterias",
+    "address": "Avenida Regente Feijó, 1739 - Jardim Anália Franco, São Paulo - SP",
+    "latitude": -23.5614832,
+    "longitude": -46.560666,
+    "category": "special",
+    "materials": [
+      "Pilhas e baterias"
+    ],
+    "public": true,
+    "hours": "Consulte o horário de funcionamento do shopping",
+    "notes": "Caixas de coleta no Piso Tulipa, corredor ao lado da loja Khelf. O ponto do mapa identifica o shopping; localize o coletor no interior.",
+    "source": "https://www.shoppinganaliafranco.com.br/o-shopping/multiplique-o-bem/",
+    "source_label": "Shopping Anália Franco",
+    "coordinate_source": "https://www.google.com/maps/place/Shopping+An%C3%A1lia+Franco/data=!4m2!3m1!1s0x94ce5e820dde705d:0x5d9ada76950fa481",
+    "verified_on": "2026-10-31"
+  },
+  {
+    "id": "sp-drogasil-celso-4076",
+    "name": "Drogasil Tatuapé - descarte de medicamentos",
+    "address": "Avenida Celso Garcia, 4076 - Tatuapé, São Paulo - SP",
+    "latitude": -23.5359515,
+    "longitude": -46.5729477,
+    "category": "medicine",
+    "materials": [
+      "Medicamentos"
+    ],
+    "public": true,
+    "hours": "Consulte o horário da unidade",
+    "source": "https://www.logmed.org.br/arquivos/atuais/pontos-de-descarte-21-10-2024.pdf",
+    "source_label": "LogMed / Drogasil",
+    "coordinate_source": "https://www.benditoguia.com.br/empresa/drogasil-tatuape-sao-paulo",
+    "verified_on": "2026-10-31",
+    "notes": "Unidade identificada na lista LogMed e na divulgação da Drogasil para o Tatuapé. Confirme o coletor na loja; não use o coletor comum de medicamentos para agulhas soltas ou outros resíduos.",
+    "additional_source": "https://www.drogasil.com.br/blog/saude/medicamentos/como-descartar-corretamente-suas-canetas-injetaveis"
+  }
+]

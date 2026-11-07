@@ -1,17 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F7F9F8">
-
-
-    <!-- =====================================================
-         MAPA
-         ===================================================== -->
-
+    android:background="@color/canvas">
     <FrameLayout
         android:id="@+id/areaMapa"
         android:layout_width="0dp"
@@ -20,598 +13,85 @@
         app:layout_constraintBottom_toTopOf="@id/painelOportunidades"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
-
-
-        <!-- MAPA JÁ UTILIZADO NO CLIENTE -->
-
         <ImageView
-            android:id="@+id/imgMapaAmbulante"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:contentDescription="Mapa da região"
+            android:contentDescription="@string/texto_mapa_ilustrativo"
             android:scaleType="centerCrop"
             android:src="@drawable/mapa_cliente_bg" />
-
-
-        <!-- =================================================
-             CONTROLES FLUTUANTES
-             ================================================= -->
-
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingStart="16dp"
-            android:paddingTop="10dp"
-            android:paddingEnd="16dp">
-
-
-            <!-- LOCALIZAÇÃO -->
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:background="@drawable/bg_floating_control"
-                android:elevation="4dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="13dp"
-                android:paddingEnd="14dp">
-
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:contentDescription="Localização"
-                    android:src="@drawable/ic_location_small"
-                    app:tint="@color/brand_700" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="7dp"
-                    android:text="Consolação, SP"
-                    android:textColor="@color/ink_900"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-
-            <!-- ESPAÇO -->
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1" />
-
-
-            <!-- DISPONIBILIDADE -->
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnDisponibilidade"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:minWidth="0dp"
-                android:paddingStart="15dp"
-                android:paddingEnd="15dp"
-                android:text="●  Disponível"
-                android:textAllCaps="false"
-                android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                app:backgroundTint="@color/brand_700"
-                app:cornerRadius="20dp" />
-
-        </LinearLayout>
-
+            android:layout_gravity="top|start"
+            android:layout_margin="16dp"
+            android:background="@drawable/bg_floating_control"
+            android:padding="12dp"
+            android:text="@string/texto_mapa_ilustrativo"
+            android:textColor="@color/ink_900"
+            android:textSize="12sp" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDisponibilidade"
+            android:gravity="center" android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_gravity="top|end"
+            android:layout_margin="16dp"
+            android:text="@string/disponivel"
+            android:textAllCaps="false"
+            app:cornerRadius="24dp" />
     </FrameLayout>
-
-
-
-    <!-- =====================================================
-         PAINEL DE OPORTUNIDADES
-         ===================================================== -->
-
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/painelOportunidades"
         android:layout_width="0dp"
-        android:layout_height="315dp"
+        android:layout_height="wrap_content"
+        android:minHeight="220dp"
         app:cardBackgroundColor="@android:color/white"
         app:cardCornerRadius="24dp"
         app:cardElevation="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
-
-
-        <androidx.core.widget.NestedScrollView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:fillViewport="true"
-            android:overScrollMode="never">
-
-
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/texto_solicitacoes_de_coleta"
+                android:textColor="@color/ink_900"
+                android:textSize="20sp"
+                android:textStyle="bold" />
             <LinearLayout
+                android:id="@+id/layoutPedidos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/txtPedidoRecebido"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="72dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_history_card"
+                    android:padding="16dp"
+                    android:text="@string/sem_pedidos"
+                    android:textColor="@color/ink_900"
+                    android:textSize="15sp" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/layoutIndisponivel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingBottom="16dp">
-
-
-                <!-- =================================================
-                     CABEÇALHO
-                     ================================================= -->
-
-                <LinearLayout
+                android:visibility="gone">
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingStart="20dp"
-                    android:paddingTop="17dp"
-                    android:paddingEnd="20dp"
-                    android:paddingBottom="12dp">
-
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:letterSpacing="0.08"
-                            android:text="OPORTUNIDADES NA REGIÃO"
-                            android:textColor="@color/brand_700"
-                            android:textSize="10sp"
-                            android:textStyle="bold" />
-
-
-                        <TextView
-                            android:id="@+id/txtQuantidadePedidos"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="4 pedidos próximos"
-                            android:textColor="@color/ink_900"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Na sua área de atuação"
-                            android:textColor="@color/ink_500"
-                            android:textSize="11sp" />
-
-                    </LinearLayout>
-
-
-                    <!-- ÍCONE DE PESQUISA -->
-
-                    <TextView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:gravity="center"
-                        android:text="⌕"
-                        android:textColor="#9CA3AF"
-                        android:textSize="24sp" />
-
-                </LinearLayout>
-
-
-
-                <!-- =====================================================
-                     ÁREA QUANDO ESTIVER INDISPONÍVEL
-                     ===================================================== -->
-
-                <LinearLayout
-                    android:id="@+id/layoutIndisponivel"
-                    android:layout_width="match_parent"
-                    android:layout_height="150dp"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:visibility="gone">
-
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Você está indisponível"
-                        android:textColor="#9CA3AF"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
-
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        android:text="Ative para receber solicitações"
-                        android:textColor="#9CA3AF"
-                        android:textSize="11sp" />
-
-                </LinearLayout>
-
-
-
-                <!-- =====================================================
-                     LISTA DE PEDIDOS
-                     ===================================================== -->
-
-                <LinearLayout
-                    android:id="@+id/layoutPedidos"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp">
-
-
-                    <!-- =================================================
-                         PEDIDO 1 - ELETRÔNICOS
-                         ================================================= -->
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardPedido1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        app:cardBackgroundColor="#F7F9F8"
-                        app:cardCornerRadius="18dp"
-                        app:cardElevation="0dp"
-                        app:strokeColor="#E5E7EB"
-                        app:strokeWidth="1dp">
-
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="14dp">
-
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center_vertical"
-                                android:orientation="horizontal">
-
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:background="#EEF2FF"
-                                    android:paddingStart="9dp"
-                                    android:paddingTop="5dp"
-                                    android:paddingEnd="9dp"
-                                    android:paddingBottom="5dp"
-                                    android:text="💻  Eletrônicos"
-                                    android:textColor="#4F46E5"
-                                    android:textSize="11sp"
-                                    android:textStyle="bold" />
-
-
-                                <View
-                                    android:layout_width="0dp"
-                                    android:layout_height="1dp"
-                                    android:layout_weight="1" />
-
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="📍 380 m"
-                                    android:textColor="#6B7280"
-                                    android:textSize="12sp"
-                                    android:textStyle="bold" />
-
-                            </LinearLayout>
-
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="7dp"
-                                android:maxLines="1"
-                                android:text="TV de tubo 29&quot; e um rádio antigo. Estão na garagem."
-                                android:textColor="#374151"
-                                android:textSize="12sp" />
-
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="3dp"
-                                android:text="Consolação, SP"
-                                android:textColor="#9CA3AF"
-                                android:textSize="11sp" />
-
-                        </LinearLayout>
-
-                    </com.google.android.material.card.MaterialCardView>
-
-
-
-                    <!-- =================================================
-                         PEDIDO 2 - MEDICAMENTOS
-                         ================================================= -->
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardPedido2"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        app:cardBackgroundColor="#F7F9F8"
-                        app:cardCornerRadius="18dp"
-                        app:cardElevation="0dp"
-                        app:strokeColor="#E5E7EB"
-                        app:strokeWidth="1dp">
-
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="14dp">
-
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center_vertical"
-                                android:orientation="horizontal">
-
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:background="#E0F2FE"
-                                    android:paddingStart="9dp"
-                                    android:paddingTop="5dp"
-                                    android:paddingEnd="9dp"
-                                    android:paddingBottom="5dp"
-                                    android:text="💊  Medicamentos"
-                                    android:textColor="#0891B2"
-                                    android:textSize="11sp"
-                                    android:textStyle="bold" />
-
-
-                                <View
-                                    android:layout_width="0dp"
-                                    android:layout_height="1dp"
-                                    android:layout_weight="1" />
-
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="📍 720 m"
-                                    android:textColor="#6B7280"
-                                    android:textSize="12sp"
-                                    android:textStyle="bold" />
-
-                            </LinearLayout>
-
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="7dp"
-                                android:maxLines="1"
-                                android:text="3 caixas de remédios vencidos e xaropes"
-                                android:textColor="#374151"
-                                android:textSize="12sp" />
-
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="3dp"
-                                android:text="Jardim Paulista, SP"
-                                android:textColor="#9CA3AF"
-                                android:textSize="11sp" />
-
-                        </LinearLayout>
-
-                    </com.google.android.material.card.MaterialCardView>
-
-
-
-                    <!-- =================================================
-                         PEDIDO 3 - PILHAS
-                         ================================================= -->
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardPedido3"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        app:cardBackgroundColor="#F7F9F8"
-                        app:cardCornerRadius="18dp"
-                        app:cardElevation="0dp"
-                        app:strokeColor="#E5E7EB"
-                        app:strokeWidth="1dp">
-
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="14dp">
-
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center_vertical"
-                                android:orientation="horizontal">
-
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:background="#FEF3C7"
-                                    android:paddingStart="9dp"
-                                    android:paddingTop="5dp"
-                                    android:paddingEnd="9dp"
-                                    android:paddingBottom="5dp"
-                                    android:text="🔋  Pilhas"
-                                    android:textColor="#D97706"
-                                    android:textSize="11sp"
-                                    android:textStyle="bold" />
-
-
-                                <View
-                                    android:layout_width="0dp"
-                                    android:layout_height="1dp"
-                                    android:layout_weight="1" />
-
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="📍 1,1 km"
-                                    android:textColor="#6B7280"
-                                    android:textSize="12sp"
-                                    android:textStyle="bold" />
-
-                            </LinearLayout>
-
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="7dp"
-                                android:maxLines="1"
-                                android:text="Pilhas e baterias de controles remotos e mouse"
-                                android:textColor="#374151"
-                                android:textSize="12sp" />
-
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="3dp"
-                                android:text="Cerqueira César, SP"
-                                android:textColor="#9CA3AF"
-                                android:textSize="11sp" />
-
-                        </LinearLayout>
-
-                    </com.google.android.material.card.MaterialCardView>
-
-
-
-                    <!-- =================================================
-                         PEDIDO 4 - BATERIAS
-                         ================================================= -->
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardPedido4"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        app:cardBackgroundColor="#F7F9F8"
-                        app:cardCornerRadius="18dp"
-                        app:cardElevation="0dp"
-                        app:strokeColor="#E5E7EB"
-                        app:strokeWidth="1dp">
-
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="14dp">
-
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center_vertical"
-                                android:orientation="horizontal">
-
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:background="#FEE2E2"
-                                    android:paddingStart="9dp"
-                                    android:paddingTop="5dp"
-                                    android:paddingEnd="9dp"
-                                    android:paddingBottom="5dp"
-                                    android:text="⚡  Baterias"
-                                    android:textColor="#DC2626"
-                                    android:textSize="11sp"
-                                    android:textStyle="bold" />
-
-
-                                <View
-                                    android:layout_width="0dp"
-                                    android:layout_height="1dp"
-                                    android:layout_weight="1" />
-
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="📍 1,5 km"
-                                    android:textColor="#6B7280"
-                                    android:textSize="12sp"
-                                    android:textStyle="bold" />
-
-                            </LinearLayout>
-
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="7dp"
-                                android:maxLines="1"
-                                android:text="Bateria de carro 60Ah e 2 baterias de nobreak"
-                                android:textColor="#374151"
-                                android:textSize="12sp" />
-
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="3dp"
-                                android:text="Jardim Paulista, SP"
-                                android:textColor="#9CA3AF"
-                                android:textSize="11sp" />
-
-                        </LinearLayout>
-
-                    </com.google.android.material.card.MaterialCardView>
-
-
-                </LinearLayout>
-
+                    android:paddingTop="24dp"
+                    android:text="@string/texto_ative_sua_disponibilidade_para_consultar_os_p"
+                    android:textSize="15sp" />
             </LinearLayout>
-
-        </androidx.core.widget.NestedScrollView>
-
+        </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

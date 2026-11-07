@@ -1,0 +1,40 @@
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: coletai
+      MYSQL_USER: coletai
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Defina MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Defina MYSQL_ROOT_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+  api:
+    build: .
+    restart: unless-stopped
+    environment:
+      COLETAI_DATABASE_URL: mysql+pymysql://coletai:${MYSQL_PASSWORD}@mysql/coletai?charset=utf8mb4
+    depends_on:
+      mysql:
+        condition: service_healthy
+  https:
+    image: caddy:2
+    restart: unless-stopped
+    environment:
+      COLETAI_HOST: ${COLETAI_HOST:?Defina o domínio HTTPS}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+    depends_on:
+      - api
+volumes:
+  mysql_data:
+  caddy_data:

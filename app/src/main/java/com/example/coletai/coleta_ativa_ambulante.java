@@ -17,7 +17,8 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.button.MaterialButton;
 
-public class coleta_ativa_ambulante extends AppCompatActivity {
+public class coleta_ativa_ambulante extends PedidoActivity {
+    @Override protected boolean aceitaStatus(String status) { return "active".equals(status) || "done".equals(status); }
 
     private View layoutColetaAtiva;
     private View layoutFinalizada;
@@ -42,7 +43,6 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
 
     private String etapaAtual;
 
-
     @Override
     protected void onCreate(
             Bundle savedInstanceState
@@ -52,21 +52,17 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
                 savedInstanceState
         );
 
-
         EdgeToEdge.enable(
                 this
         );
-
 
         setContentView(
                 R.layout.activity_coleta_ativa_ambulante
         );
 
-
         configurarBarras();
 
         iniciarComponentes();
-
 
         preferencias =
                 getSharedPreferences(
@@ -74,14 +70,12 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
                         Context.MODE_PRIVATE
                 );
 
-
         carregarDados();
 
         carregarEtapa();
 
         configurarEventos();
     }
-
 
     // =====================================================
     // BARRAS
@@ -100,7 +94,6 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
                                     WindowInsetsCompat.Type.systemBars()
                             );
 
-
                     view.setPadding(
                             systemBars.left,
                             systemBars.top,
@@ -108,12 +101,10 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
                             systemBars.bottom
                     );
 
-
                     return insets;
                 }
         );
     }
-
 
     // =====================================================
     // COMPONENTES
@@ -126,79 +117,66 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
                         R.id.layoutColetaAtiva
                 );
 
-
         layoutFinalizada =
                 findViewById(
                         R.id.layoutFinalizada
                 );
-
 
         btnVoltar =
                 findViewById(
                         R.id.btnVoltar
                 );
 
-
         txtEnderecoCompleto =
                 findViewById(
                         R.id.txtEnderecoCompleto
                 );
-
 
         txtRegiao =
                 findViewById(
                         R.id.txtRegiao
                 );
 
-
         txtObservacao =
                 findViewById(
                         R.id.txtObservacao
                 );
-
 
         txtEmoji =
                 findViewById(
                         R.id.txtEmoji
                 );
 
-
         txtTipoPeso =
                 findViewById(
                         R.id.txtTipoPeso
                 );
-
 
         txtDescricao =
                 findViewById(
                         R.id.txtDescricao
                 );
 
-
         txtValor =
                 findViewById(
                         R.id.txtValor
                 );
-
 
         txtValorFinal =
                 findViewById(
                         R.id.txtValorFinal
                 );
 
-
         btnAcaoColeta =
                 findViewById(
                         R.id.btnAcaoColeta
                 );
-
 
         btnVoltarInicio =
                 findViewById(
                         R.id.btnVoltarInicio
                 );
     }
-
 
     // =====================================================
     // CARREGAR DADOS
@@ -212,13 +190,11 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
                         "Localização atual do cliente"
                 );
 
-
         String regiao =
                 preferencias.getString(
                         "pedido_regiao",
                         "Consolação"
                 );
-
 
         String cidade =
                 preferencias.getString(
@@ -226,13 +202,11 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
                         "São Paulo"
                 );
 
-
         String observacao =
                 preferencias.getString(
                         "pedido_observacao",
                         ""
                 );
-
 
         String tipo =
                 preferencias.getString(
@@ -240,13 +214,11 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
                         "Outros"
                 );
 
-
         String emoji =
                 preferencias.getString(
                         "pedido_emoji",
                         "📦"
                 );
-
 
         String peso =
                 preferencias.getString(
@@ -254,13 +226,11 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
                         ""
                 );
 
-
         String descricao =
                 preferencias.getString(
                         "pedido_descricao",
                         ""
                 );
-
 
         String preco =
                 preferencias.getString(
@@ -268,21 +238,13 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
                         "0,00"
                 );
 
-
         // ENDEREÇO
 
         txtEnderecoCompleto.setText(
                 endereco
         );
 
-
-        txtRegiao.setText(
-                regiao
-                        + ", "
-                        + cidade
-                        + " — SP"
-        );
-
+        txtRegiao.setText(endereco);
 
         // OBSERVAÇÃO
 
@@ -303,13 +265,11 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
                     View.VISIBLE
             );
 
-
             txtObservacao.setText(
                     "💬 "
                             + observacao
             );
         }
-
 
         // PEDIDO
 
@@ -317,18 +277,15 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
                 emoji
         );
 
-
         txtTipoPeso.setText(
                 tipo
                         + " · "
                         + peso
         );
 
-
         txtDescricao.setText(
                 descricao
         );
-
 
         // VALOR
 
@@ -337,13 +294,11 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
                         + preco
         );
 
-
         txtValorFinal.setText(
                 "R$ "
                         + preco
         );
     }
-
 
     // =====================================================
     // CARREGAR ETAPA
@@ -357,13 +312,11 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
                         ""
                 );
 
-
         etapaAtual =
                 preferencias.getString(
                         "coleta_etapa",
                         "ready"
                 );
-
 
         if (
                 etapaAtual == null
@@ -373,7 +326,6 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
             etapaAtual =
                     "ready";
         }
-
 
         /*
          * PROTEÇÃO IMPORTANTE:
@@ -397,7 +349,6 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
             etapaAtual =
                     "ready";
 
-
             preferencias
                     .edit()
 
@@ -409,10 +360,8 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
                     .apply();
         }
 
-
         atualizarTela();
     }
-
 
     // =====================================================
     // EVENTOS
@@ -424,23 +373,21 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
                 view -> finish()
         );
 
-
         btnAcaoColeta.setOnClickListener(
                 view -> avancarEtapa()
         );
-
 
         btnVoltarInicio.setOnClickListener(
                 view -> finish()
         );
     }
 
-
     // =====================================================
     // AVANÇAR ETAPA
     // =====================================================
 
     private void avancarEtapa() {
+        if (!verificarPedido() || !"active".equals(preferencias.getString("pedido_status", ""))) return;
 
         switch (etapaAtual) {
 
@@ -453,7 +400,6 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
                 etapaAtual =
                         "going";
 
-
                 preferencias
                         .edit()
 
@@ -464,18 +410,15 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
 
                         .apply();
 
-
                 Toast.makeText(
                         this,
                         "Deslocamento iniciado",
                         Toast.LENGTH_SHORT
                 ).show();
 
-
                 atualizarTela();
 
                 break;
-
 
             // =============================================
             // GOING -> COLLECTING
@@ -485,7 +428,6 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
 
                 etapaAtual =
                         "collecting";
-
 
                 preferencias
                         .edit()
@@ -497,18 +439,15 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
 
                         .apply();
 
-
                 Toast.makeText(
                         this,
                         "Você chegou ao local",
                         Toast.LENGTH_SHORT
                 ).show();
 
-
                 atualizarTela();
 
                 break;
-
 
             // =============================================
             // COLLECTING -> DONE
@@ -521,7 +460,6 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
                 break;
         }
     }
-
 
     // =====================================================
     // ATUALIZAR TELA
@@ -540,16 +478,13 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
             return;
         }
 
-
         layoutColetaAtiva.setVisibility(
                 View.VISIBLE
         );
 
-
         layoutFinalizada.setVisibility(
                 View.GONE
         );
-
 
         switch (etapaAtual) {
 
@@ -559,10 +494,7 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
 
             case "ready":
 
-                btnAcaoColeta.setText(
-                        "🚚  Iniciar deslocamento"
-                );
-
+                btnAcaoColeta.setText(R.string.texto_iniciar_deslocamento);
 
                 btnAcaoColeta.setBackgroundTintList(
                         ColorStateList.valueOf(
@@ -574,17 +506,13 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
 
                 break;
 
-
             // =============================================
             // CHEGUEI
             // =============================================
 
             case "going":
 
-                btnAcaoColeta.setText(
-                        "📍  Cheguei no local"
-                );
-
+                btnAcaoColeta.setText(R.string.texto_cheguei_no_local);
 
                 btnAcaoColeta.setBackgroundTintList(
                         ColorStateList.valueOf(
@@ -596,17 +524,13 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
 
                 break;
 
-
             // =============================================
             // FINALIZAR
             // =============================================
 
             case "collecting":
 
-                btnAcaoColeta.setText(
-                        "✓  Finalizar coleta"
-                );
-
+                btnAcaoColeta.setText(R.string.texto_finalizar_coleta);
 
                 btnAcaoColeta.setBackgroundTintList(
                         ColorStateList.valueOf(
@@ -618,7 +542,6 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
 
                 break;
 
-
             // =============================================
             // QUALQUER ESTADO INVÁLIDO
             // =============================================
@@ -627,7 +550,6 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
 
                 etapaAtual =
                         "ready";
-
 
                 preferencias
                         .edit()
@@ -639,13 +561,11 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
 
                         .apply();
 
-
                 atualizarTela();
 
                 break;
         }
     }
-
 
     // =====================================================
     // FINALIZAR
@@ -656,25 +576,20 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
         etapaAtual =
                 "done";
 
-
         SharedPreferences.Editor editor =
                 preferencias.edit();
-
 
         editor.putString(
                 "pedido_status",
                 "done"
         );
 
-
         editor.putString(
                 "coleta_etapa",
                 "done"
         );
 
-
         editor.apply();
-
 
         Toast.makeText(
                 this,
@@ -682,10 +597,8 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
                 Toast.LENGTH_SHORT
         ).show();
 
-
         mostrarColetaFinalizada();
     }
-
 
     // =====================================================
     // FINALIZADA
@@ -696,7 +609,6 @@ public class coleta_ativa_ambulante extends AppCompatActivity {
         layoutColetaAtiva.setVisibility(
                 View.GONE
         );
-
 
         layoutFinalizada.setVisibility(
                 View.VISIBLE

@@ -1,0 +1,10 @@
+<resources>
+    <color name="admin_bg">@color/canvas</color>
+    <color name="admin_surface">#FFFFFF</color>
+    <color name="admin_navy">@color/brand_800</color>
+    <color name="admin_ink">@color/ink_900</color>
+    <color name="admin_muted">@color/ink_500</color>
+    <color name="admin_primary">@color/brand_700</color>
+    <color name="admin_tint">@color/brand_100</color>
+    <color name="admin_line">@color/line</color>
+</resources>
