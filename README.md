@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/img/logo.png" alt="Logo do Coletaí" width="220">
+<img src="app/src/main/res/drawable/logo_coletai.png" alt="Logo do Coletaí" width="220">
 
 # Coletaí
 
