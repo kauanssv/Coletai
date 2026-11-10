@@ -260,7 +260,7 @@ Roda os testes unitários e o lint, gera o APK debug e compila os testes instrum
 
 **Curso:** Análise e Desenvolvimento de Sistemas<br>
 **Universidade:** Universidade Cidade de São Paulo (UNICID)<br>
-**Orientação:** [PREENCHER]
+**Orientação:** Jadir Mendonça
 
 <br>
 
