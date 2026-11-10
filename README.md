@@ -20,10 +20,13 @@ Aplicativo Android que conecta quem precisa descartar resíduos a ambulantes e e
 
 <br>
 
+<!--
+Quando tiver os prints, suba em docs/img/ e apague as marcas de comentário desta faixa:
 <img src="docs/img/tela-cliente.png" width="170" alt="Tela do cliente">
 <img src="docs/img/tela-ambulante.png" width="170" alt="Tela do ambulante">
 <img src="docs/img/tela-empresa.png" width="170" alt="Tela da empresa">
 <img src="docs/img/tela-admin.png" width="170" alt="Painel administrativo">
+-->
 
 </div>
 
@@ -69,7 +72,7 @@ flowchart LR
     B --> C["Proposta<br/>valor + mensagem"]
     C --> D{"Cliente"}
     D -- "Aceita" --> E["Deslocamento"]
-    D -- "Recusa" --> F["Proposta recusada"]
+    D -- "Recusa" --> F["Pedido segue aberto"]
     E --> G["Coleta"]
     G --> H["Descarte"]
 ```
@@ -78,13 +81,73 @@ Detalhes em [`docs/FLUXO_PEDIDOS.md`](docs/FLUXO_PEDIDOS.md).
 
 ### Arquitetura
 
+O fluxo principal é **Android Java/XML → API HTTPS → MySQL**. Sem API configurada, o APK debug usa um ambiente local para demonstrar as regras.
+
 ```mermaid
-flowchart LR
-    A["App Android<br/>Java + XML"] -- "HTTPS" --> B["API"]
-    B --> C[("MySQL")]
-    A <-- "Bluetooth<br/>modo offline" --> D["Outro dispositivo"]
-    A --> E["Mapa local<br/>MapLibre Native"]
+flowchart TB
+    subgraph APP["App Android (Java + XML)"]
+        UI["Telas<br/>WorkspaceActivity, AdminActivity,<br/>LocationActivity e diálogos"]
+        REP["Regras e dados<br/>CollectionRepository, ProfileRepository,<br/>AdminRepository, AuditRepository"]
+        GW["PlatformGateway<br/>+ PlatformStore"]
+        BT["BluetoothPlatform<br/>+ BluetoothEngine"]
+        UI --> REP
+        REP --> GW
+    end
+    UI --> MAP["MapLibre Native<br/>MapTiler + OpenRouteService"]
+    GW -- "HTTPS" --> API["backend/api.py + models.py<br/>autorização, regras e transações"]
+    API --> DB[("MySQL")]
+    BT <-- "Bluetooth, sem servidor" --> PHONE["Outro celular"]
 ```
+
+> Visão em camadas simplificada. A descrição completa de cada classe está em [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md).
+
+### Componentes principais
+
+| Componente | Responsabilidade |
+|---|---|
+| `WorkspaceActivity` | Solicitações, histórico, avisos, cadastro e materiais atendidos |
+| `RequestFormDialog` | Data, endereço e materiais com peso individual |
+| `AddressEditorDialog` e `LocationActivity` | Endereços estruturados, coordenadas opcionais e mapa com MapLibre Native, MapTiler e OpenRouteService |
+| `CollectionRepository` | Regras de aceite direto, edição, cancelamento, reabertura, conclusão, avaliação e visibilidade |
+| `ProfileRepository` e `PasswordHashes` | Cadastros, situação do acesso e credenciais protegidas no ambiente local |
+| `PlatformGateway` | Login, estado autorizado e mutações via HTTPS, sem gravar localmente para mascarar falhas do servidor |
+| `PlatformStore` | Separa o ambiente local do cache autenticado remoto |
+| `PlatformTasks` | Autenticação e rede fora da UI, com controle de término e sincronização dos testes |
+| `AdminActivity` e `AdminRepository` | Cadastros, cooperativas, solicitações, catálogo e informações da plataforma |
+| `AuditRepository` | Autor, data e cópias antes e depois, inclusive para exclusões lógicas |
+| `backend/api.py` e `backend/models.py` | Autorização, regras e transações MySQL no servidor |
+
+### Regras de negócio
+
+```mermaid
+stateDiagram-v2
+    [*] --> aberta
+    aberta --> aceita: coletor aceita
+    aceita --> a_caminho: deslocamento
+    a_caminho --> concluida: coleta e descarte
+    aceita --> aberta: responsável desiste
+    concluida --> [*]
+```
+
+- O cidadão pode cancelar o pedido, que então encerra como `cancelada`.
+- A desistência do responsável volta o pedido para `aberta` e remove a atribuição.
+- Recusar uma proposta não encerra a solicitação.
+- Só o cidadão dono edita o pedido, e apenas enquanto ele está aberto.
+- O servidor valida essas regras independentemente do cliente.
+- A avaliação é única por solicitação concluída.
+- Cada usuário acessa só os registros autorizados. Administradores consultam também os excluídos.
+
+### Decisões técnicas
+
+- **Snapshot do endereço:** o endereço fica copiado no pedido, então atualizar o cadastro não altera pedidos antigos.
+- **Auditoria:** toda mudança guarda autor, data e cópias antes e depois, inclusive nas exclusões lógicas.
+- **Sem mascarar falhas:** o `PlatformGateway` não grava localmente quando o servidor falha.
+- **Modo offline separado:** `BluetoothPlatform` e `BluetoothEngine` executam as mesmas operações entre celulares sem servidor HTTPS, separados do protocolo legado. Veja [`docs/BLUETOOTH_OFFLINE.md`](docs/BLUETOOTH_OFFLINE.md).
+- **Compatibilidade:** `PedidoRepository`, `EventStore`, `BluetoothColetai` e as telas antigas continuam no projeto, e o ambiente local pode migrar os registros antigos de cidadãos.
+
+### Limites da execução
+
+Não foram fornecidos domínio HTTPS, credenciais MySQL nem chaves do MapTiler e do OpenRouteService. Por isso, os testes de API rodam em uma base SQLite isolada, e o DDL também é compilado para MySQL. A implantação e a integração real com o servidor dependem dessas configurações. Veja [`docs/CONFORMIDADE_1_4.md`](docs/CONFORMIDADE_1_4.md).
 
 Mais em [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md), [`docs/MAPAS.md`](docs/MAPAS.md) e [`backend/README.md`](backend/README.md).
 
