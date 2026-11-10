@@ -227,26 +227,26 @@ Roda os testes unitários e o lint, gera o APK debug e compila os testes instrum
 <table>
   <tr>
     <td align="center">
-      <a href="https://github.com/PREENCHER">
-        <img src="https://github.com/PREENCHER.png" width="100" alt="Kauan de Souza dos Santos Vieira"><br>
+      <a href="https://github.com/kauanssv">
+        <img src="https://github.com/kauanssv.png" width="200" alt="Kauan de Souza dos Santos Vieira"><br>
         <sub><b>Kauan de Souza<br>dos Santos Vieira</b></sub>
       </a>
     </td>
     <td align="center">
       <a href="https://github.com/lwkaue">
-        <img src="https://github.com/lwkaue.png" width="100" alt="Kauê Sousa Miranda"><br>
+        <img src="https://github.com/lwkaue.png" width="200" alt="Kauê Sousa Miranda"><br>
         <sub><b>Kauê Sousa<br>Miranda</b></sub>
       </a>
     </td>
     <td align="center">
-      <a href="https://github.com/PREENCHER">
-        <img src="https://github.com/PREENCHER.png" width="100" alt="Keven Sousa Miranda"><br>
+      <a href="https://github.com/knkzz1">
+        <img src="https://github.com/knkzz1.png" width="200" alt="Keven Sousa Miranda"><br>
         <sub><b>Keven Sousa<br>Miranda</b></sub>
       </a>
     </td>
     <td align="center">
-      <a href="https://github.com/PREENCHER">
-        <img src="https://github.com/PREENCHER.png" width="100" alt="Thiago Cavalcante Guimarães"><br>
+      <a href="https://github.com/ThiagoCavalcantt">
+        <img src="https://github.com/ThiagoCavalcantt.png" width="200" alt="Thiago Cavalcante Guimarães"><br>
         <sub><b>Thiago Cavalcante<br>Guimarães</b></sub>
       </a>
     </td>
@@ -260,7 +260,7 @@ Roda os testes unitários e o lint, gera o APK debug e compila os testes instrum
 
 **Curso:** Análise e Desenvolvimento de Sistemas<br>
 **Universidade:** Universidade Cidade de São Paulo (UNICID)<br>
-**Orientação:** Jadir Mendonça
+**Orientação:** [PREENCHER]
 
 <br>
 
