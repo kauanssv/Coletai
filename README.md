@@ -1,8 +1,9 @@
+# Coletaí
 <div align="center">
 
 <img src="app/src/main/res/drawable/logo_coletai.png" alt="Logo do Coletaí" width="220">
 
-# Coletaí
+
 
 **Juntos por uma sociedade mais saudável.**<br>
 Aplicativo Android que conecta quem precisa descartar resíduos a ambulantes e empresas que fazem a coleta. Um "delivery reverso" para pilhas, baterias, eletrônicos, seringas, óleo e mais.
