@@ -33,8 +33,8 @@ Aplicativo Android que conecta quem precisa descartar resíduos a ambulantes e e
 
 <br>
 
-<details open>
-<summary><b>📱 Todas as telas por perfil</b></summary>
+<details>
+<summary><b> Todas as telas</b></summary>
 
 <br>
 
