@@ -15,10 +15,6 @@ Aplicativo Android que conecta quem precisa descartar resíduos a ambulantes e e
 <img alt="MapLibre" src="https://img.shields.io/badge/MapLibre-Native-4FAA84?style=for-the-badge">
 <img alt="MySQL" src="https://img.shields.io/badge/MySQL-API%20HTTPS-3C7168?style=for-the-badge&logo=mysql&logoColor=white">
 
-<br><br>
-
-
-
 </div>
 
 ---
@@ -34,7 +30,7 @@ Aplicativo Android que conecta quem precisa descartar resíduos a ambulantes e e
 <br>
 
 <details>
-<summary><b> Todas as telas</b></summary>
+<summary><b>Todas as telas</b></summary>
 
 <br>
 
@@ -202,7 +198,9 @@ Mais em [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md), [`docs/MAPAS.md`](docs/MAP
 | **XML** | Layouts das telas |
 | **Android Studio** | IDE e build |
 | **MapLibre Native** | Mapa local com pontos de descarte |
+| **Python** | API do backend |
 | **API HTTPS + MySQL** | Backend e banco de dados |
+| **Docker** | Execução do backend em contêiner |
 | **Bluetooth** | Comunicação offline entre dispositivos |
 | **Git e GitHub** | Versionamento e colaboração |
 
@@ -224,17 +222,46 @@ Mais em [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md), [`docs/MAPAS.md`](docs/MAP
 
 ## Como rodar
 
-**Pré-requisitos:** Android Studio com o SDK e o JDK indicados pelo Gradle, e um emulador ou celular Android.
+**Pré-requisitos:** Android Studio com o SDK e o JDK indicados pelo Gradle, e um emulador ou celular com **Android 7.0 (API 24) ou superior**.
 
 ```bash
-git clone [PREENCHER: link do repositório]
+git clone https://github.com/kauanssv/Coletai.git
 ```
 
 1. Abra a **pasta raiz** do projeto no Android Studio e espere o Gradle sincronizar.
-2. Configure o SDK local em `local.properties`.
+2. Confira se o `local.properties` aponta para o SDK do Android (o Android Studio cria esse arquivo sozinho).
 3. Rode o app no emulador ou no celular.
 
-Para a API e o banco, siga o [`backend/README.md`](backend/README.md).
+Sem nenhuma configuração extra, o app abre em **modo de demonstração**, com um ambiente local que simula as regras do sistema.
+
+### Configuração opcional
+
+Para ligar o app à API real e aos serviços de mapa e rota, defina as propriedades abaixo:
+
+| Propriedade | Para que serve | Onde definir |
+|---|---|---|
+| `COLETAI_API_BASE_URL` | Endereço da API HTTPS | `gradle.properties` ou `-PCOLETAI_API_BASE_URL=...` |
+| `COLETAI_MAPTILER_API_KEY` | Chave do MapTiler | `local.properties`, `gradle.properties` ou variável de ambiente |
+| `COLETAI_ORS_API_KEY` | Chave do OpenRouteService | `local.properties`, `gradle.properties` ou variável de ambiente |
+
+Exemplo de `local.properties`:
+
+```properties
+COLETAI_MAPTILER_API_KEY=sua_chave
+COLETAI_ORS_API_KEY=sua_chave
+```
+
+Exemplo de `gradle.properties`:
+
+```properties
+COLETAI_API_BASE_URL=https://seu-servidor
+```
+
+> Não publique chaves nem endereços de produção no repositório. O `local.properties` não deve ser versionado.
+
+### Backend
+
+A pasta [`backend/`](backend) reúne a API em Python (`api.py` e `models.py`), o esquema do banco (`schema.mysql.sql`), os arquivos para execução com Docker (`Dockerfile`, `compose.yaml` e `Caddyfile`) e um `.env.example` com as variáveis de ambiente. Para subir a API e o banco, siga o [`backend/README.md`](backend/README.md).
 
 ### Verificações e APK debug
 
@@ -304,12 +331,12 @@ Roda os testes unitários e o lint, gera o APK debug e compila os testes instrum
 
 **Universidade:** Universidade Cidade de São Paulo (UNICID)
 
-**Orientação:** [Jadir Mendonça]
+**Orientação:** Jadir Mendonça
 
 ---
 
 <div align="center">
 
-Desenvolvido pela equipe Coletaí 
+Desenvolvido pela equipe Coletaí · [Licença MIT](LICENSE)
 
 </div>
