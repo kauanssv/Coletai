@@ -1,4 +1,3 @@
-
 <div align="center">
 
 <img src="app/src/main/res/drawable/logo_coletai.png" alt="Logo do Coletaí" width="250">
@@ -24,13 +23,53 @@ Aplicativo Android que conecta quem precisa descartar resíduos a ambulantes e e
 
 ---
 
-## Screenshots do aplicativo
+## Telas do aplicativo
 
 <div align="center">
   <img src="screenshots/tela_inicial.png" width="32%" alt="Tela inicial do Coletaí">
   <img src="screenshots/tela_mapa.png" width="32%" alt="Mapa do Coletaí">
   <img src="screenshots/tela_pedido.png" width="32%" alt="Tela de pedido do Coletaí">
 </div>
+
+<br>
+
+<details open>
+<summary><b>📱 Todas as telas por perfil</b></summary>
+
+<br>
+
+### Cliente
+
+<div align="center">
+  <img src="screenshots/01-login.jpg" width="19%" alt="Tela de login">
+  <img src="screenshots/02-inicio-cliente.jpg" width="19%" alt="Área inicial do cliente">
+  <img src="screenshots/03-criar-solicitacao.jpg" width="19%" alt="Criação de solicitação">
+  <img src="screenshots/04-perfil-cliente.jpg" width="19%" alt="Perfil do cliente">
+  <img src="screenshots/07-historico-cliente.jpg" width="19%" alt="Histórico de coletas do cliente">
+</div>
+
+<p align="center"><sub>Login · Início · Nova solicitação · Perfil · Histórico</sub></p>
+
+### Coletor
+
+<div align="center">
+  <img src="screenshots/05-recebimento-solicitacao-coletor.jpg" width="19%" alt="Recebimento de solicitação">
+  <img src="screenshots/06-acompanhamento-descarte-coletor.jpg" width="19%" alt="Acompanhamento e confirmação do descarte">
+  <img src="screenshots/08-perfil-coletor.jpg" width="19%" alt="Perfil do coletor">
+</div>
+
+<p align="center"><sub>Recebimento de solicitação · Acompanhamento e descarte · Perfil</sub></p>
+
+### Administrador
+
+<div align="center">
+  <img src="screenshots/09-dashboard-admin.jpg" width="19%" alt="Dashboard do administrador">
+  <img src="screenshots/10-contas-admin.jpg" width="19%" alt="Lista de contas cadastradas">
+</div>
+
+<p align="center"><sub>Dashboard · Contas cadastradas</sub></p>
+
+</details>
 
 ---
 
@@ -265,12 +304,12 @@ Roda os testes unitários e o lint, gera o APK debug e compila os testes instrum
 
 **Universidade:** Universidade Cidade de São Paulo (UNICID)
 
-**Orientação:** [PREENCHER]
+**Orientação:** [Jadir Mendonça]
 
 ---
 
 <div align="center">
 
-Desenvolvido pela equipe Coletaí · [Licença](LICENSE)
+Desenvolvido pela equipe Coletaí 
 
 </div>
