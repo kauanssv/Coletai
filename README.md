@@ -1,10 +1,12 @@
+
 <div align="center">
 
-<img src="app/src/main/res/drawable/logo_coletai.png" alt="Logo do Coletaí" width="220">
+<img src="app/src/main/res/drawable/logo_coletai.png" alt="Logo do Coletaí" width="250">
 
 # Coletaí
 
-**Juntos por uma sociedade mais saudável.**<br>
+**Juntos por uma sociedade mais saudável.**
+
 Aplicativo Android que conecta quem precisa descartar resíduos a ambulantes e empresas que fazem a coleta. Um "delivery reverso" para pilhas, baterias, eletrônicos, seringas, óleo e mais.
 
 <br>
@@ -16,44 +18,44 @@ Aplicativo Android que conecta quem precisa descartar resíduos a ambulantes e e
 
 <br><br>
 
-[Sobre](#-sobre) · [Funcionalidades](#-funcionalidades) · [Como funciona](#-como-funciona) · [Como rodar](#-como-rodar) · [Documentação](#-documentação) · [Colaboradores](#-colaboradores)
 
-<br>
-
-<!--
-Quando tiver os prints, suba em docs/img/ e apague as marcas de comentário desta faixa:
-<img src="docs/img/tela-cliente.png" width="170" alt="Tela do cliente">
-<img src="docs/img/tela-ambulante.png" width="170" alt="Tela do ambulante">
-<img src="docs/img/tela-empresa.png" width="170" alt="Tela da empresa">
-<img src="docs/img/tela-admin.png" width="170" alt="Painel administrativo">
--->
 
 </div>
 
-<br>
+---
 
-## 🌱 Sobre
+## Screenshots do aplicativo
+
+<div align="center">
+  <img src="screenshots/tela_inicial.png" width="32%" alt="Tela inicial do Coletaí">
+  <img src="screenshots/tela_mapa.png" width="32%" alt="Mapa do Coletaí">
+  <img src="screenshots/tela_pedido.png" width="32%" alt="Tela de pedido do Coletaí">
+</div>
+
+---
+
+## Sobre
 
 Muita gente quer descartar certos resíduos do jeito certo, mas não sabe onde levar nem quem pode buscar. O Coletaí resolve isso com logística reversa: o cliente pede a coleta e um coletor, que pode ser ambulante ou empresa, se oferece para buscar o material com uma proposta de valor.
 
 > [!NOTE]
 > O MVP Android (Java) foi apresentado no **6º WECTI da UNICID**. Na validação por QR code, o app recebeu **15 avaliações com nota 10**.
 
-<br>
+---
 
-## ✨ Funcionalidades
+## Funcionalidades
 
-| 📦 Pedidos | 🤝 Propostas | 📍 Mapa e histórico |
+| Pedidos | Propostas | Mapa e histórico |
 |---|---|---|
 | Criação e acompanhamento de pedidos de coleta | Envio de proposta com valor e mensagem, com aceite ou recusa pelo cliente | Mapa local com pontos de descarte e histórico de pedidos e coletas |
 
-| 🚚 Etapas da coleta | 📡 Modo offline | 🛠️ Administração |
+| Etapas da coleta | Modo offline | Administração |
 |---|---|---|
 | Deslocamento, coleta e descarte acompanhados passo a passo | Comunicação entre dispositivos via Bluetooth para apresentar sem internet | Painel administrativo demonstrativo |
 
-<br>
+---
 
-## 👥 Perfis
+## Perfis
 
 | Perfil | O que faz |
 |---|---|
@@ -62,9 +64,9 @@ Muita gente quer descartar certos resíduos do jeito certo, mas não sabe onde l
 | **Empresa** | Atua como coletora, com o mesmo fluxo de propostas e coletas |
 | **Administrador** | Acompanha a operação pelo painel administrativo demonstrativo |
 
-<br>
+---
 
-## 🔄 Como funciona
+## Como funciona
 
 ```mermaid
 flowchart LR
@@ -151,9 +153,9 @@ Não foram fornecidos domínio HTTPS, credenciais MySQL nem chaves do MapTiler e
 
 Mais em [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md), [`docs/MAPAS.md`](docs/MAPAS.md) e [`backend/README.md`](backend/README.md).
 
-<br>
+---
 
-## 🧰 Tecnologias
+## Tecnologias
 
 | Tecnologia | Uso |
 |---|---|
@@ -165,22 +167,23 @@ Mais em [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md), [`docs/MAPAS.md`](docs/MAP
 | **Bluetooth** | Comunicação offline entre dispositivos |
 | **Git e GitHub** | Versionamento e colaboração |
 
-<br>
+---
 
-## 📁 Estrutura do repositório
+## Estrutura do repositório
 
 | Pasta ou arquivo | Conteúdo |
 |---|---|
 | [`app/`](app) | Código do app Android (Java e XML) |
 | [`backend/`](backend) | API e banco de dados |
-| [`docs/`](docs) | Documentação técnica e imagens do README (`docs/img/`) |
+| [`docs/`](docs) | Documentação técnica do projeto |
+| [`screenshots/`](screenshots) | Capturas de tela do aplicativo |
 | [`gradle/`](gradle) | Arquivos do Gradle Wrapper |
 | [`tools/`](tools) | Scripts Python: `build_disposal_catalog.py` (catálogo de descarte) e `build_offline_map.py` (mapa offline) |
 | [`LICENSE`](LICENSE) | Licença do projeto |
 
-<br>
+---
 
-## 🚀 Como rodar
+## Como rodar
 
 **Pré-requisitos:** Android Studio com o SDK e o JDK indicados pelo Gradle, e um emulador ou celular Android.
 
@@ -204,9 +207,9 @@ No PowerShell, na raiz do projeto:
 
 Roda os testes unitários e o lint, gera o APK debug e compila os testes instrumentados. O APK debug fica em `app/build/outputs/apk/debug/`.
 
-<br>
+---
 
-## 📚 Documentação
+## Documentação
 
 | Documento | Assunto |
 |---|---|
@@ -219,9 +222,9 @@ Roda os testes unitários e o lint, gera o APK debug e compila os testes instrum
 | [Apresentação offline por Bluetooth](docs/BLUETOOTH_OFFLINE.md) | Demonstração sem internet |
 | [Relatório de QA de 02/11/2026](docs/QA_2026-11-02.md) | Resultado dos testes |
 
-<br>
+---
 
-## 🤝 Colaboradores
+## Colaboradores
 
 <div align="center">
 <table>
@@ -254,18 +257,20 @@ Roda os testes unitários e o lint, gera o APK debug e compila os testes instrum
 </table>
 </div>
 
-<br>
+---
 
-## 🎓 Informações acadêmicas
+## Informações acadêmicas
 
-**Curso:** Análise e Desenvolvimento de Sistemas<br>
-**Universidade:** Universidade Cidade de São Paulo (UNICID)<br>
+**Curso:** Análise e Desenvolvimento de Sistemas
+
+**Universidade:** Universidade Cidade de São Paulo (UNICID)
+
 **Orientação:** [PREENCHER]
 
-<br>
+---
 
 <div align="center">
 
-Feito com 💚 pela equipe Coletaí · [Licença](LICENSE)
+Desenvolvido pela equipe Coletaí · [Licença](LICENSE)
 
 </div>
